@@ -1,0 +1,25 @@
+# --- python ---
+__pycache__/
+*.pyc
+
+# --- eval run artifacts: keep the real-run .jsonl + .meta.json; drop the rest ---
+# smoke runs (2 prompts each, throwaway)
+results/*__SMOKE.jsonl
+results/*__SMOKE.log
+results/*__SMOKE.meta.json
+# aborted / partial runs that were archived
+results/_aborted_*
+# my background-task console captures
+results/_*_console.log
+results/_*.log
+results/_smoke_console.log
+# per-call progress-log mirrors (redundant with the .jsonl)
+results/*.log
+# per-run report copies (redundant with the top-level report*.md)
+results/*.report.md
+
+# optional: the superseded n_ctx=8192 first run (uncomment to exclude)
+# results/gemma4-26b-a4b-q8km__2026-05-11T17-04-05.*
+
+# orphan meta for the aborted concurrency=1 run (its .jsonl is _aborted_19-48-54_concurrency1.jsonl)
+results/gemma4-26b-a4b-q8km__2026-05-11T19-48-54.*

@@ -1,0 +1,42 @@
+{
+  "model_tag": "gemma4-26b-a4b-q8km",
+  "endpoint": "http://localhost:8080/v1/chat/completions",
+  "sampling": {
+    "temperature": 1.0,
+    "top_p": 0.95,
+    "top_k": 64
+  },
+  "thinking_toggle": "chat_template_kwargs.enable_thinking (true=on / false=off); reasoning returned in reasoning_content",
+  "served_model_id": "gemma-4-26b-a4b",
+  "n_ctx": 262144,
+  "n_ctx_train": 262144,
+  "n_embd": 2816,
+  "n_vocab": 262144,
+  "n_params": 25233142046,
+  "file_size_bytes": 27620407416,
+  "server_build": "b9101-389ff61d7",
+  "server": "llama.cpp",
+  "server_cmdline": "llama-server -m /models/gemma-4-26B-A4B-it-UD-Q8_K_XL.gguf -ngl 99 -c 524288 --parallel 2 -t 8 -sm layer -ts 1/1 -ctk q8_0 -ctv q8_0 -fa on --jinja --host 0.0.0.0 --port 8080 --metrics -a gemma-4-26b-a4b",
+  "model_file": "gemma-4-26B-A4B-it-UD-Q8_K_XL.gguf",
+  "run_started": "2026-05-12T06-18-31",
+  "n_ctx_used_by_runner": 262144,
+  "max_tokens_policy": "per-prompt cap (default 8192 thinking-on / 2048 off; long_context uses each prompt's value); clamped to fit n_ctx=262144",
+  "capabilities": [
+    "coding_quality"
+  ],
+  "thinking_modes": [
+    "on",
+    "off"
+  ],
+  "calls_planned": 28,
+  "client_concurrency": 1,
+  "run_duration_min": 22.7,
+  "calls": 28,
+  "calls_per_sec": 0.021,
+  "results": {
+    "pass": 28,
+    "fail": 0,
+    "pending_rubric": 0,
+    "error": 0
+  }
+}
