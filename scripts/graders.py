@@ -29,12 +29,16 @@ def extract_code(s):
         return '\n\n'.join(b.rstrip() for b in blocks)
     return s  # assume the whole reply is code
 
+# Tool graders need to see the per-call record (tool_calls etc), not just text;
+# every other grader still takes (g, text) -- zero edits to the 16 existing ones.
+_TOOL_TYPES = {"tool_call", "no_tool_call", "tool_calls_set"}
+
 # ---------------------------------------------------------------- entry -------
-def grade(grader, text):
+def grade(grader, text, rec=None):
     if grader is None:
         return dict(score=None, passed=None, notes="no grader", pending=False)
     if isinstance(grader, list):
-        subs = [grade(g, text) for g in grader]
+        subs = [grade(g, text, rec) for g in grader]
         if any(s.get("pending") for s in subs):
             return dict(score=None, passed=None, pending=True,
                         notes=" | ".join(s.get("notes", "") for s in subs), sub=subs)
@@ -48,7 +52,7 @@ def grade(grader, text):
     if fn is None:
         return dict(score=0.0, passed=False, notes=f"unknown grader type {t!r}", pending=False)
     try:
-        return fn(grader, text or "")
+        return fn(grader, text or "", rec) if t in _TOOL_TYPES else fn(grader, text or "")
     except Exception as e:  # a broken grader should not abort the run
         return dict(score=0.0, passed=False, notes=f"grader error: {e!r}", pending=False)
 
@@ -328,10 +332,136 @@ def g_code_quality(g, text):
                 notes="quality " + (", ".join(f"{k}={checks[k]:.2f}" for k in failed) if failed
                                     else f"all {len(checks)} checks clean"))
 
+# ---------------------------------------------------------------- tool helpers ----
+def _norm_tool_calls(rec):
+    """Return [{name, args_obj, args_text}, ...] from a result rec. llama.cpp
+    serves `arguments` as a JSON string; we also accept already-parsed shapes."""
+    raw = (rec or {}).get("tool_calls") or []
+    out = []
+    for tc in raw:
+        name = tc.get("name") or (tc.get("function") or {}).get("name")
+        a = tc.get("arguments")
+        if a is None:
+            a = (tc.get("function") or {}).get("arguments")
+        if isinstance(a, str):
+            args_text = a
+            try: args_obj = json.loads(a)
+            except Exception: args_obj = None
+        else:
+            args_obj = a
+            try: args_text = json.dumps(a)
+            except Exception: args_text = str(a)
+        out.append({"name": name, "args_obj": args_obj, "args_text": args_text})
+    return out
+
+def _args_ok(spec, args):
+    """Per-arg constraints. Each entry in `spec` is:
+        "*"                        arg must be present, any value
+        {"equals": v}              exact value (string-normalized)
+        {"in": [v1, ...]}          enum
+        {"regex": "..."}           re.search on str(value), case-insensitive
+        {"contains": "x"}          substring of str(value), case-insensitive
+        {"type": "string|number|int|bool|array|object"}
+    Combinations in one dict are AND-ed. Returns (ok, notes_list)."""
+    notes, ok = [], True
+    if not isinstance(args, dict):
+        args = {}
+    pytypes = {"string": str, "number": (int, float), "int": int,
+               "bool": bool, "array": list, "object": dict}
+    for k, c in spec.items():
+        if k not in args:
+            ok = False; notes.append(f"missing arg {k!r}"); continue
+        v = args[k]
+        if c == "*":
+            continue
+        if isinstance(c, dict):
+            if "equals" in c and _norm(v) != _norm(c["equals"]):
+                ok = False; notes.append(f"{k}={v!r}!={c['equals']!r}")
+            if "in" in c and _norm(v) not in {_norm(x) for x in c["in"]}:
+                ok = False; notes.append(f"{k}={v!r} not in {c['in']}")
+            if "regex" in c and not re.search(c["regex"], str(v), re.I):
+                ok = False; notes.append(f"{k}={v!r} no-match /{c['regex']}/")
+            if "contains" in c and c["contains"].lower() not in str(v).lower():
+                ok = False; notes.append(f"{k}={v!r} missing {c['contains']!r}")
+            if "type" in c:
+                # bool is a subclass of int -- guard explicitly
+                tp = pytypes[c["type"]]
+                if c["type"] == "int" and isinstance(v, bool):
+                    ok = False; notes.append(f"{k} wrong type bool (want int)")
+                elif c["type"] == "number" and isinstance(v, bool):
+                    ok = False; notes.append(f"{k} wrong type bool (want number)")
+                elif not isinstance(v, tp):
+                    ok = False; notes.append(f"{k} wrong type {type(v).__name__}")
+    return ok, notes
+
+# ---------------------------------------------------------------- tool graders ----
+def g_tool_call(g, text, rec):
+    """{name, args, allow_extra_args:True, forbid_content:False}
+    Pass iff exactly 1 tool call to `name`, args satisfy constraints,
+    optionally no extra args / no content alongside."""
+    calls = _norm_tool_calls(rec)
+    if not calls:
+        return _res(False, "no tool call emitted")
+    if len(calls) != 1:
+        return _res(False, f"expected 1 call, got {len(calls)}: {[c['name'] for c in calls]}")
+    c = calls[0]
+    if c["name"] != g["name"]:
+        return _res(False, f"wrong fn: called {c['name']!r} want {g['name']!r}")
+    ok, notes = _args_ok(g.get("args", {}), c["args_obj"] or {})
+    if ok and not g.get("allow_extra_args", True):
+        extra = set((c["args_obj"] or {}).keys()) - set(g.get("args", {}))
+        if extra:
+            ok = False; notes.append(f"extra args {sorted(extra)}")
+    if ok and g.get("forbid_content") and (text or "").strip():
+        ok = False; notes.append(f"unexpected content alongside call: {text[:60]!r}")
+    return _res(ok, f"call={c['name']}({c['args_text'][:120]})  {'; '.join(notes) or 'ok'}")
+
+def g_no_tool_call(g, text, rec):
+    """{must_say_regex?:'...'}  Pass iff zero tool calls, and (optionally) the
+    content matches must_say_regex. Use for 'should answer directly' or
+    'should ask clarifying question'."""
+    calls = _norm_tool_calls(rec)
+    if calls:
+        return _res(False, f"emitted {len(calls)} call(s): {[c['name'] for c in calls]}")
+    pat = g.get("must_say_regex")
+    if pat and not re.search(pat, text or "", re.I):
+        return _res(False, f"no tool call (good) but content missing /{pat}/")
+    return _res(True, "no tool call as required")
+
+def g_tool_calls_set(g, text, rec):
+    """{calls:[{name,args}], order:'any'|'strict', allow_extra_calls:False}
+    Pass iff every required call (matched by name + arg constraints) was emitted.
+    order='strict' enforces emission order. allow_extra_calls permits extras."""
+    want = g["calls"]
+    got = _norm_tool_calls(rec)
+    if not got:
+        return _res(False, "no tool calls emitted")
+    used = [False] * len(got)
+    matches = []
+    for i, w in enumerate(want):
+        chosen = -1
+        for j, c in enumerate(got):
+            if used[j] or c["name"] != w["name"]:
+                continue
+            ok, _ = _args_ok(w.get("args", {}), c["args_obj"] or {})
+            if ok:
+                chosen = j; used[j] = True; break
+        if chosen < 0:
+            return _res(False, f"required call#{i} {w['name']}({w.get('args')}) not found "
+                               f"(got {[c['name'] for c in got]})")
+        matches.append(chosen)
+    if g.get("order", "any") == "strict" and matches != sorted(matches):
+        return _res(False, f"calls present but order wrong: idx_seq={matches}")
+    if not g.get("allow_extra_calls", False) and any(not u for u in used):
+        extras = [got[j]["name"] for j, u in enumerate(used) if not u]
+        return _res(False, f"unwanted extra calls: {extras}")
+    return _res(True, f"matched {len(want)}/{len(want)} calls (order={g.get('order','any')})")
+
 GRADERS = {
     "contains": g_contains, "regex": g_regex, "regex_all": g_regex_all, "numeric": g_numeric,
     "word_count": g_word_count, "line_count": g_line_count, "bullets": g_bullets, "json": g_json,
     "forbid_char": g_forbid_char, "starts_ends": g_starts_ends, "python": g_python, "rubric": g_rubric,
     "count": g_count, "sentence_count": g_sentence_count, "paragraph_count": g_paragraph_count,
     "code_quality": g_code_quality,
+    "tool_call": g_tool_call, "no_tool_call": g_no_tool_call, "tool_calls_set": g_tool_calls_set,
 }

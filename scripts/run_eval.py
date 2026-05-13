@@ -18,7 +18,7 @@ plan order (each line is self-describing, so report.py doesn't care).
 The per-line schema is the cross-run comparison contract -- keep it stable. See
 ~/.claude/projects/-home-peleg/memory/local-model-eval.md.
 """
-import argparse, datetime, json, sys, threading, time, urllib.request, urllib.error
+import argparse, datetime, json, re, sys, threading, time, urllib.request, urllib.error
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
@@ -39,8 +39,10 @@ SAFETY_TOKENS = 96                    # leave a little headroom under n_ctx
 MAXTOK_THINKING = 8192
 MAXTOK_PLAIN = 2048
 
-CAP_ORDER = ["coherence", "reasoning", "coding", "coding_quality", "instruction_following", "long_context", "writing"]
-_HARD_BASE = ["coherence", "reasoning", "coding", "instruction_following", "long_context", "writing"]
+CAP_ORDER = ["coherence", "reasoning", "coding", "coding_quality", "instruction_following",
+             "long_context", "writing", "tool_calling"]
+_HARD_BASE = ["coherence", "reasoning", "coding", "instruction_following", "long_context",
+              "writing", "tool_calling"]
 HARD_CAPS = [c + "_hard" for c in _HARD_BASE] + ["coding_quality_hard"]   # discriminating "hard tier" (separate prompt files)
 FULL_ORDER = CAP_ORDER + HARD_CAPS
 
@@ -50,7 +52,7 @@ def est_tokens(s: str) -> int:
     return int(len(s) / 3.2) + 1
 
 
-def call_model(messages, thinking, max_tokens, timeout=900):
+def call_model(messages, thinking, max_tokens, tools=None, tool_choice=None, timeout=900):
     body = {
         "model": MODEL_ID,
         "messages": messages,
@@ -59,6 +61,10 @@ def call_model(messages, thinking, max_tokens, timeout=900):
         "chat_template_kwargs": {"enable_thinking": bool(thinking)},
         **SAMPLING,
     }
+    if tools is not None:
+        body["tools"] = tools
+    if tool_choice is not None:
+        body["tool_choice"] = tool_choice
     data = json.dumps(body).encode()
     req = urllib.request.Request(ENDPOINT, data=data, headers={"Content-Type": "application/json"})
     t0 = time.time()
@@ -67,6 +73,14 @@ def call_model(messages, thinking, max_tokens, timeout=900):
     dt_ms = round((time.time() - t0) * 1000, 1)
     ch = resp["choices"][0]
     msg = ch.get("message", {})
+    # Normalize tool_calls -> [{id, name, arguments(JSON-string)}, ...]; flatten the
+    # OpenAI "function" envelope so graders see one consistent shape.
+    tool_calls = []
+    for tc in (msg.get("tool_calls") or []):
+        fn = tc.get("function") or {}
+        tool_calls.append({"id": tc.get("id"),
+                           "name": fn.get("name") or tc.get("name"),
+                           "arguments": fn.get("arguments") if "function" in tc else tc.get("arguments")})
     return {
         "text": msg.get("content") or "",
         "thinking": msg.get("reasoning_content") or "",
@@ -74,7 +88,38 @@ def call_model(messages, thinking, max_tokens, timeout=900):
         "usage": resp.get("usage", {}),
         "latency_ms": dt_ms,
         "request_body": body,
+        "tool_calls": tool_calls,
     }
+
+
+_TOOL_CONTENT_FENCE = re.compile(r'```[ \t]*(?:json)?[ \t]*\r?\n(.*?)```', re.S)
+
+
+def _rescue_calls_from_content(text):
+    """Some chat templates emit tool-call JSON into message.content rather than
+    populating tool_calls. Best-effort recover {name, arguments(JSON-string)} from
+    object/array/fenced shapes. Returns [] on no match."""
+    m = _TOOL_CONTENT_FENCE.search(text or "")
+    blob = m.group(1) if m else (text or "")
+    for opn, cls in (('{', '}'), ('[', ']')):
+        i, j = blob.find(opn), blob.rfind(cls)
+        if 0 <= i < j:
+            try:
+                obj = json.loads(blob[i:j+1])
+            except Exception:
+                continue
+            items = obj if isinstance(obj, list) else [obj]
+            out = []
+            for it in items:
+                if isinstance(it, dict) and "name" in it:
+                    args = it.get("arguments", it.get("args", {}))
+                    if not isinstance(args, str):
+                        try: args = json.dumps(args)
+                        except Exception: args = str(args)
+                    out.append({"id": None, "name": it["name"], "arguments": args})
+            if out:
+                return out
+    return []
 
 
 def probe_server_meta(model_tag):
@@ -135,6 +180,14 @@ def load_prompts(cap):
 
 
 def build_messages(p):
+    # Multi-turn prompts (tool-calling tests with pre-injected tool results)
+    # provide a full `messages` list; we use it verbatim, optionally prepending
+    # a `system` if one is also set and missing from the sequence.
+    if isinstance(p.get("messages"), list) and p["messages"]:
+        msgs = list(p["messages"])
+        if p.get("system") and not (msgs and msgs[0].get("role") == "system"):
+            msgs.insert(0, {"role": "system", "content": p["system"]})
+        return msgs
     msgs = []
     if p.get("system"):
         msgs.append({"role": "system", "content": p["system"]})
@@ -147,7 +200,9 @@ def run_one(idx, total, tag, cap, p, mode):
     where kind in {'pass','fail','pend','err'}. Never raises."""
     thinking = (mode == "on")
     msgs = build_messages(p)
-    prompt_tok = sum(est_tokens(m["content"]) for m in msgs)
+    tools = p.get("tools")
+    tool_choice = p.get("tool_choice")
+    prompt_tok = sum(est_tokens(m.get("content") or "") for m in msgs)
     ask = p.get("max_tokens", MAXTOK_THINKING if thinking else MAXTOK_PLAIN)
     max_tokens = max(64, min(ask, N_CTX - prompt_tok - SAFETY_TOKENS))
     rec = {
@@ -162,17 +217,28 @@ def run_one(idx, total, tag, cap, p, mode):
             "max_tokens": max_tokens,
             **SAMPLING,
             "chat_template_kwargs": {"enable_thinking": thinking},
+            **({"tools": tools} if tools is not None else {}),
+            **({"tool_choice": tool_choice} if tool_choice is not None else {}),
         },
         "grader": p.get("grader"),
+        **({"tools_offered": [t.get("function", {}).get("name") for t in tools]} if tools else {}),
     }
     try:
-        r = call_model(msgs, thinking, max_tokens)
+        r = call_model(msgs, thinking, max_tokens, tools=tools, tool_choice=tool_choice)
         rec["response_text"] = r["text"]
         rec["thinking_text"] = r["thinking"]
         rec["latency_ms"] = r["latency_ms"]
         rec["usage"] = r["usage"]
         rec["finish_reason"] = r["finish_reason"]
-        gr = G.grade(p.get("grader"), r["text"])
+        rec["tool_calls"] = r["tool_calls"]
+        # Template-variance rescue: if tools were offered and tool_calls came back
+        # empty, try parsing tool-call JSON out of content.
+        if tools and not rec["tool_calls"]:
+            rescued = _rescue_calls_from_content(r["text"])
+            if rescued:
+                rec["tool_calls"] = rescued
+                rec["tool_calls_in_content"] = True
+        gr = G.grade(p.get("grader"), r["text"], rec=rec)
         rec["grading"] = gr
         if gr.get("pending"):
             kind, status = "pend", "PEND-RUBRIC"

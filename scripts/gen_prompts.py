@@ -790,6 +790,274 @@ long_context_hard = [
  lc_h_sum_of_three("lc-h-12", 220, 912),
 ]
 
+# ====================================================================== tool_calling
+# Reusable OpenAI-style tool specs. Each prompt picks one or more from this library.
+def _tool(name, description, properties, required=None):
+    return {"type": "function", "function": {"name": name, "description": description,
+            "parameters": {"type": "object", "properties": properties, "required": required or []}}}
+
+TOOL_WEATHER     = _tool("get_weather", "Get current weather conditions for a city.",
+                         {"city": {"type": "string", "description": "City name, e.g. 'Paris'."},
+                          "units": {"type": "string", "enum": ["celsius", "fahrenheit"]}},
+                         ["city"])
+TOOL_WEB         = _tool("web_search", "Search the public web and return top results.",
+                         {"query": {"type": "string"},
+                          "max_results": {"type": "integer"}},
+                         ["query"])
+TOOL_CALC        = _tool("calculator", "Evaluate a numeric arithmetic expression.",
+                         {"expression": {"type": "string"}}, ["expression"])
+TOOL_CAL_CREATE  = _tool("calendar_create_event",
+                         "Create a calendar event with a title, ISO-8601 start time, and optional duration in minutes.",
+                         {"title": {"type": "string"},
+                          "start": {"type": "string", "description": "ISO-8601 local time, e.g. 2026-05-15T15:00."},
+                          "duration_min": {"type": "integer"}},
+                         ["title", "start"])
+TOOL_EMAIL       = _tool("send_email", "Send an email to a recipient.",
+                         {"to": {"type": "string"}, "subject": {"type": "string"}, "body": {"type": "string"}},
+                         ["to", "subject", "body"])
+TOOL_TIMER       = _tool("set_timer", "Set a countdown timer.",
+                         {"seconds": {"type": "integer"}, "label": {"type": "string"}},
+                         ["seconds"])
+TOOL_STOCK       = _tool("get_stock_price", "Get the current stock price for a ticker symbol.",
+                         {"symbol": {"type": "string"}}, ["symbol"])
+TOOL_TRANSL      = _tool("translate", "Translate a short text into one of the supported target languages.",
+                         {"text": {"type": "string"},
+                          "target_lang": {"type": "string",
+                              "enum": ["en", "fr", "de", "es", "ja", "zh"]}},
+                         ["text", "target_lang"])
+TOOL_FLIGHT      = _tool("search_flights", "Search for flights between two airports on a given date.",
+                         {"origin": {"type": "string"}, "destination": {"type": "string"},
+                          "date": {"type": "string", "description": "Departure date, YYYY-MM-DD."}},
+                         ["origin", "destination", "date"])
+TOOL_UNIT        = _tool("convert_units", "Convert a numeric value between units.",
+                         {"value": {"type": "number"}, "from_unit": {"type": "string"},
+                          "to_unit": {"type": "string"}},
+                         ["value", "from_unit", "to_unit"])
+TOOL_SUM_URL     = _tool("summarize_url", "Fetch a URL and return a short summary of its contents.",
+                         {"url": {"type": "string"}}, ["url"])
+TOOL_FIND_USER   = _tool("find_user", "Search for users by partial name match. Returns a list of {id, name} matches.",
+                         {"name_query": {"type": "string"}}, ["name_query"])
+TOOL_GET_USER    = _tool("get_user", "Get a single user's full profile by numeric id.",
+                         {"user_id": {"type": "integer"}}, ["user_id"])
+TOOL_DELETE_DB   = _tool("delete_database", "PERMANENTLY DELETE a named database. Cannot be undone.",
+                         {"name": {"type": "string"}}, ["name"])
+
+# Bake today's date into the system prompt so date-relative prompts ("next Friday",
+# "three weeks from today") can be resolved without a clarifying-question loop —
+# this is how production agent prompts are set up in practice. The date is frozen
+# into the prompt files; regenerating gen_prompts.py refreshes it.
+import datetime as _dt
+_TODAY = _dt.date.today().isoformat()  # e.g. "2026-05-13"
+TC_SYS = ("You have access to function tools. Call a function when it would help the user. "
+          "If no tool is appropriate, answer the user directly in plain text. "
+          "Use only the named tools provided. "
+          f"Today's date is {_TODAY}.")
+
+# Base tier: clear single-tool needs, multi-tool selection, parallel, refusal, multi-turn.
+tool_calling = [
+ {"id": "tc-01", "system": TC_SYS,
+  "user": "What is the weather in Paris right now?",
+  "tools": [TOOL_WEATHER], "tool_choice": "auto",
+  "grader": {"type": "tool_call", "name": "get_weather",
+             "args": {"city": {"equals": "Paris"}}}},
+
+ {"id": "tc-02", "system": TC_SYS,
+  "user": "Search the web for the latest SpaceX Starship launch results.",
+  "tools": [TOOL_WEATHER, TOOL_WEB, TOOL_CALC, TOOL_EMAIL, TOOL_CAL_CREATE], "tool_choice": "auto",
+  "grader": {"type": "tool_call", "name": "web_search",
+             "args": {"query": {"contains": "Starship"}}}},
+
+ {"id": "tc-03", "system": TC_SYS,
+  "user": "Give me the weather in Berlin in Fahrenheit.",
+  "tools": [TOOL_WEATHER], "tool_choice": "auto",
+  "grader": {"type": "tool_call", "name": "get_weather",
+             "args": {"city": {"equals": "Berlin"},
+                      "units": {"equals": "fahrenheit"}}}},
+
+ {"id": "tc-04", "system": TC_SYS,
+  "user": "Please convert 7.5 miles into kilometers.",
+  "tools": [TOOL_UNIT], "tool_choice": "auto",
+  "grader": {"type": "tool_call", "name": "convert_units",
+             "args": {"value": {"equals": 7.5},
+                      "from_unit": {"regex": r"^(miles?|mi)$"},
+                      "to_unit":   {"regex": r"^(km|kilomet(re|er)s?)$"}}}},
+
+ {"id": "tc-05", "system": TC_SYS,
+  "user": "Set a calendar event called Dentist for 3pm next Friday.",
+  "tools": [TOOL_CAL_CREATE], "tool_choice": "auto",
+  "grader": {"type": "tool_call", "name": "calendar_create_event",
+             "args": {"title": {"contains": "Dentist"},
+                      "start": {"regex": r"\d{4}-\d{2}-\d{2}T15:00"}}}},
+
+ {"id": "tc-06", "system": TC_SYS,
+  "user": "Set a 90-second timer.",
+  "tools": [TOOL_TIMER], "tool_choice": "auto",
+  "grader": {"type": "tool_call", "name": "set_timer",
+             "args": {"seconds": {"equals": 90, "type": "int"}}}},
+
+ {"id": "tc-07", "system": TC_SYS,
+  "user": "What's AAPL trading at?",
+  "tools": [TOOL_STOCK], "tool_choice": "auto",
+  "grader": {"type": "tool_call", "name": "get_stock_price",
+             "args": {"symbol": {"equals": "AAPL"}}}},
+
+ {"id": "tc-08", "system": TC_SYS,
+  "user": "What's the capital of Australia?",
+  "tools": [TOOL_WEATHER, TOOL_EMAIL], "tool_choice": "auto",
+  "grader": [{"type": "no_tool_call", "must_say_regex": r"\bcanberra\b"}]},
+
+ {"id": "tc-09", "system": TC_SYS,
+  "user": "Translate 'good morning' into Japanese.",
+  "tools": [TOOL_TRANSL], "tool_choice": "auto",
+  "grader": {"type": "tool_call", "name": "translate",
+             "args": {"text": {"contains": "good morning"},
+                      "target_lang": {"equals": "ja"}}}},
+
+ {"id": "tc-10", "system": TC_SYS,
+  "user": "What is 23% of 84?",
+  "tools": [TOOL_CALC], "tool_choice": "auto",
+  "grader": {"type": "tool_call", "name": "calculator",
+             "args": {"expression": {"regex": r"(0?\.23\s*\*\s*84|84\s*\*\s*0?\.23|23\s*[/*]\s*100\s*\*\s*84)"}}}},
+
+ {"id": "tc-11", "system": TC_SYS,
+  "user": "What's the current weather in Paris AND in Tokyo? Use celsius for both.",
+  "tools": [TOOL_WEATHER], "tool_choice": "auto",
+  "grader": {"type": "tool_calls_set", "order": "any", "allow_extra_calls": False,
+             "calls": [
+               {"name": "get_weather", "args": {"city": {"equals": "Paris"}, "units": {"equals": "celsius"}}},
+               {"name": "get_weather", "args": {"city": {"equals": "Tokyo"}, "units": {"equals": "celsius"}}}]}},
+
+ # Multi-turn easy: pre-injected tool result. Model is graded on the FINAL content.
+ {"id": "tc-12", "system": TC_SYS,
+  "messages": [
+    {"role": "user", "content": "What is the current price of MSFT? Answer in one short sentence."},
+    {"role": "assistant", "content": "",
+     "tool_calls": [{"id": "call_msft", "type": "function",
+                     "function": {"name": "get_stock_price",
+                                  "arguments": "{\"symbol\":\"MSFT\"}"}}]},
+    {"role": "tool", "tool_call_id": "call_msft", "name": "get_stock_price",
+     "content": "{\"symbol\":\"MSFT\",\"price\":410.20,\"currency\":\"USD\"}"}],
+  "tools": [TOOL_STOCK], "tool_choice": "auto",
+  "grader": [{"type": "no_tool_call"},
+             {"type": "contains", "values": ["410", "MSFT"]}]},
+
+ {"id": "tc-13", "system": TC_SYS,
+  "user": "Find flights from New York to London on July 4, 2026.",
+  "tools": [TOOL_FLIGHT], "tool_choice": "auto",
+  "grader": {"type": "tool_call", "name": "search_flights",
+             "args": {"origin": {"regex": r"(NYC|JFK|LGA|EWR|New York)"},
+                      "destination": {"regex": r"(LON|LHR|LCY|London)"},
+                      "date": {"regex": r"(2026-07-04|07/04/2026|July 4)"}}}},
+]
+
+# Hard tier: ambiguity, missing args, enum traps, near-identical tools, parallel mixed-args,
+# seductive but wrong tools, type-strict, tool_choice:required, multi-turn after error.
+tool_calling_hard = [
+ {"id": "tc-h-01", "system": TC_SYS,
+  "user": "Send Bob an email.",
+  "tools": [TOOL_EMAIL], "tool_choice": "auto",
+  "grader": [{"type": "no_tool_call",
+              "must_say_regex": r"(what|which|whose|address|email|subject|body|content|about|topic|message|specifics|clarif)"}]},
+
+ {"id": "tc-h-02", "system": TC_SYS,
+  "user": "Summarize the latest reviews of the iPhone 16.",
+  "tools": [TOOL_SUM_URL, TOOL_WEB], "tool_choice": "auto",
+  "grader": {"type": "tool_call", "name": "web_search",
+             "args": {"query": {"contains": "iPhone 16"}}}},
+
+ {"id": "tc-h-03", "system": TC_SYS,
+  "user": "Translate 'Welcome to my home' into Hindi for me.",
+  "tools": [TOOL_TRANSL], "tool_choice": "auto",
+  "grader": [{"type": "no_tool_call",
+              "must_say_regex": r"(hindi|hi\b|only support|cannot|don'?t support|not supported|unavailable|outside)"}]},
+
+ {"id": "tc-h-04", "system": TC_SYS,
+  "user": "Look up the user named Sarah Chen for me.",
+  "tools": [TOOL_FIND_USER, TOOL_GET_USER], "tool_choice": "auto",
+  "grader": {"type": "tool_call", "name": "find_user",
+             "args": {"name_query": {"contains": "Sarah"}}}},
+
+ {"id": "tc-h-05", "system": TC_SYS,
+  "user": "What's the weather in Paris in Celsius and Houston in Fahrenheit?",
+  "tools": [TOOL_WEATHER], "tool_choice": "auto",
+  "grader": {"type": "tool_calls_set", "order": "any", "allow_extra_calls": False,
+             "calls": [
+               {"name": "get_weather", "args": {"city": {"equals": "Paris"},   "units": {"equals": "celsius"}}},
+               {"name": "get_weather", "args": {"city": {"equals": "Houston"}, "units": {"equals": "fahrenheit"}}}]}},
+
+ # "Translate then schedule" — first call should be the translation; second step
+ # genuinely needs that result, so a single-turn model is expected to call translate first.
+ {"id": "tc-h-06", "system": TC_SYS,
+  "user": "Translate the word 'Welcome' into French, and then schedule a 9am reminder for tomorrow with that translation as the title.",
+  "tools": [TOOL_TRANSL, TOOL_CAL_CREATE], "tool_choice": "auto",
+  "grader": {"type": "tool_call", "name": "translate",
+             "args": {"text": {"contains": "Welcome"}, "target_lang": {"equals": "fr"}}}},
+
+ {"id": "tc-h-07", "system": TC_SYS,
+  "user": "Can you clean up my desktop for me?",
+  "tools": [TOOL_DELETE_DB], "tool_choice": "auto",
+  "grader": [{"type": "no_tool_call",
+              "must_say_regex": r"(can(?:not|'?t)|don'?t have|no (?:tool|access)|clarif|what do you|which|files|not (?:able|equipped)|unable)"}]},
+
+ {"id": "tc-h-08", "system": TC_SYS,
+  "user": "Three weeks from today at 10am, meeting with Sara.",
+  "tools": [TOOL_CAL_CREATE], "tool_choice": "auto",
+  "grader": {"type": "tool_call", "name": "calendar_create_event",
+             "args": {"title": {"contains": "Sara"},
+                      "start": {"regex": r"\d{4}-\d{2}-\d{2}T10:00"}}}},
+
+ # Multi-turn with pre-injected tool result. Model must use the result, NOT re-call.
+ {"id": "tc-h-09", "system": TC_SYS,
+  "messages": [
+    {"role": "user", "content": "What's the weather in Reykjavik right now? Answer in one short sentence."},
+    {"role": "assistant", "content": "",
+     "tool_calls": [{"id": "call_rkv", "type": "function",
+                     "function": {"name": "get_weather",
+                                  "arguments": "{\"city\":\"Reykjavik\",\"units\":\"celsius\"}"}}]},
+    {"role": "tool", "tool_call_id": "call_rkv", "name": "get_weather",
+     "content": "{\"city\":\"Reykjavik\",\"temp_c\":-3,\"conditions\":\"light snow\",\"wind_kmh\":22}"}],
+  "tools": [TOOL_WEATHER], "tool_choice": "auto",
+  "grader": [{"type": "no_tool_call"},
+             {"type": "contains", "values": ["-3", "snow"]}]},
+
+ {"id": "tc-h-10", "system": TC_SYS,
+  "user": "What is the weather in Paris?",
+  "tools": [TOOL_WEATHER, TOOL_EMAIL], "tool_choice": "auto",
+  "grader": {"type": "tool_call", "name": "get_weather",
+             "args": {"city": {"equals": "Paris"}},
+             "allow_extra_args": False}},
+
+ # Type-strict: 150 must be int, not "150" string or 150.0 float.
+ {"id": "tc-h-11", "system": TC_SYS,
+  "user": "Set a timer for two and a half minutes.",
+  "tools": [TOOL_TIMER], "tool_choice": "auto",
+  "grader": {"type": "tool_call", "name": "set_timer",
+             "args": {"seconds": {"equals": 150, "type": "int"}}}},
+
+ # tool_choice:"required" plus forbid_content -- catches mixed prose + call.
+ {"id": "tc-h-12", "system": TC_SYS,
+  "user": "Weather in Paris.",
+  "tools": [TOOL_WEATHER], "tool_choice": "required",
+  "grader": {"type": "tool_call", "name": "get_weather",
+             "args": {"city": {"equals": "Paris"}},
+             "forbid_content": True}},
+
+ # Multi-turn after a tool error: model must NOT re-call, should explain the error.
+ {"id": "tc-h-13", "system": TC_SYS,
+  "messages": [
+    {"role": "user", "content": "What's the current price of XYZQ?"},
+    {"role": "assistant", "content": "",
+     "tool_calls": [{"id": "call_x", "type": "function",
+                     "function": {"name": "get_stock_price",
+                                  "arguments": "{\"symbol\":\"XYZQ\"}"}}]},
+    {"role": "tool", "tool_call_id": "call_x", "name": "get_stock_price",
+     "content": "{\"error\":\"unknown symbol\",\"symbol\":\"XYZQ\"}"}],
+  "tools": [TOOL_STOCK], "tool_choice": "auto",
+  "grader": [{"type": "no_tool_call"},
+             {"type": "regex", "pattern": r"(unknown|not\s*found|no(?:t|n)\s*exist|invalid|wasn'?t\s*recogn|isn'?t\s*recogn|couldn'?t\s*find|XYZQ)",
+              "ignorecase": True}]},
+]
+
 # ====================================================================== emit
 write("coherence", coherence)
 write("reasoning", reasoning)
@@ -805,4 +1073,6 @@ write("coding_quality_hard", coding_quality_hard)
 write("instruction_following_hard", instruction_following_hard)
 write("long_context_hard", long_context_hard)
 write("writing_hard", writing_hard)
+write("tool_calling", tool_calling)
+write("tool_calling_hard", tool_calling_hard)
 print("done.")

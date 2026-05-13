@@ -1,10 +1,10 @@
 # Local model eval report
 
 - Model tag(s): gemma4-26b-a4b-q8km, gemma4-31b-q5kxl, qwen3.5-122b-a10b-q3kxl, qwen3.6-35b-a3b-q8kxl
-- Source file(s): _aborted_19-48-54_concurrency1.jsonl, _aborted_22-10-29_hardrun_4calls.jsonl, gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl, gemma4-26b-a4b-q8km__2026-05-11T22-05-22__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T03-21-56__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl, gemma4-26b-a4b-q8km__2026-05-12T06-13-52__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T06-18-31.jsonl, gemma4-26b-a4b-q8km__2026-05-12T11-49-54__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T12-44-12.jsonl, gemma4-31b-q5kxl__2026-05-11T22-14-41__SMOKE.jsonl, gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl, gemma4-31b-q5kxl__2026-05-12T15-07-51__SMOKE.jsonl, gemma4-31b-q5kxl__2026-05-12T15-12-37.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T12-20-57__SMOKE.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl, qwen3.6-35b-a3b-q8kxl__2026-05-12T16-39-39__SMOKE.jsonl, qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl
-- Capabilities: coding, coding_hard, coding_quality, coding_quality_hard, coherence, coherence_hard, instruction_following, instruction_following_hard, long_context, long_context_hard, reasoning, reasoning_hard, writing, writing_hard
+- Source file(s): _aborted_19-48-54_concurrency1.jsonl, _aborted_22-10-29_hardrun_4calls.jsonl, gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl, gemma4-26b-a4b-q8km__2026-05-11T22-05-22__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T03-21-56__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl, gemma4-26b-a4b-q8km__2026-05-12T06-13-52__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T06-18-31.jsonl, gemma4-26b-a4b-q8km__2026-05-12T11-49-54__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T12-44-12.jsonl, gemma4-31b-q5kxl__2026-05-11T22-14-41__SMOKE.jsonl, gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl, gemma4-31b-q5kxl__2026-05-12T15-07-51__SMOKE.jsonl, gemma4-31b-q5kxl__2026-05-12T15-12-37.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T12-20-57__SMOKE.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T22-54-51__SMOKE.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T22-59-11.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T23-02-43.jsonl, qwen3.6-35b-a3b-q8kxl__2026-05-12T16-39-39__SMOKE.jsonl, qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl
+- Capabilities: coding, coding_hard, coding_quality, coding_quality_hard, coherence, coherence_hard, instruction_following, instruction_following_hard, long_context, long_context_hard, reasoning, reasoning_hard, tool_calling, tool_calling_hard, writing, writing_hard
 - Thinking modes: off, on
-- Total calls: 2039  (graded 2020, pending rubric 19)
+- Total calls: 2095  (graded 2076, pending rubric 19)
 
 ## Run configuration
 
@@ -522,6 +522,93 @@
 - calls_per_sec: 0.013
 - results: pass=322, fail=26, pending_rubric=70, error=0
 
+### qwen3.5-122b-a10b-q3kxl__2026-05-13T22-54-51__SMOKE.jsonl
+
+- Model tag: qwen3.5-122b-a10b-q3kxl
+- Served model id: qwen3.5-122b-a10b-q3
+- Model file: Qwen3.5-122B-A10B-UD-Q3_K_XL-00001-of-00003.gguf
+- Parameters: 122,111,526,912 (~122.1 B)
+- File size: 56,959,537,152 bytes (~53.0 GiB)
+- Context (n_ctx): 153600
+- Trained context: 262144
+- Embedding dim: 3072
+- Vocab size: 248320
+- Inference server: llama.cpp
+- Server build: b9101-389ff61d7
+- Server cmdline: `llama-server -m /models/UD-Q3_K_XL/Qwen3.5-122B-A10B-UD-Q3_K_XL-00001-of-00003.gguf -ngl 99 -c 153600 --parallel 1 --threads 8 -sm layer -ts 1/1 -ctk q8_0 -ctv q8_0 -fa on -b 4096 -ub 1024 --jinja --host 0.0.0.0 --port 8080 --metrics --temp 0.7 --top-p 0.8 --top-k 20 --presence-penalty 1.5 --min-p 0.0 -a qwen3.5-122b-a10b-q3`
+- Endpoint: http://localhost:8080/v1/chat/completions
+- Sampling: temperature=0.7, top_p=0.8, top_k=20, presence_penalty=1.5, min_p=0.0
+- Thinking-mode toggle: chat_template_kwargs.enable_thinking (true=on / false=off); reasoning returned in reasoning_content
+- Client concurrency: 1
+- max_tokens policy: per-prompt cap (default 8192 thinking-on / 2048 off; long_context uses each prompt's value); clamped to fit n_ctx=153600
+- Run started: 2026-05-13T22-54-51
+- Run duration (min): 0.3
+- Total calls: 4
+- n_ctx_used_by_runner: 153600
+- capabilities: ['tool_calling']
+- thinking_modes: ['on', 'off']
+- calls_planned: 4
+- calls_per_sec: 0.199
+- results: pass=4, fail=0, pending_rubric=0, error=0
+
+### qwen3.5-122b-a10b-q3kxl__2026-05-13T22-59-11.jsonl
+
+- Model tag: qwen3.5-122b-a10b-q3kxl
+- Served model id: qwen3.5-122b-a10b-q3
+- Model file: Qwen3.5-122B-A10B-UD-Q3_K_XL-00001-of-00003.gguf
+- Parameters: 122,111,526,912 (~122.1 B)
+- File size: 56,959,537,152 bytes (~53.0 GiB)
+- Context (n_ctx): 153600
+- Trained context: 262144
+- Embedding dim: 3072
+- Vocab size: 248320
+- Inference server: llama.cpp
+- Server build: b9101-389ff61d7
+- Server cmdline: `llama-server -m /models/UD-Q3_K_XL/Qwen3.5-122B-A10B-UD-Q3_K_XL-00001-of-00003.gguf -ngl 99 -c 153600 --parallel 1 --threads 8 -sm layer -ts 1/1 -ctk q8_0 -ctv q8_0 -fa on -b 4096 -ub 1024 --jinja --host 0.0.0.0 --port 8080 --metrics --temp 0.7 --top-p 0.8 --top-k 20 --presence-penalty 1.5 --min-p 0.0 -a qwen3.5-122b-a10b-q3`
+- Endpoint: http://localhost:8080/v1/chat/completions
+- Sampling: temperature=0.7, top_p=0.8, top_k=20, presence_penalty=1.5, min_p=0.0
+- Thinking-mode toggle: chat_template_kwargs.enable_thinking (true=on / false=off); reasoning returned in reasoning_content
+- Client concurrency: 1
+- max_tokens policy: per-prompt cap (default 8192 thinking-on / 2048 off; long_context uses each prompt's value); clamped to fit n_ctx=153600
+- Run started: 2026-05-13T22-59-11
+- Run duration (min): 2.5
+- Total calls: 26
+- n_ctx_used_by_runner: 153600
+- capabilities: ['tool_calling_hard']
+- thinking_modes: ['on', 'off']
+- calls_planned: 26
+- calls_per_sec: 0.176
+- results: pass=25, fail=1, pending_rubric=0, error=0
+
+### qwen3.5-122b-a10b-q3kxl__2026-05-13T23-02-43.jsonl
+
+- Model tag: qwen3.5-122b-a10b-q3kxl
+- Served model id: qwen3.5-122b-a10b-q3
+- Model file: Qwen3.5-122B-A10B-UD-Q3_K_XL-00001-of-00003.gguf
+- Parameters: 122,111,526,912 (~122.1 B)
+- File size: 56,959,537,152 bytes (~53.0 GiB)
+- Context (n_ctx): 153600
+- Trained context: 262144
+- Embedding dim: 3072
+- Vocab size: 248320
+- Inference server: llama.cpp
+- Server build: b9101-389ff61d7
+- Server cmdline: `llama-server -m /models/UD-Q3_K_XL/Qwen3.5-122B-A10B-UD-Q3_K_XL-00001-of-00003.gguf -ngl 99 -c 153600 --parallel 1 --threads 8 -sm layer -ts 1/1 -ctk q8_0 -ctv q8_0 -fa on -b 4096 -ub 1024 --jinja --host 0.0.0.0 --port 8080 --metrics --temp 0.7 --top-p 0.8 --top-k 20 --presence-penalty 1.5 --min-p 0.0 -a qwen3.5-122b-a10b-q3`
+- Endpoint: http://localhost:8080/v1/chat/completions
+- Sampling: temperature=0.7, top_p=0.8, top_k=20, presence_penalty=1.5, min_p=0.0
+- Thinking-mode toggle: chat_template_kwargs.enable_thinking (true=on / false=off); reasoning returned in reasoning_content
+- Client concurrency: 1
+- max_tokens policy: per-prompt cap (default 8192 thinking-on / 2048 off; long_context uses each prompt's value); clamped to fit n_ctx=153600
+- Run started: 2026-05-13T23-02-43
+- Run duration (min): 2.2
+- Total calls: 26
+- n_ctx_used_by_runner: 153600
+- capabilities: ['tool_calling']
+- thinking_modes: ['on', 'off']
+- calls_planned: 26
+- calls_per_sec: 0.201
+- results: pass=26, fail=0, pending_rubric=0, error=0
+
 ### qwen3.6-35b-a3b-q8kxl__2026-05-12T16-39-39__SMOKE.jsonl
 
 - Model tag: qwen3.6-35b-a3b-q8kxl
@@ -584,7 +671,7 @@
 
 | scope | n | pass rate | mean score | median latency (ms) | median out-tokens |
 |---|---|---|---|---|---|
-| all | 2039 | 94.5% | 0.953 | 17840 | 407 |
+| all | 2095 | 94.6% | 0.953 | 17041 | 389 |
 
 ## By run (source file)
 
@@ -609,6 +696,9 @@
 | gemma4-31b-q5kxl__2026-05-12T15-12-37.jsonl | gemma4-31b-q5kxl | 262144 | 58 | 96.6% | 0.952 | 38229 | 629 |
 | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-20-57__SMOKE.jsonl | qwen3.5-122b-a10b-q3kxl | 153600 | 4 | 100.0% | 1.000 | 31674 | 600 |
 | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | qwen3.5-122b-a10b-q3kxl | 153600 | 418 | 91.9% | 0.938 | 27376 | 551 |
+| qwen3.5-122b-a10b-q3kxl__2026-05-13T22-54-51__SMOKE.jsonl | qwen3.5-122b-a10b-q3kxl | 153600 | 4 | 100.0% | 1.000 | 4527 | 66 |
+| qwen3.5-122b-a10b-q3kxl__2026-05-13T22-59-11.jsonl | qwen3.5-122b-a10b-q3kxl | 153600 | 26 | 96.2% | 0.962 | 3973 | 66 |
+| qwen3.5-122b-a10b-q3kxl__2026-05-13T23-02-43.jsonl | qwen3.5-122b-a10b-q3kxl | 153600 | 26 | 100.0% | 1.000 | 3751 | 62 |
 | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-39-39__SMOKE.jsonl | qwen3.6-35b-a3b-q8kxl | 262144 | 4 | 100.0% | 1.000 | 12700 | 508 |
 | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | qwen3.6-35b-a3b-q8kxl | 262144 | 418 | 92.6% | 0.940 | 14884 | 509 |
 
@@ -751,6 +841,12 @@
 | reasoning_hard | on | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 20 | 100.0% | 1.000 | 59994 | 985 |
 | reasoning_hard | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 20 | 100.0% | 1.000 | 68426 | 1459 |
 | reasoning_hard | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 20 | 95.0% | 0.950 | 45247 | 1822 |
+| tool_calling | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T22-54-51__SMOKE.jsonl | 2 | 100.0% | 1.000 | 1807 | 34 |
+| tool_calling | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T23-02-43.jsonl | 13 | 100.0% | 1.000 | 1721 | 33 |
+| tool_calling | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T22-54-51__SMOKE.jsonl | 2 | 100.0% | 1.000 | 8239 | 112 |
+| tool_calling | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T23-02-43.jsonl | 13 | 100.0% | 1.000 | 7598 | 106 |
+| tool_calling_hard | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T22-59-11.jsonl | 13 | 100.0% | 1.000 | 1924 | 37 |
+| tool_calling_hard | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T22-59-11.jsonl | 13 | 92.3% | 0.923 | 8602 | 126 |
 | writing | off | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 21 | 100.0% | 0.962 | 3345 | 118 |
 | writing | off | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 1 | — | — | 1136 | 19 |
 | writing | off | gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl | 2 | — | — | 3871 | 125 |
@@ -778,8 +874,8 @@
 
 | thinking | n | pass rate | mean score | median latency (ms) | median out-tokens |
 |---|---|---|---|---|---|
-| off | 1026 | 93.4% | 0.950 | 6320 | 136 |
-| on | 1013 | 95.5% | 0.956 | 48217 | 1218 |
+| off | 1054 | 93.6% | 0.951 | 6147 | 131 |
+| on | 1041 | 95.6% | 0.956 | 46845 | 1169 |
 
 ## By capability
 
@@ -797,6 +893,8 @@
 | long_context_hard | 98 | 94.9% | 0.949 | 39722 | 530 |  |
 | reasoning | 230 | 100.0% | 1.000 | 15282 | 422 |  |
 | reasoning_hard | 170 | 98.8% | 0.988 | 24929 | 689 |  |
+| tool_calling | 30 | 100.0% | 1.000 | 3751 | 62 |  |
+| tool_calling_hard | 26 | 96.2% | 0.962 | 3973 | 66 |  |
 | writing | 215 | 97.1% | 0.944 | 15822 | 325 | 5 |
 | writing_hard | 114 | 86.6% | 0.851 | 24864 | 566 | 2 |
 
@@ -827,6 +925,10 @@
 | reasoning | on | 115 | 100.0% | 1.000 | 28372 | 725 |
 | reasoning_hard | off | 86 | 100.0% | 1.000 | 15066 | 400 |
 | reasoning_hard | on | 84 | 97.6% | 0.976 | 47745 | 1230 |
+| tool_calling | off | 15 | 100.0% | 1.000 | 1721 | 33 |
+| tool_calling | on | 15 | 100.0% | 1.000 | 7598 | 106 |
+| tool_calling_hard | off | 13 | 100.0% | 1.000 | 1924 | 37 |
+| tool_calling_hard | on | 13 | 92.3% | 0.923 | 8602 | 126 |
 | writing | off | 108 | 99.0% | 0.956 | 4620 | 114 |
 | writing | on | 107 | 95.2% | 0.932 | 53977 | 1459 |
 | writing_hard | off | 58 | 92.9% | 0.895 | 5367 | 142 |
@@ -985,7 +1087,7 @@
 | writing_hard | three_distinct_voices | 8 | 1.000 |
 | writing_hard | tragic_version_genuinely_tragic | 8 | 1.000 |
 
-## Failures (112)
+## Failures (113)
 
 | capability | prompt | mode | score | notes | finish/err |
 |---|---|---|---|---|---|
@@ -1070,6 +1172,7 @@
 | coding_quality_hard | cq-h-11 | off | 0.647 | ok:tests pass \| X:rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line | stop |
 | coding_quality_hard | cq-h-14 | on | 0.222 | X:rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line 3, in <module>\ | length |
 | coding_quality_hard | cq-h-14 | off | 0.893 | ok:tests pass \| ok:tests pass \| X:quality complexity=0.68, nesting=0.75, length=0.00, ruff | stop |
+| tool_calling_hard | tc-h-03 | on | 0.000 | X:emitted 1 call(s): ['translate'] | tool_calls |
 | coding | cod-05 | off | 0.000 | rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line 8, in <module>\n  | stop |
 | coding | cod-08 | off | 0.000 | rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line 22, in <module>\n | stop |
 | coding | cod-14 | off | 0.000 | rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line 51, in <module>\n | stop |

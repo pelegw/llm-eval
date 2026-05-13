@@ -95,6 +95,7 @@ before a real run).
 | **long_context** | retrieve / scan / count over a synthetic haystack of 60–250 short personnel records — needle ("what's X's lucky number"), count ("how many live in city Y"), the Nth-occurrence-of-a-hobby, windowed counts, retrieve-3-and-sum, contradiction/correction handling. Haystacks are generated, so the gold answer is known exactly | programmatic (numeric / name-from-records) |
 | **writing** | craft tasks — haiku, sonnet (ABAB CDCD EFEF GG), cover letter, mystery opening, limerick, bedtime story, "rewrite this sentence", flash fiction with a bookend constraint, song lyric with an identical chorus, acrostic, 100-word single-sentence story, second-person/present-tense scene, archaic-register continuation… | rubric (Claude scores 1–5 per named criterion — see §6) |
 | **coherence** | internal consistency under self-imposed structure — invent terms and reason from them, interleaved causal chains, a dungeon with a provably-shortest path, invent a base-6 numeral system and verify the arithmetic, a 4-generation family tree + distant-relation queries, necessary-vs-sufficient classification. *(Currently excluded from the comparison runs by choice — it's a "is it broken" floor that strong models ceiling.)* | rubric |
+| **tool_calling** | does the model emit the *right* OpenAI-style function call given a tool spec? — single-tool happy path, multi-tool selection from 5+ tools, argument extraction from prose, type-strict args (catches `"150"` vs `150`), enum constraints, refusal when no tool fits, parallel calls, multi-turn integration of a pre-injected tool result, ambiguous tool descriptions, seductive but wrong tools (e.g. `delete_database` for "clean up my desktop"), `tool_choice:"required"` discipline | programmatic (`tool_call`, `no_tool_call`, `tool_calls_set` — match by function name + per-arg constraints; see §6 and §8) |
 
 The exact prompts, ids, and graders for every one of these are in **[`TESTS.md`](TESTS.md)**.
 
@@ -125,6 +126,11 @@ pass; the score is the mean of the sub-scores). Types:
   prompts catch O(n²)-or-worse / exponential solutions.
 - `code_quality {fn_name, require_type_hints, require_docstring, max_cc, max_nesting, max_body_lines, run_ruff, …}` —
   see §7.
+- `tool_call {name, args, allow_extra_args, forbid_content}` / `no_tool_call {must_say_regex?}` / `tool_calls_set
+  {calls:[{name, args}], order, allow_extra_calls}` — read `tool_calls` from the response record. Argument
+  constraints (`args`) are per-arg: `"*"` (presence-only), `{"equals": v}`, `{"in": [...]}`, `{"regex": "..."}`,
+  `{"contains": "..."}`, `{"type": "string|number|int|bool|array|object"}`; multiple keys are AND-ed. `bool` is
+  rejected for `int`/`number` type checks explicitly. See §8.
 
 ### Rubric graders (writing & coherence) — `scripts/grade_rubrics.py`
 
@@ -172,7 +178,56 @@ over-long, lint-dirty blob).
 
 ---
 
-## 8. Sampling
+## 8. The `tool_calling` tier (single-step function calling)
+
+This tier tests whether the model emits the *right* OpenAI-style structured tool call in response to a user
+request, given a list of `tools` (function specs). It does NOT test long-horizon agentic loops or multi-step tool
+chains — just the single-step "given a tool spec, do you call the right function with the right arguments?"
+competency.
+
+**Request shape.** A `tool_calling` prompt adds two optional fields the harness passes verbatim to the endpoint:
+`tools` (list of OpenAI tool dicts) and `tool_choice` (`"auto"` / `"none"` / `"required"` / `{type:"function",
+function:{name:...}}`). The harness captures `message.tool_calls` from the response (normalized to a flat
+`[{id, name, arguments(JSON-string)}, ...]` list, stripping the OpenAI `function` envelope) into the result record
+alongside `response_text` / `thinking_text`. A new optional record field `tools_offered` lists the tool names that
+were passed in.
+
+**Content-fallback rescue.** Some chat templates emit tool-call JSON into `message.content` instead of populating
+`tool_calls`. If `tools` were offered and `tool_calls` came back empty, the harness tries to parse a
+`{name, arguments}` shape out of the content (object / array / fenced-JSON). When this rescue fires, the record is
+flagged with `tool_calls_in_content: true` so the report can surface the template variance.
+
+**Multi-turn convention.** A few hard prompts (`tc-12`, `tc-h-09`, `tc-h-13`) pre-inject a fake `tool`-role result
+into the conversation to test whether the model *integrates* the result rather than re-calling. These prompts use
+the optional `messages` field (a full prebuilt sequence ending in a `{role: "tool", tool_call_id: ..., content: ...}`
+message); `build_messages()` honors this verbatim instead of building from `system` + `user`. The model is graded
+on the *final-turn content*: it should NOT emit a fresh tool call, and the content should weave in the mock
+result's data.
+
+**Today's date.** The shared `TC_SYS` system prompt includes `Today's date is YYYY-MM-DD.` (the date at prompt-gen
+time). This is baked into the prompt file (not the per-run runtime), so a re-run reproduces the same prompts. The
+date is necessary for prompts like "set a calendar event for next Friday" — without it, the model defensively asks
+for clarification (a real, observed failure mode pre-fix). If you re-generate `gen_prompts.py` on a different day,
+the prompt set refreshes with the new date and date-relative tests should be re-run.
+
+**Graders** (`tool_call`, `no_tool_call`, `tool_calls_set`) — see §6. They read `tool_calls` off the record dict
+(threaded into `grade()` as the optional `rec=` keyword arg; the 16 existing graders are unchanged and still called
+as `grade(g, text)`). Argument constraints support `equals` / `in` (enum) / `regex` / `contains` / `type` and a
+`"*"` presence-only shorthand; constraints in one dict are AND-ed. `allow_extra_args` (default True) controls
+whether tool calls with extra args beyond the spec pass; `forbid_content` (default False) asserts the model
+emitted only the call, no prose alongside; `tool_calls_set` supports `order: "any"|"strict"` and
+`allow_extra_calls: False` (default — extras fail the test).
+
+**`finish_reason: "tool_calls"`** is a normal completion state, not an error. The harness records it but graders
+don't depend on it. (Watch for `"length"` — that means the model got truncated mid-arg-JSON.)
+
+**Default inclusion.** `tool_calling` joins `CAP_ORDER` and `tool_calling_hard` joins `HARD_CAPS` — `--caps all`,
+`--caps hard`, and `--caps everything` all include them. Models without tool-use chat templates will fail every
+prompt loudly (`"no tool call emitted"`), which is itself the right signal.
+
+---
+
+## 9. Sampling
 
 Sampling parameters are set per the **loaded model's vendor recommendation** and recorded in each run's
 `.meta.json` (so it's never ambiguous which run used which). Gemma rec: `temperature=1.0, top_p=0.95, top_k=64`.
@@ -183,7 +238,7 @@ first.
 
 ---
 
-## 9. The results schema (the cross-run contract)
+## 10. The results schema (the cross-run contract)
 
 Each line of `results/<tag>__<ts>.jsonl` is one call. Keep this shape stable — it's what makes runs comparable:
 
@@ -207,7 +262,7 @@ means and a failures table) — it groups by `model_tag`, so a multi-file invoca
 
 ---
 
-## 10. Reproducibility & adding a model
+## 11. Reproducibility & adding a model
 
 - **Prompt generation is deterministic** — `scripts/gen_prompts.py` is seeded, so `python3 scripts/gen_prompts.py`
   regenerates byte-identical prompt files (including the synthetic long-context haystacks). Re-run it after editing
@@ -220,20 +275,21 @@ means and a failures table) — it groups by `model_tag`, so a multi-file invoca
 
 ---
 
-## 11. What this does *not* measure (limitations)
+## 12. What this does *not* measure (limitations)
 
 - **Ceiling effects.** The base tier maxes out for any competent model — it can't rank two strong models. That's
   what the hard tier is for, and even the hard tier should get harder for frontier models.
 - **Rubric subjectivity.** Writing/coherence scores are one reviewer's calibrated judgment; they compress the top
   end. (Pairwise grading would fix this.)
 - **Coverage.** The whole eval tests *crisp, gradeable sub-skills* — arithmetic, function-writing, constraint-
-  following, retrieval, bounded creative tasks. It does **not** test long-horizon planning, multi-file reasoning,
-  novel synthesis, tool use, or sustained agentic work. A model could ace every prompt here and still be a worse
-  *assistant* than one that aces them too but also has the deeper capabilities the eval never probes. **"Tops this
-  eval" ≠ "best model."** This caveat cuts against over-trusting the eval for strong models — not toward favoring
-  weak ones (the design choices that look like "reward minimalism" — penalizing over-delivery, rewarding concise
-  code — are really "reward instruction-following and clean code", both of which the better model wins).
-- **Sampling not identical across models** (see §8).
+  following, retrieval, bounded creative tasks, and *single-step* tool calling. It does **not** test long-horizon
+  agentic loops, multi-step tool chains where one call's output feeds the next, multi-file reasoning, or novel
+  synthesis. A model could ace every prompt here and still be a worse *assistant* than one that aces them too but
+  also has the deeper capabilities the eval never probes. **"Tops this eval" ≠ "best model."** This caveat cuts
+  against over-trusting the eval for strong models — not toward favoring weak ones (the design choices that look
+  like "reward minimalism" — penalizing over-delivery, rewarding concise code — are really "reward instruction-
+  following and clean code", both of which the better model wins).
+- **Sampling not identical across models** (see §9).
 - **Latency is comparable only at `--concurrency 1`**, and only between models run on the same hardware/server
   config; the `n_ctx` and `max_tokens` policy also affect thinking-on behavior (a small thinking-token budget makes
   over-thinking models truncate).
@@ -243,6 +299,6 @@ means and a failures table) — it groups by `model_tag`, so a multi-file invoca
 ## See also
 
 - **[`TESTS.md`](TESTS.md)** — every prompt, its id, what it probes, its grader.
-- **[`ANALYSIS.md`](ANALYSIS.md)** — narrative analysis of the runs done so far (3 models: gemma-4-26b-a4b,
-  gemma-4-31b, qwen3.6-35b-a3b).
+- **[`ANALYSIS.md`](ANALYSIS.md)** — narrative analysis of the runs done so far (4 models: gemma-4-26b-a4b,
+  gemma-4-31b, qwen3.6-35b-a3b, qwen3.5-122b-a10b at Q3_K_XL).
 - **`report_compare.md`** — the numbers tables for those runs.

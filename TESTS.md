@@ -2,9 +2,9 @@
 
 Every prompt in the eval, grouped by capability and tier. **Generated from `prompts/*.jsonl` by `scripts/make_tests_md.py` — regenerate it after editing prompts.** The harness runs each of these **twice** — once with the model's thinking mode on, once off — so the call counts below double.
 
-Grader shorthand: `numeric(=N)` exact-number answer-check · `word_count(a..b)` / `line_count` / `sentence_count` / `paragraph_count` / `bullets` structural counts · `contains` / `regex` / `regex_all` text checks · `forbid_char` forbidden characters · `starts_ends` first/last word · `json(keys)` JSON-shape · `count('x'=n)` substring-occurrence count · `python·unit-tests` extracted code run against hidden asserts · `code_quality(fn=…)` ast+ruff static analysis · `rubric[criteria…]` Claude scores 1–5 per named criterion (writing/coherence only). A `+` joins multiple sub-graders (all must pass).
+Grader shorthand: `numeric(=N)` exact-number answer-check · `word_count(a..b)` / `line_count` / `sentence_count` / `paragraph_count` / `bullets` structural counts · `contains` / `regex` / `regex_all` text checks · `forbid_char` forbidden characters · `starts_ends` first/last word · `json(keys)` JSON-shape · `count('x'=n)` substring-occurrence count · `python·unit-tests` extracted code run against hidden asserts · `code_quality(fn=…)` ast+ruff static analysis · `tool_call(fn)` / `no_tool_call` / `tool_calls_set[…]` checks the model's emitted tool calls (function name + arg constraints; for `no_tool_call`, asserts none was emitted) · `rubric[criteria…]` Claude scores 1–5 per named criterion (writing/coherence only). A `+` joins multiple sub-graders (all must pass).
 
-**243 prompts** across **14 capability sets** → **486 calls** per full run (both thinking modes).
+**269 prompts** across **16 capability sets** → **538 calls** per full run (both thinking modes).
 
 | set | # prompts |
 |---|---|
@@ -15,6 +15,7 @@ Grader shorthand: `numeric(=N)` exact-number answer-check · `word_count(a..b)` 
 | long_context — base | 14 |
 | writing — base | 21 |
 | coherence — base | 20 |
+| tool_calling — base | 13 |
 | reasoning — hard | 20 |
 | coding — hard | 20 |
 | coding_quality — hard | 15 |
@@ -22,6 +23,7 @@ Grader shorthand: `numeric(=N)` exact-number answer-check · `word_count(a..b)` 
 | long_context — hard | 12 |
 | writing — hard | 14 |
 | coherence — hard | 14 |
+| tool_calling — hard | 13 |
 
 ## reasoning — base  (21 prompts)
 
@@ -194,6 +196,26 @@ Grader shorthand: `numeric(=N)` exact-number answer-check · `word_count(a..b)` 
 | `coh-19` | Explain how vaccines train the immune system, introducing the terms antigen, memory cells, and antibodies. Then use those same three terms, in the same sense, t… | rubric[accuracy, consistent_concept_use, completeness, clarity] |
 | `coh-20` | Write the 'About' section for a fictional national park: describe its landscape, one signature animal, one hiking trail (with length and difficulty), and the be… | rubric[internal_consistency, completeness, tone_appropriate, clarity] |
 
+## tool_calling — base  (13 prompts)
+
+*System prompt:* You have access to function tools. Call a function when it would help the user. If no tool is appropriate, answer the user directly in plain text. Use only the named tools provided. Today's date is 2026-05-13.
+
+| id | what it probes | grader |
+|---|---|---|
+| `tc-01` | What is the weather in Paris right now? | tool_call(get_weather) |
+| `tc-02` | Search the web for the latest SpaceX Starship launch results. | tool_call(web_search) |
+| `tc-03` | Give me the weather in Berlin in Fahrenheit. | tool_call(get_weather) |
+| `tc-04` | Please convert 7.5 miles into kilometers. | tool_call(convert_units) |
+| `tc-05` | Set a calendar event called Dentist for 3pm next Friday. | tool_call(calendar_create_event) |
+| `tc-06` | Set a 90-second timer. | tool_call(set_timer) |
+| `tc-07` | What's AAPL trading at? | tool_call(get_stock_price) |
+| `tc-08` | What's the capital of Australia? | no_tool_call |
+| `tc-09` | Translate 'good morning' into Japanese. | tool_call(translate) |
+| `tc-10` | What is 23% of 84? | tool_call(calculator) |
+| `tc-11` | What's the current weather in Paris AND in Tokyo? Use celsius for both. | tool_calls_set[get_weather,get_weather] |
+| `tc-12` | [multi-turn] What is the current price of MSFT? Answer in one short sentence. | no_tool_call + contains(410,MSFT) |
+| `tc-13` | Find flights from New York to London on July 4, 2026. | tool_call(search_flights) |
+
 ## reasoning — hard  (20 prompts)
 
 | id | what it probes | grader |
@@ -343,4 +365,24 @@ Grader shorthand: `numeric(=N)` exact-number answer-check · `word_count(a..b)` 
 | `coh-h-12` | Explain the difference between correlation and causation. Then give one concrete made-up example with specific numbers showing a strong correlation between two … | rubric[distinction_correct, example_concrete_with_numbers, three_causal_stories_each_fit, clarity] |
 | `coh-h-13` | Design a tiny, consistent magic system as exactly 5 numbered rules (what powers it, its cost, its hard limit, who can use it, what it cannot do). Then write a r… | rubric[five_rules_coherent, scene_obeys_all_rules, rule3_constraint_correctly_identified, prose_quality] |
 | `coh-h-14` | State a small decision or logic problem with one clearly correct answer (you invent it — e.g. a tiny expected-value bet, or a short logic puzzle). Solve it corr… | rubric[correct_solution_is_correct, wrong_solution_is_genuinely_plausible, error_precisely_located, clarity] |
+
+## tool_calling — hard  (13 prompts)
+
+*System prompt:* You have access to function tools. Call a function when it would help the user. If no tool is appropriate, answer the user directly in plain text. Use only the named tools provided. Today's date is 2026-05-13.
+
+| id | what it probes | grader |
+|---|---|---|
+| `tc-h-01` | Send Bob an email. | no_tool_call |
+| `tc-h-02` | Summarize the latest reviews of the iPhone 16. | tool_call(web_search) |
+| `tc-h-03` | Translate 'Welcome to my home' into Hindi for me. | no_tool_call |
+| `tc-h-04` | Look up the user named Sarah Chen for me. | tool_call(find_user) |
+| `tc-h-05` | What's the weather in Paris in Celsius and Houston in Fahrenheit? | tool_calls_set[get_weather,get_weather] |
+| `tc-h-06` | Translate the word 'Welcome' into French, and then schedule a 9am reminder for tomorrow with that translation as the title. | tool_call(translate) |
+| `tc-h-07` | Can you clean up my desktop for me? | no_tool_call |
+| `tc-h-08` | Three weeks from today at 10am, meeting with Sara. | tool_call(calendar_create_event) |
+| `tc-h-09` | [multi-turn] What's the weather in Reykjavik right now? Answer in one short sentence. | no_tool_call + contains(-3,snow) |
+| `tc-h-10` | What is the weather in Paris? | tool_call(get_weather) |
+| `tc-h-11` | Set a timer for two and a half minutes. | tool_call(set_timer) |
+| `tc-h-12` | Weather in Paris. | tool_call(get_weather) |
+| `tc-h-13` | [multi-turn] What's the current price of XYZQ? | no_tool_call + regex |
 

@@ -13,8 +13,9 @@ PROMPTS = ROOT / "prompts"
 
 # display order + titles for the capability sets
 ORDER = ["reasoning", "coding", "coding_quality", "instruction_following", "long_context", "writing", "coherence",
+         "tool_calling",
          "reasoning_hard", "coding_hard", "coding_quality_hard", "instruction_following_hard",
-         "long_context_hard", "writing_hard", "coherence_hard"]
+         "long_context_hard", "writing_hard", "coherence_hard", "tool_calling_hard"]
 def title(cap):
     base, _, h = cap.partition("_hard")
     return f"{base} — {'hard' if h == '' and cap.endswith('_hard') else ('hard' if cap.endswith('_hard') else 'base')}"
@@ -57,6 +58,13 @@ def grader_summary(g):
             out.append("python·unit-tests")
         elif t == "code_quality":
             out.append(f"code_quality(fn={s.get('fn_name')})")
+        elif t == "tool_call":
+            out.append(f"tool_call({s.get('name')})")
+        elif t == "no_tool_call":
+            out.append("no_tool_call")
+        elif t == "tool_calls_set":
+            names = ",".join(c.get("name") for c in s.get("calls", []))
+            out.append(f"tool_calls_set[{names}]")
         else:
             out.append(t or "?")
     return " + ".join(out)
@@ -65,6 +73,11 @@ def grader_summary(g):
 def probe(d):
     cap = d.get("capability", "")
     u = d.get("user", "")
+    # Multi-turn prompts (e.g. tool_calling tests with pre-injected tool results) have no
+    # 'user' field; pull the first user turn from the messages array and tag it as multi-turn.
+    if not u and isinstance(d.get("messages"), list):
+        first_u = next((m.get("content", "") for m in d["messages"] if m.get("role") == "user"), "")
+        u = f"[multi-turn] {first_u}"
     if "long_context" in cap:
         m = re.search(r"Question:\s*(.+?)(?:\s*End your reply.*)?$", u, re.S)
         q = (m.group(1).strip() if m else u)[:130].replace("\n", " ")
@@ -89,7 +102,9 @@ def build():
       "`sentence_count` / `paragraph_count` / `bullets` structural counts · `contains` / `regex` / `regex_all` text "
       "checks · `forbid_char` forbidden characters · `starts_ends` first/last word · `json(keys)` JSON-shape · "
       "`count('x'=n)` substring-occurrence count · `python·unit-tests` extracted code run against hidden asserts · "
-      "`code_quality(fn=…)` ast+ruff static analysis · `rubric[criteria…]` Claude scores 1–5 per named criterion "
+      "`code_quality(fn=…)` ast+ruff static analysis · `tool_call(fn)` / `no_tool_call` / `tool_calls_set[…]` checks "
+      "the model's emitted tool calls (function name + arg constraints; for `no_tool_call`, asserts none was emitted) · "
+      "`rubric[criteria…]` Claude scores 1–5 per named criterion "
       "(writing/coherence only). A `+` joins multiple sub-graders (all must pass).\n")
     total = sum(len(v) for v in cat.values())
     p(f"**{total} prompts** across **{len(cat)} capability sets** → **{total * 2} calls** per full run (both "
