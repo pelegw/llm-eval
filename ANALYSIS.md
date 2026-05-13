@@ -1,12 +1,16 @@
-# Local-model eval — 3-way analysis
+# Local-model eval — 4-way analysis
 
-*gemma-4-26b-a4b · gemma-4-31b · qwen3.6-35b-a3b — written 2026-05-12*
+*gemma-4-26b-a4b · gemma-4-31b · qwen3.6-35b-a3b · qwen3.5-122b-a10b — written 2026-05-12, updated 2026-05-13*
 
 This is the narrative companion to `report_compare.md` (which has the raw numbers tables) and the eval memory at
-`~/.claude/projects/-home-peleg/memory/local-model-eval.md`. All three models were run through the eval harness
+`~/.claude/projects/-home-peleg/memory/local-model-eval.md`. All four models were run through the eval harness
 in `~/llm-eval/` (llama.cpp OpenAI-compatible endpoint, concurrency 1, both thinking modes). **Coherence was
-excluded from all three** by request — the base/`*_hard` tiers below cover reasoning, coding, code-quality,
+excluded from all four** by request — the base/`*_hard` tiers below cover reasoning, coding, code-quality,
 instruction-following, long-context, and writing.
+
+**Quant caveat for the 4th model**: qwen3.5-122b-a10b was run at **Q3_K_XL** (aggressive 3-bit), much more
+quantized than the other three (Q5/Q8). The discussion below flags where the underperformance is plausibly
+quant-attributable.
 
 ---
 
@@ -17,6 +21,7 @@ instruction-following, long-context, and writing.
 | **gemma-4-31b** | 31B dense | Q5_K_XL | base+hard run: **97.5%** / 0.978 mean | **co-leader** |
 | **gemma-4-26b-a4b** | 26B MoE, ~4B active | Q8_K_XL | base run **98.3%** / 0.976; hard run 90.9% / 0.935 | **co-leader** |
 | **qwen3.6-35b-a3b** | 35B MoE, ~3B active | Q8_K_XL | **92.6%** / 0.940 mean | **clear 3rd** |
+| **qwen3.5-122b-a10b** | 122B MoE, ~10B active | Q3_K_XL | **91.9%** / 0.938 mean | **4th — Q3 quant penalty** |
 
 - The **two Gemmas are co-leaders** — effectively tied on the base tier (~98%); the **31B-dense edges the hard
   tier** (95.7% vs the 26B-A4B's 90.9%), and the *entire* gap is the 26B-A4B over-thinking itself into
@@ -24,12 +29,18 @@ instruction-following, long-context, and writing.
 - **Qwen3.6-35B-A3B is a clear third**: it shares the over-thinking truncation trait (a bit milder than the
   26B-A4B) *and* additionally lags on basic coding, basic instruction-following, hard-IF, hard-code-quality
   correctness, and long-context counting — especially thinking-off — plus more poetry-form misses.
-- **Code quality is the least-differentiating axis** — all three write solid, idiomatic, well-typed, well-documented
-  Python; all three flunk the same over-engineered-`evaluate`-parser quality bar when thinking-off.
+- **Qwen3.5-122B-A10B at Q3 finishes 4th** — *despite ~4× the parameter count of Qwen3.6*. It matches the Gemmas on
+  reasoning + hard-coding correctness (100% both), but falls apart on `coding_quality_hard`-off (**53.3%**, the
+  lowest cell in any model × cap), shows the **most truncations** of any model (13, all thinking-on), and is **2×
+  slower** than Qwen3.6 wall-clock. The aggressive Q3 quant is the most likely culprit — bigger model, more lossy
+  weights, the loss dominates the size advantage.
+- **Code quality is the least-differentiating axis at the base tier** — all four write solid, idiomatic,
+  well-typed, well-documented Python at thinking-on (`coding_quality` mean ≥ 0.97 for everyone). At the *hard*
+  tier off-mode the spread is huge — Gemma-31B 93% → Qwen3.6 73% → Qwen3.5-Q3 53%.
 - **Practical:** run any of these **thinking-on for precision-sensitive work** (exact counts, stacked constraints,
-  correctness-critical code) — but the two MoEs (26B-A4B, Qwen-A3B) will sometimes burn the whole token budget
-  thinking and emit nothing on hard prompts, so give them a generous `max_tokens` cap / fallback. The 31B-dense
-  is the safest bet: it deliberates *and* lands the answer.
+  correctness-critical code) — but the three MoEs (26B-A4B, Qwen3.6-A3B, Qwen3.5-A10B-Q3) will sometimes burn the
+  whole token budget thinking and emit nothing on hard prompts, so give them a generous `max_tokens` cap /
+  fallback. The 31B-dense is the safest bet: it deliberates *and* lands the answer.
 
 ---
 
@@ -48,9 +59,13 @@ instruction-following, long-context, and writing.
   over generated haystacks). *Rubric* for writing — Claude scores 1–5 on ~4 named criteria per prompt, reading both
   the response and the reasoning trace; pass ≥ 0.6.
 - **Sampling — NOT identical across models** (this is the main caveat): the Gemma runs used Gemma's recommended
-  sampling (`temp 1.0, top_p 0.95, top_k 64`); the Qwen run used Qwen3's (`temp 0.7, top_p 0.8, top_k 20,
+  sampling (`temp 1.0, top_p 0.95, top_k 64`); both Qwen runs used Qwen3's (`temp 0.7, top_p 0.8, top_k 20,
   presence_penalty 1.5, min_p 0`). Recorded in each run's `.meta.json`. A sampling-matched re-run would tighten the
   comparison.
+- **Quant — also NOT identical**: gemma-4-26b-a4b at Q8_K_XL, qwen3.6-35b-a3b at Q8_K_XL, gemma-4-31b at Q5_K_XL,
+  qwen3.5-122b-a10b at **Q3_K_XL** (much more aggressive). The Q3 means qwen3.5's results aren't strictly
+  apples-to-apples — they're "what this model looks like at the quant it actually fits in", which is the realistic
+  product question, but means a "raw architecture quality" attribution to it would be wrong.
 - **Other caveats:** the base tier ceilings out (can't separate two strong models there — that's why the hard tier
   exists, and it could be harder still for frontier models); rubric grading is calibrated to "competent" more than
   "exceptional", so it compresses the top end (trust big gaps, not 0.05 differences); the eval covers *crisp,
@@ -124,54 +139,97 @@ instruction-following, long-context, and writing.
   the Gemmas). Thinking-on it's verbose (median ~1.2k output tokens). Q8 weights, ~20.4 GiB on disk. (Server ran
   with `--temp 0.7 --top-p 0.8 --top-k 20 --presence-penalty 1.5` — Qwen3 rec — and the harness matched it.)
 
+### qwen3.5-122b-a10b (MoE, ~10B active, **Q3_K_XL**) — 4th, with quant caveat
+
+- **Base + hard (one run, 418 calls): 91.9% / 0.938.** Despite being ~4× the parameter count of Qwen3.6, it lands
+  *behind* it on overall score — a clear signal that the Q3 quant is biting. 95.5% thinking-on vs 88.0% off
+  (biggest on/off gap of the four models).
+- **The two things it does as well as anyone:** `reasoning` + `reasoning_hard` 100%/100% both modes (matches all
+  four), and `coding_hard` 100%/100% (matches all four — its correctness is intact under Q3).
+- **The places it fails worst:**
+  - `coding_quality_hard` thinking-off **53.3%** — the lowest cell of any model × any cap. Of the 7 fails:
+    quality issues on multiple "well-typed correct code under static analysis" prompts (complexity/nesting/ruff)
+    plus a handful of correctness misses. Thinking-on it recovers to 86.7% (same as Qwen3.6) — deliberation
+    rescues most of the gap.
+  - `instruction_following_hard` thinking-off **62.5%** (10/16) — *better than Qwen3.6's 50%* but still well off
+    the Gemmas (75% and 68.8%). Thinking-on: 75% with 4 truncations — verbose thinking eating the budget.
+  - `writing_hard` thinking-on **64.3%** (rubric 0.693) — *tied with the Gemma-26B-A4B for the lowest rubric on
+    this cap*, and for the same reason: **5 truncations** (wr-h-08, -09, -11, -12, -13 all thinking-on emit empty
+    or chaotic output). Off-mode it recovers to 85.7% (rubric 0.829), still the weakest of the four off-mode but
+    a real signal that "thinking" isn't reliable on hard creative tasks here.
+- **It also has the over-thinking truncation trait, *worse* than Qwen3.6** — 13 total `finish=length`, all
+  thinking-on (rate ~3%, up from Qwen3.6's ~1%). Cluster: 4× instruction_following_hard, 5× writing_hard, 2×
+  coding_quality_hard, 1× instruction_following base, 1× writing base. Larger active-params (~10B) didn't tame
+  the over-thinking — if anything they made it slower and more prone to budget-blow.
+- **Quality of *output* when it produces output**: the *successful* thinking-on outputs are often very good — e.g.
+  its `wr-h-05`-on comic/tragic vase-drop pair is sharply crafted; `wr-h-10`-on three-genres locked-drawer set
+  hits all three voices distinctly; its `wr-h-04`-on staircase poem nails all 8 word-counts exactly; its
+  `wr-h-14`-on six-stanza VCVCBC with identical chorus and genuine bridge departure is clean. The model has
+  capacity; it's reliability and quant-cost that drag the numbers down.
+- **Latency: the slowest of all four by a wide margin.** 552 min wall-clock for 418 calls = 0.76 calls/min
+  (compare Qwen3.6's ~5h, Gemma-31B's ~6h for the same workload). Q3 quant on this MoE doesn't recover
+  per-active-param compute the way Q8 does. Thinking-on writing prompts: median ~3k output tokens, max latency
+  > 400s. Per-call latency 2–3× the next slowest model in most caps.
+- **Q3 caveat in one line:** at Q4+ this model is presumably more competitive; at Q3_K_XL, it's a slow
+  4th-place finisher on this hardware. The "more parameters = better" reflex doesn't hold below a quant floor.
+
 ---
 
-## Capability-by-capability (thinking-off shown — the discriminating mode; all three are ~100% / near-ceiling
+## Capability-by-capability (thinking-off shown — the discriminating mode; all four are ~100% / near-ceiling
 thinking-on on most of these except where noted)
 
-| capability | gemma-4-26b-a4b | gemma-4-31b | qwen3.6-35b-a3b |
-|---|---|---|---|
-| `reasoning` (base) | 100% | 100% | 100% |
-| `reasoning_hard` | 100% off / 95% on (1 trunc) | 100% / 100% | 100% off / 95% on (1 trunc) |
-| `coding` (base) | 95–100% off / 100% on | 100% / 100% | **85.7% off** / 100% on |
-| `coding_hard` | 100% / 100% | 100% / 100% | 100% / 100% |
-| `coding_quality` | 100% (~0.99) | 100% (~0.97) | 93% off / 100% on (~0.97) |
-| `coding_quality_hard` | 87% off / 100% on | 93% off / 93% on | **73% off** / 87% on |
-| `instruction_following` (base) | 95.2% off / 100% on | 95.2% off / 100% on | **81.0% off** / 100% on |
-| `instruction_following_hard` | 75% off / 75% on (trunc) | 68.8% off / 100% on | **50% off** / 87.5% on |
-| `long_context` (base) | 100% / 100% | 92.9% off / 100% on | 92.9% off / 100% on |
-| `long_context_hard` | 100% off / 92% on (trunc) | 91.7% off / 100% on | **83.3% off** / 100% on |
-| `writing` (base, rubric) | 100% off / 95% on (~0.95) | 100% / 100% (~0.97) | 95% off / 100% on (~0.95) |
-| `writing_hard` (rubric) | 100% off / 64% on (5 truncs) | 100% off / 93% on (1 trunc) | 86% off / 100% on (~0.88) |
+| capability | gemma-4-26b-a4b | gemma-4-31b | qwen3.6-35b-a3b | qwen3.5-122b-a10b-Q3 |
+|---|---|---|---|---|
+| `reasoning` (base) | 100% | 100% | 100% | 100% |
+| `reasoning_hard` | 100% off / 95% on (1 trunc) | 100% / 100% | 100% off / 95% on (1 trunc) | 100% / 100% |
+| `coding` (base) | 95–100% off / 100% on | 100% / 100% | **85.7% off** / 100% on | 95.2% off / 100% on |
+| `coding_hard` | 100% / 100% | 100% / 100% | 100% / 100% | 100% / 100% |
+| `coding_quality` | 100% (~0.99) | 100% (~0.97) | 93% off / 100% on (~0.97) | 93% off / 100% on (~0.99) |
+| `coding_quality_hard` | 87% off / 100% on | 93% off / 93% on | **73% off** / 87% on | **53% off** / 87% on |
+| `instruction_following` (base) | 95.2% off / 100% on | 95.2% off / 100% on | **81.0% off** / 100% on | **85.7% off** / 95.2% on (1 trunc) |
+| `instruction_following_hard` | 75% off / 75% on (trunc) | 68.8% off / 100% on | **50% off** / 87.5% on | **62.5% off** / 75% on (4 truncs) |
+| `long_context` (base) | 100% / 100% | 92.9% off / 100% on | 92.9% off / 100% on | 100% / 100% |
+| `long_context_hard` | 100% off / 92% on (trunc) | 91.7% off / 100% on | **83.3% off** / 100% on | 91.7% off / 100% on |
+| `writing` (base, rubric) | 100% off / 95% on (~0.95) | 100% / 100% (~0.97) | 95% off / 100% on (~0.95) | 100% off / 95% on (1 trunc, ~0.94) |
+| `writing_hard` (rubric) | 100% off / **64% on** (5 truncs) | 100% off / 93% on (1 trunc) | 86% off / 100% on (~0.88) | **86% off** / **64% on** (5 truncs, ~0.69) |
 
 Bold = noticeably worse than the field. Note the pattern: the **26B-A4B's red cells are all thinking-ON
-truncations**; the **Qwen's red cells are all thinking-OFF capability gaps** (plus a milder version of the same
-truncation issue). The 31B has neither problem in any large way.
+truncations**; the **Qwen3.6's red cells are all thinking-OFF capability gaps** (plus a milder version of the same
+truncation issue); the **Qwen3.5-Q3 has BOTH problems** (worst-of-both: capability gaps off-mode AND the worst
+truncation rate on-mode). The 31B has neither problem in any large way.
 
 ---
 
 ## Failure-pattern summary (the "what actually goes wrong" view)
 
-1. **Over-thinking → empty/truncated output** (`finish=length`, always thinking-ON). 26B-A4B: 11. Qwen-A3B: 5.
-   31B-dense: 1. The two small-active-params MoEs spend the whole 8192-token budget reasoning and emit nothing on
-   hard prompts. The 31B-dense reliably wraps up.
-2. **Exact word/length counts, thinking-OFF.** All three slip here ("exactly 50 words", "exactly 100 words", "60–80
-   words", etc.) — the 31B least, Qwen most (and Qwen consistently *overshoots*). Thinking-ON, all three count
+1. **Over-thinking → empty/truncated output** (`finish=length`, always thinking-ON). 26B-A4B: 11. Qwen3.6-A3B: 5.
+   **Qwen3.5-A10B-Q3: 13** (the new worst). 31B-dense: 1. The three MoEs all spend the whole 8192-token budget
+   reasoning and emit nothing on hard prompts; the larger active-param count of Qwen3.5 didn't help, possibly
+   because Q3 makes the deliberation pass less efficient per token. The 31B-dense reliably wraps up.
+2. **Exact word/length counts, thinking-OFF.** All four slip here ("exactly 50 words", "exactly 100 words", "60–80
+   words", etc.) — the 31B least, Qwen3.6 most (and Qwen3.6 consistently *overshoots*); Qwen3.5-Q3 misses some
+   (wr-h-02-off: 89 words instead of exactly 100, wr-18-off: 103 instead of ≤100). Thinking-ON, all four count
    explicitly in the trace and get them right.
 3. **Strict char-forbid constraints, thinking-OFF.** Used punctuation in a "lowercase + spaces only" prompt; used a
-   word containing the forbidden letter (e.g. "Read" → 'e', "stars" → 's'). All three; Qwen worst.
-4. **Long-list counting off-by-ones.** "How many records have lucky number > 500" → off by 1–6. 31B and Qwen both
-   hit these on `lc-14` / `lc-h-09`; the 26B mostly didn't (but truncated on `lc-h-05`-on instead).
+   word containing the forbidden letter (e.g. "Read" → 'e', "stars" → 's'). All four; Qwens worst.
+4. **Long-list counting off-by-ones.** "How many records have lucky number > 500" → off by 1–6. 31B, Qwen3.6, and
+   Qwen3.5 hit these on `lc-14` / `lc-h-09`; the 26B mostly didn't (but truncated on `lc-h-05`-on instead).
 5. **Poetry/form precision.** Rhyme schemes (limericks where line 5 doesn't rhyme with 1–2; sonnet A-rhymes that
-   are slant), syllable counts, the staircase-poem line-word-counts, an acrostic that spells the wrong word. Qwen
-   has the most of these; the Gemmas have a few.
-6. **Hard-coding correctness, thinking-OFF.** Only Qwen has *genuine* hard-coding correctness misses (`wildcard_match`,
-   `dijkstra` wrong off-mode); the Gemmas pass those.
-7. **Over-engineered / lint-dirty code quality.** All three flunk the `evaluate` recursive-descent-parser prompt on
-   *quality* (works, but deeply nested + over-long + ruff hits) when thinking-off. Common to all three.
+   are slant), syllable counts, the staircase-poem line-word-counts, an acrostic that spells the wrong word.
+   Qwen3.5-Q3-off blows the staircase poem (4 of 8 line-word-counts wrong) and the iambic-pentameter mug ad
+   (1 of 4 lines off by a syllable); Qwen3.6 had similar trouble. The Gemmas have a few.
+6. **Hard-coding correctness, thinking-OFF.** Only Qwen3.6 has *genuine* hard-coding correctness misses
+   (`wildcard_match`, `dijkstra` wrong off-mode); the Gemmas and Qwen3.5 pass those. Qwen3.5-Q3 instead loses
+   on `coding_quality_hard`-off (quality + a few correctness mid-cases).
+7. **Over-engineered / lint-dirty code quality.** All four flunk the `evaluate` recursive-descent-parser prompt on
+   *quality* (works, but deeply nested + over-long + ruff hits) when thinking-off. Common to all four — a real
+   architectural bias of this cohort, not a specific weakness.
 8. **Over-delivery on "rewrite this sentence".** Models give a menu of 5–12 rewrite options + a "tips" section
-   instead of *one* rewrite — both Gemmas badly; Qwen mildly thinking-off, and Qwen *cleanly* (one rewrite)
-   thinking-on.
+   instead of *one* rewrite — both Gemmas badly; both Qwens mildly thinking-off, and both Qwens *cleanly* (one
+   rewrite) thinking-on.
+9. **The pun-limerick failure mode (Qwen3.5-Q3-off specifically)**: produces 4 draft limericks with
+   `*(Wait, let me refine...)*` annotations between them — leaks thinking-style commentary into the response. A
+   classic small-model-under-pressure failure that the bigger architecture didn't prevent under Q3.
 
 ---
 
@@ -188,31 +246,45 @@ its best thinking-on creative work matches the Gemmas — but it's the least *re
 basic instruction-following, falls apart on the hard instruction-following / hard-code-quality / long-context tiers
 thinking-off, has its own (milder) over-thinking truncation issue, and overshoots length constraints. If you need a
 fast model and you're using it thinking-off for simple stuff, it's fine; for anything precision-sensitive it's the
-weakest of the three.
+weakest of the four for everyday off-mode use.
 
-Across all three: this is a "tiny-active-params or modest-dense" cohort, and the eval surfaces the characteristic
-weaknesses of that class — precision under constraint (thinking-off) and runaway reasoning (thinking-on, for the
-MoEs). None of them is in trouble; the differences are about *how much* of each failure mode shows up.
+**Qwen3.5-122B-A10B at Q3_K_XL finishes 4th — but with a quant asterisk.** The aggressive Q3 quant clearly costs
+it: the *worst* `coding_quality_hard`-off rate of any model (53%), the *worst* truncation rate (13 thinking-on
+truncations vs 1–11 for the others), and the *slowest* wall-clock by ~2× over Qwen3.6. It's not architecturally
+worse than Qwen3.6 — when its thinking-on outputs do land they're often very good — but the
+"more parameters under a more aggressive quant" tradeoff doesn't pay off below Q4 on this hardware. **If you can
+fit Q4+ of a 70–122B model**, that's the right comparison to make next; this Q3 run isn't a verdict on the
+architecture, just on the *quant×architecture* point you're forced to take.
+
+Across all four: this is a "tiny-to-moderate active-params" cohort, and the eval surfaces the characteristic
+weaknesses of that class — precision under constraint (thinking-off), runaway reasoning (thinking-on, for the
+MoEs), and a quant floor below which raw parameter count stops paying. None of them is in trouble; the differences
+are about *how much* of each failure mode shows up.
 
 ---
 
 ## Files
 
-- `~/llm-eval/report_compare.md` — all 7 runs, raw numbers, the `### Capability × thinking mode × run` table.
-- `~/llm-eval/report_31b.md`, `~/llm-eval/report.md` — per-model 31B and 26B-base reports.
+- `~/llm-eval/report_compare.md` — all 4 model runs, raw numbers, the `### Capability × thinking mode × run` table.
 - `~/llm-eval/results/*.jsonl` — raw per-call records (full responses, reasoning traces, per-criterion grading,
   latencies, token usage). Key ones: `gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl` (26B base),
   `gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl` (26B hard), `gemma4-26b-a4b-q8km__2026-05-12T06-18-31.jsonl` +
   `…12-44-12.jsonl` (26B code-quality), `gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl` (31B base+hard) +
-  `…2026-05-12T15-12-37.jsonl` (31B code-quality), `qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl` (Qwen full).
+  `…2026-05-12T15-12-37.jsonl` (31B code-quality), `qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl` (Qwen3.6 full),
+  `qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl` (Qwen3.5 full at Q3_K_XL).
 - `~/llm-eval/prompts/*.jsonl` — the prompt sets (base + `*_hard` + `coding_quality` + `coding_quality_hard`).
 - `~/llm-eval/scripts/` — `gen_prompts.py`, `run_eval.py`, `graders.py`, `report.py`, `grade_rubrics.py`.
 - Eval memory: `~/.claude/projects/-home-peleg/memory/local-model-eval.md` — run history, harness notes, the
-  sampling caveat (revert `SAMPLING` to Gemma's values before any future Gemma re-run).
+  sampling caveat (revert `SAMPLING` to the right values per model family before any re-run).
 
 ## Open items (none urgent)
 
-- A sampling-matched comparison (re-run a Gemma with Qwen's sampling, or vice versa) would tighten the 3-way.
+- A sampling-matched comparison (re-run a Gemma with Qwen's sampling, or vice versa) would tighten the 4-way.
+- A **Q4+ rerun of qwen3.5-122b-a10b** would let us isolate quant cost from architecture quality.
+- **Tool calling** capability is in the next-feature pipeline (see `~/.claude/plans/`): a 26-prompt set with new
+  `tool_call` / `no_tool_call` / `tool_calls_set` graders, plus backfill of all four existing models via delta runs.
 - A `coherence`/`coherence_hard` run for any of these (deliberately skipped everywhere; ~1 hr per model).
 - A harder `coding_quality_hard` tier, or pairwise/relative rubric grading for writing, to discriminate further at
   the top.
+- `MAXTOK_THINKING` bump from 8192 → 16384 (would cut the 30-truncation-across-models problem to a handful;
+  doubles worst-case latency for the slow MoEs).
