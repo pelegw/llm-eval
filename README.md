@@ -76,5 +76,7 @@ Runs done so far: `gemma-4-26b-a4b` (Q8), `gemma-4-31b` (Q5), `qwen3.6-35b-a3b` 
 the 26B-A4B over-thinks into truncated outputs); Qwen3.6-35B-A3B is a clear third; Qwen3.5-122B-A10B at Q3_K_XL
 finishes 4th despite ~4× the parameter count of Qwen3.6 — the aggressive Q3 quant erases the size advantage.
 
-The `tool_calling` capability is **new** (added 2026-05-13). Currently rolled out on `qwen3.5-122b-a10b-q3kxl`
-(51/52 = 98.1% pass, both tiers); backfill for the other 3 models pending.
+The `tool_calling` capability is **new** (added 2026-05-13, backfilled across all 4 models on 2026-05-14).
+**Gemma-4-26B-A4B is the perfect-score winner here at 52/52 (100%)**, followed by Gemma-31B and Qwen3.5-Q3 tied at
+51/52 (98.1%), Qwen3.6 at 50/52 (96.2%). Tool-call discipline is uniformly strong across the cohort — only the
+hard tier (and only `tc-h-03` Hindi-not-in-enum + `tc-h-05` parallel mixed-enum) discriminates.

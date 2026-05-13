@@ -32,8 +32,8 @@ ENDPOINT = "http://localhost:8080/v1/chat/completions"
 MODEL_ID = "gemma-4-26b-a4b"          # server-side id (label only; llama.cpp ignores it) — the run is recorded under --tag
 N_CTX = 8192                          # served context per slot; auto-detected at startup (fallback)
 # Sampling: set per the loaded model's vendor recommendation (recorded in each run's .meta.json).
-# Gemma rec: dict(temperature=1.0, top_p=0.95, top_k=64).  Qwen3 rec (current): below.
-SAMPLING = dict(temperature=0.7, top_p=0.8, top_k=20, presence_penalty=1.5, min_p=0.0)   # Qwen3 recommendation
+# Gemma rec (current): below.  Qwen3 rec: dict(temperature=0.7, top_p=0.8, top_k=20, presence_penalty=1.5, min_p=0.0)
+SAMPLING = dict(temperature=1.0, top_p=0.95, top_k=64)   # Gemma recommendation
 SAFETY_TOKENS = 96                    # leave a little headroom under n_ctx
 # default per-prompt generation cap (clamped to fit n_ctx); thinking needs lots of room
 MAXTOK_THINKING = 8192

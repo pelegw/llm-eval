@@ -200,6 +200,32 @@ truncation rate on-mode). The 31B has neither problem in any large way.
 
 ---
 
+## Tool calling — backfilled 2026-05-14 (52 calls each, both modes)
+
+| model | tc base | tc hard | combined | wall-clock | notes |
+|---|---|---|---|---|---|
+| **gemma-4-26b-a4b** | 26/26 | **26/26** | **52/52 (100%)** | 2.5 min | the only perfect score; tool-call discipline is intact even thinking-on |
+| **gemma-4-31b** | 26/26 | 25/26 | 51/52 (98.1%) | 4.2 min | 1 fail: tc-h-03 on, *silently translated Hindi in content* instead of explaining the enum doesn't support it — bypasses the spec's transparency requirement |
+| **qwen3.5-122b-a10b-Q3** | 26/26 | 25/26 | 51/52 (98.1%) | 2.5 min × 2 (base + hard) | 1 fail: tc-h-03 on, thinking trace correctly identified "Hindi unsupported" then called translate(target_lang="zh") anyway — *real thinking-vs-action gap* |
+| **qwen3.6-35b-a3b** | 26/26 | 24/26 | 50/52 (96.2%) | 3.9 min | 2 fails: (1) tc-h-03 off invented `target_lang="hi"` (not in the enum) — schema-discipline failure; (2) tc-h-05 on emitted only the Paris/celsius call, dropped the parallel Houston/fahrenheit call entirely |
+
+**Key takeaways**:
+
+1. **Tool calling is the most-uniformly-good cap of the eval** — the base tier is 100% across all 4 models in both modes (108/108 calls); only the hard tier discriminates, and only by 0–2 fails. **None of these models is *bad* at single-step tool use.**
+2. **Wall-clock varies 1.7×**: the smaller-active-params models (Gemma-26B-A4B 2.5 min, Qwen3.5 5 min combined) finished fastest because tool-call outputs are short. The dense 31B is the slowest of the four for this cap (4.2 min, ~30s/call thinking-on average).
+3. **`tc-h-03` (Hindi-not-in-enum) is the universally hardest prompt** — every model except the 26B-A4B failed it in one mode or another. Three distinct failure modes surfaced:
+   - **Qwen3.6 off**: invented `"hi"` outside the enum (worst: ignored the schema entirely)
+   - **Qwen3.5 on**: enumerated correctly in thinking, then called with `"zh"` (thinking-action gap)
+   - **Gemma-31B on**: silently bypassed by translating to Hindi in content (no transparency)
+   - **Gemma-26B-A4B both**: correctly refused + explained — clean pass
+4. **`tc-h-05` (parallel mixed-enum: Paris in C, Houston in F)** caught Qwen3.6-on dropping one call entirely — real parallel-call discipline failure.
+5. **The 26B-A4B's over-thinking pathology does NOT bite tool calling** — tool-call outputs are short, the thinking budget never gets exhausted, all 13 hard prompts pass thinking-on. This is the model's most-confident-passing cap.
+6. **Q3-quant cost is absent here** — Qwen3.5-Q3 ties Gemma-31B-Q5 at 98.1%. Whatever the Q3 quant breaks in other caps (code-quality, instruction-following), it doesn't reach the structured-emission pathway.
+
+**Implication for model selection**: if your use case is *single-step* tool calling (the "given a tool, call it right" pattern that covers most agent invocation paths), **the 26B-A4B is now objectively the top pick** — perfect score, fastest, and its over-thinking truncation problem doesn't surface here. Pair with thinking-off for low-latency tool routing.
+
+---
+
 ## Failure-pattern summary (the "what actually goes wrong" view)
 
 1. **Over-thinking → empty/truncated output** (`finish=length`, always thinking-ON). 26B-A4B: 11. Qwen3.6-A3B: 5.
