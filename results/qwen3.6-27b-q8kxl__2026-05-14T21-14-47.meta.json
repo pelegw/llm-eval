@@ -1,0 +1,57 @@
+{
+  "model_tag": "qwen3.6-27b-q8kxl",
+  "endpoint": "http://localhost:8080/v1/chat/completions",
+  "sampling": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "presence_penalty": 1.5,
+    "min_p": 0.0
+  },
+  "thinking_toggle": "chat_template_kwargs.enable_thinking (true=on / false=off); reasoning returned in reasoning_content",
+  "served_model_id": "qwen3.6-27b",
+  "n_ctx": 262144,
+  "n_ctx_train": 262144,
+  "n_embd": 5120,
+  "n_vocab": 248320,
+  "n_params": 26895998464,
+  "file_size_bytes": 35314169856,
+  "server_build": "b9101-389ff61d7",
+  "server": "llama.cpp",
+  "server_cmdline": "llama-server -m /models/Qwen3.6-27B-UD-Q8_K_XL.gguf -ngl 99 -c 262144 --parallel 1 -t 8 -sm layer -ts 1/1 -ctk q8_0 -ctv q8_0 -fa on -b 4096 -ub 1024 --jinja --host 0.0.0.0 --port 8080 --metrics --temp 0.7 --top-p 0.8 --top-k 20 --presence-penalty 1.5 --min-p 0.0 -a qwen3.6-27b",
+  "model_file": "Qwen3.6-27B-UD-Q8_K_XL.gguf",
+  "run_started": "2026-05-14T21-14-47",
+  "n_ctx_used_by_runner": 262144,
+  "max_tokens_policy": "per-prompt cap (default 8192 thinking-on / 2048 off; long_context uses each prompt's value); clamped to fit n_ctx=262144",
+  "capabilities": [
+    "reasoning",
+    "coding",
+    "coding_quality",
+    "instruction_following",
+    "long_context",
+    "writing",
+    "tool_calling",
+    "reasoning_hard",
+    "coding_hard",
+    "instruction_following_hard",
+    "long_context_hard",
+    "writing_hard",
+    "tool_calling_hard",
+    "coding_quality_hard"
+  ],
+  "thinking_modes": [
+    "on",
+    "off"
+  ],
+  "calls_planned": 470,
+  "client_concurrency": 1,
+  "run_duration_min": 691.8,
+  "calls": 470,
+  "calls_per_sec": 0.011,
+  "results": {
+    "pass": 380,
+    "fail": 19,
+    "pending_rubric": 70,
+    "error": 1
+  }
+}

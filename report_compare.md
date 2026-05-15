@@ -1,10 +1,10 @@
 # Local model eval report
 
-- Model tag(s): gemma4-26b-a4b-q8km, gemma4-31b-q5kxl, qwen3.5-122b-a10b-q3kxl, qwen3.6-35b-a3b-q8kxl
-- Source file(s): _aborted_19-48-54_concurrency1.jsonl, _aborted_22-10-29_hardrun_4calls.jsonl, gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl, gemma4-26b-a4b-q8km__2026-05-11T22-05-22__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T03-21-56__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl, gemma4-26b-a4b-q8km__2026-05-12T06-13-52__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T06-18-31.jsonl, gemma4-26b-a4b-q8km__2026-05-12T11-49-54__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T12-44-12.jsonl, gemma4-26b-a4b-q8km__2026-05-14T00-42-42.jsonl, gemma4-31b-q5kxl__2026-05-11T22-14-41__SMOKE.jsonl, gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl, gemma4-31b-q5kxl__2026-05-12T15-07-51__SMOKE.jsonl, gemma4-31b-q5kxl__2026-05-12T15-12-37.jsonl, gemma4-31b-q5kxl__2026-05-14T00-16-43.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T12-20-57__SMOKE.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T22-54-51__SMOKE.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T22-59-11.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T23-02-43.jsonl, qwen3.6-35b-a3b-q8kxl__2026-05-12T16-39-39__SMOKE.jsonl, qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl, qwen3.6-35b-a3b-q8kxl__2026-05-14T00-04-36.jsonl
+- Model tag(s): gemma4-26b-a4b-q8km, gemma4-31b-q5kxl, qwen3.5-122b-a10b-q3kxl, qwen3.6-27b-q8kxl, qwen3.6-35b-a3b-q8kxl
+- Source file(s): _aborted_19-48-54_concurrency1.jsonl, _aborted_22-10-29_hardrun_4calls.jsonl, gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl, gemma4-26b-a4b-q8km__2026-05-11T22-05-22__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T03-21-56__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl, gemma4-26b-a4b-q8km__2026-05-12T06-13-52__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T06-18-31.jsonl, gemma4-26b-a4b-q8km__2026-05-12T11-49-54__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T12-44-12.jsonl, gemma4-26b-a4b-q8km__2026-05-14T00-42-42.jsonl, gemma4-31b-q5kxl__2026-05-11T22-14-41__SMOKE.jsonl, gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl, gemma4-31b-q5kxl__2026-05-12T15-07-51__SMOKE.jsonl, gemma4-31b-q5kxl__2026-05-12T15-12-37.jsonl, gemma4-31b-q5kxl__2026-05-14T00-16-43.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T12-20-57__SMOKE.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T22-54-51__SMOKE.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T22-59-11.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T23-02-43.jsonl, qwen3.6-27b-q8kxl__2026-05-14T21-10-25__SMOKE.jsonl, qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl, qwen3.6-35b-a3b-q8kxl__2026-05-12T16-39-39__SMOKE.jsonl, qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl, qwen3.6-35b-a3b-q8kxl__2026-05-14T00-04-36.jsonl
 - Capabilities: coding, coding_hard, coding_quality, coding_quality_hard, coherence, coherence_hard, instruction_following, instruction_following_hard, long_context, long_context_hard, reasoning, reasoning_hard, tool_calling, tool_calling_hard, writing, writing_hard
 - Thinking modes: off, on
-- Total calls: 2251  (graded 2232, pending rubric 19)
+- Total calls: 2729  (graded 2710, pending rubric 19)
 
 ## Run configuration
 
@@ -667,6 +667,64 @@
 - calls_per_sec: 0.201
 - results: pass=26, fail=0, pending_rubric=0, error=0
 
+### qwen3.6-27b-q8kxl__2026-05-14T21-10-25__SMOKE.jsonl
+
+- Model tag: qwen3.6-27b-q8kxl
+- Served model id: qwen3.6-27b
+- Model file: Qwen3.6-27B-UD-Q8_K_XL.gguf
+- Parameters: 26,895,998,464 (~26.9 B)
+- File size: 35,314,169,856 bytes (~32.9 GiB)
+- Context (n_ctx): 262144
+- Trained context: 262144
+- Embedding dim: 5120
+- Vocab size: 248320
+- Inference server: llama.cpp
+- Server build: b9101-389ff61d7
+- Server cmdline: `llama-server -m /models/Qwen3.6-27B-UD-Q8_K_XL.gguf -ngl 99 -c 262144 --parallel 1 -t 8 -sm layer -ts 1/1 -ctk q8_0 -ctv q8_0 -fa on -b 4096 -ub 1024 --jinja --host 0.0.0.0 --port 8080 --metrics --temp 0.7 --top-p 0.8 --top-k 20 --presence-penalty 1.5 --min-p 0.0 -a qwen3.6-27b`
+- Endpoint: http://localhost:8080/v1/chat/completions
+- Sampling: temperature=0.7, top_p=0.8, top_k=20, presence_penalty=1.5, min_p=0.0
+- Thinking-mode toggle: chat_template_kwargs.enable_thinking (true=on / false=off); reasoning returned in reasoning_content
+- Client concurrency: 1
+- max_tokens policy: per-prompt cap (default 8192 thinking-on / 2048 off; long_context uses each prompt's value); clamped to fit n_ctx=262144
+- Run started: 2026-05-14T21-10-25
+- Run duration (min): 3.8
+- Total calls: 8
+- n_ctx_used_by_runner: 262144
+- capabilities: ['reasoning', 'tool_calling']
+- thinking_modes: ['on', 'off']
+- calls_planned: 8
+- calls_per_sec: 0.035
+- results: pass=8, fail=0, pending_rubric=0, error=0
+
+### qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl
+
+- Model tag: qwen3.6-27b-q8kxl
+- Served model id: qwen3.6-27b
+- Model file: Qwen3.6-27B-UD-Q8_K_XL.gguf
+- Parameters: 26,895,998,464 (~26.9 B)
+- File size: 35,314,169,856 bytes (~32.9 GiB)
+- Context (n_ctx): 262144
+- Trained context: 262144
+- Embedding dim: 5120
+- Vocab size: 248320
+- Inference server: llama.cpp
+- Server build: b9101-389ff61d7
+- Server cmdline: `llama-server -m /models/Qwen3.6-27B-UD-Q8_K_XL.gguf -ngl 99 -c 262144 --parallel 1 -t 8 -sm layer -ts 1/1 -ctk q8_0 -ctv q8_0 -fa on -b 4096 -ub 1024 --jinja --host 0.0.0.0 --port 8080 --metrics --temp 0.7 --top-p 0.8 --top-k 20 --presence-penalty 1.5 --min-p 0.0 -a qwen3.6-27b`
+- Endpoint: http://localhost:8080/v1/chat/completions
+- Sampling: temperature=0.7, top_p=0.8, top_k=20, presence_penalty=1.5, min_p=0.0
+- Thinking-mode toggle: chat_template_kwargs.enable_thinking (true=on / false=off); reasoning returned in reasoning_content
+- Client concurrency: 1
+- max_tokens policy: per-prompt cap (default 8192 thinking-on / 2048 off; long_context uses each prompt's value); clamped to fit n_ctx=262144
+- Run started: 2026-05-14T21-14-47
+- Run duration (min): 691.8
+- Total calls: 470
+- n_ctx_used_by_runner: 262144
+- capabilities: ['reasoning', 'coding', 'coding_quality', 'instruction_following', 'long_context', 'writing', 'tool_calling', 'reasoning_hard', 'coding_hard', 'instruction_following_hard', 'long_context_hard', 'writing_hard', 'tool_calling_hard', 'coding_quality_hard']
+- thinking_modes: ['on', 'off']
+- calls_planned: 470
+- calls_per_sec: 0.011
+- results: pass=380, fail=19, pending_rubric=70, error=1
+
 ### qwen3.6-35b-a3b-q8kxl__2026-05-12T16-39-39__SMOKE.jsonl
 
 - Model tag: qwen3.6-35b-a3b-q8kxl
@@ -758,7 +816,7 @@
 
 | scope | n | pass rate | mean score | median latency (ms) | median out-tokens |
 |---|---|---|---|---|---|
-| all | 2251 | 94.8% | 0.955 | 14553 | 336 |
+| all | 2729 | 94.9% | 0.956 | 16462 | 339 |
 
 ## By run (source file)
 
@@ -788,6 +846,8 @@
 | qwen3.5-122b-a10b-q3kxl__2026-05-13T22-54-51__SMOKE.jsonl | qwen3.5-122b-a10b-q3kxl | 153600 | 4 | 100.0% | 1.000 | 4527 | 66 |
 | qwen3.5-122b-a10b-q3kxl__2026-05-13T22-59-11.jsonl | qwen3.5-122b-a10b-q3kxl | 153600 | 26 | 96.2% | 0.962 | 3973 | 66 |
 | qwen3.5-122b-a10b-q3kxl__2026-05-13T23-02-43.jsonl | qwen3.5-122b-a10b-q3kxl | 153600 | 26 | 100.0% | 1.000 | 3751 | 62 |
+| qwen3.6-27b-q8kxl__2026-05-14T21-10-25__SMOKE.jsonl | qwen3.6-27b-q8kxl | 262144 | 8 | 100.0% | 1.000 | 15200 | 194 |
+| qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | qwen3.6-27b-q8kxl | 262144 | 470 | 95.1% | 0.959 | 28187 | 363 |
 | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-39-39__SMOKE.jsonl | qwen3.6-35b-a3b-q8kxl | 262144 | 4 | 100.0% | 1.000 | 12700 | 508 |
 | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | qwen3.6-35b-a3b-q8kxl | 262144 | 418 | 92.6% | 0.940 | 14884 | 509 |
 | qwen3.6-35b-a3b-q8kxl__2026-05-14T00-04-36.jsonl | qwen3.6-35b-a3b-q8kxl | 262144 | 52 | 96.2% | 0.962 | 2680 | 78 |
@@ -802,6 +862,7 @@
 | coding | off | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 21 | 95.2% | 0.952 | 3676 | 58 |
 | coding | off | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 21 | 100.0% | 1.000 | 3836 | 58 |
 | coding | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 21 | 95.2% | 0.952 | 3288 | 64 |
+| coding | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 21 | 100.0% | 1.000 | 6246 | 77 |
 | coding | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 21 | 85.7% | 0.857 | 1766 | 64 |
 | coding | on | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 21 | 95.2% | 0.952 | 22957 | 927 |
 | coding | on | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 2 | 100.0% | 1.000 | 23294 | 817 |
@@ -809,37 +870,44 @@
 | coding | on | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 21 | 100.0% | 1.000 | 49495 | 905 |
 | coding | on | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 21 | 100.0% | 1.000 | 26539 | 445 |
 | coding | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 21 | 100.0% | 1.000 | 72257 | 1536 |
+| coding | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 21 | 95.2% | 0.952 | 99802 | 1338 |
 | coding | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 21 | 100.0% | 1.000 | 27537 | 1110 |
 | coding_hard | off | gemma4-26b-a4b-q8km__2026-05-11T22-05-22__SMOKE.jsonl | 2 | 100.0% | 1.000 | 9488 | 156 |
 | coding_hard | off | gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl | 20 | 100.0% | 1.000 | 3507 | 116 |
 | coding_hard | off | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 20 | 100.0% | 1.000 | 7120 | 114 |
 | coding_hard | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 20 | 100.0% | 1.000 | 4768 | 96 |
+| coding_hard | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 20 | 100.0% | 1.000 | 9388 | 122 |
 | coding_hard | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 20 | 100.0% | 1.000 | 4141 | 161 |
 | coding_hard | on | gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl | 20 | 100.0% | 1.000 | 40828 | 1426 |
 | coding_hard | on | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 20 | 100.0% | 1.000 | 43481 | 719 |
 | coding_hard | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 20 | 100.0% | 1.000 | 99434 | 2104 |
+| coding_hard | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 20 | 100.0% | 1.000 | 169484 | 2263 |
 | coding_hard | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 20 | 100.0% | 1.000 | 59412 | 2374 |
 | coding_quality | off | gemma4-26b-a4b-q8km__2026-05-12T06-13-52__SMOKE.jsonl | 2 | 100.0% | 0.952 | 15874 | 548 |
 | coding_quality | off | gemma4-26b-a4b-q8km__2026-05-12T06-18-31.jsonl | 14 | 100.0% | 0.985 | 7753 | 265 |
 | coding_quality | off | gemma4-31b-q5kxl__2026-05-12T15-07-51__SMOKE.jsonl | 2 | 100.0% | 0.982 | 14522 | 240 |
 | coding_quality | off | gemma4-31b-q5kxl__2026-05-12T15-12-37.jsonl | 14 | 100.0% | 0.968 | 13084 | 216 |
 | coding_quality | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 14 | 92.9% | 0.923 | 12101 | 256 |
+| coding_quality | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 14 | 92.9% | 0.966 | 19005 | 252 |
 | coding_quality | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 14 | 92.9% | 0.958 | 5697 | 226 |
 | coding_quality | on | gemma4-26b-a4b-q8km__2026-05-12T06-13-52__SMOKE.jsonl | 2 | 100.0% | 0.976 | 95598 | 3204 |
 | coding_quality | on | gemma4-26b-a4b-q8km__2026-05-12T06-18-31.jsonl | 14 | 100.0% | 0.988 | 75538 | 2586 |
 | coding_quality | on | gemma4-31b-q5kxl__2026-05-12T15-07-51__SMOKE.jsonl | 2 | 100.0% | 0.969 | 101716 | 1574 |
 | coding_quality | on | gemma4-31b-q5kxl__2026-05-12T15-12-37.jsonl | 14 | 100.0% | 0.975 | 61655 | 1003 |
 | coding_quality | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 14 | 100.0% | 0.994 | 254053 | 5214 |
+| coding_quality | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 14 | 100.0% | 0.988 | 302183 | 3984 |
 | coding_quality | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 14 | 100.0% | 0.979 | 91542 | 3626 |
 | coding_quality_hard | off | gemma4-26b-a4b-q8km__2026-05-12T11-49-54__SMOKE.jsonl | 2 | 100.0% | 0.960 | 14558 | 504 |
 | coding_quality_hard | off | gemma4-26b-a4b-q8km__2026-05-12T12-44-12.jsonl | 15 | 86.7% | 0.939 | 12947 | 447 |
 | coding_quality_hard | off | gemma4-31b-q5kxl__2026-05-12T15-12-37.jsonl | 15 | 93.3% | 0.952 | 25774 | 425 |
 | coding_quality_hard | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 15 | 53.3% | 0.812 | 21798 | 467 |
+| coding_quality_hard | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 15 | 86.7% | 0.879 | 35469 | 475 |
 | coding_quality_hard | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 15 | 73.3% | 0.899 | 11504 | 461 |
 | coding_quality_hard | on | gemma4-26b-a4b-q8km__2026-05-12T11-49-54__SMOKE.jsonl | 2 | 100.0% | 0.970 | 109559 | 3680 |
 | coding_quality_hard | on | gemma4-26b-a4b-q8km__2026-05-12T12-44-12.jsonl | 15 | 100.0% | 0.969 | 122152 | 4105 |
 | coding_quality_hard | on | gemma4-31b-q5kxl__2026-05-12T15-12-37.jsonl | 15 | 93.3% | 0.915 | 119464 | 1866 |
 | coding_quality_hard | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 15 | 86.7% | 0.880 | 302657 | 6107 |
+| coding_quality_hard | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 15 | 80.0% | 0.858 | 443969 | 5773 |
 | coding_quality_hard | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 15 | 86.7% | 0.877 | 150599 | 5758 |
 | coherence | off | _aborted_19-48-54_concurrency1.jsonl | 1 | — | — | 16889 | 599 |
 | coherence | off | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 20 | 100.0% | 0.972 | 10772 | 431 |
@@ -858,6 +926,7 @@
 | instruction_following | off | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 21 | 95.2% | 0.952 | 1444 | 18 |
 | instruction_following | off | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 21 | 95.2% | 0.952 | 1388 | 18 |
 | instruction_following | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 21 | 85.7% | 0.881 | 1730 | 21 |
+| instruction_following | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 21 | 90.5% | 0.937 | 2169 | 21 |
 | instruction_following | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 21 | 81.0% | 0.865 | 928 | 20 |
 | instruction_following | on | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 21 | 85.7% | 0.881 | 7280 | 290 |
 | instruction_following | on | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 2 | 100.0% | 1.000 | 5742 | 199 |
@@ -865,15 +934,18 @@
 | instruction_following | on | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 21 | 100.0% | 1.000 | 15352 | 266 |
 | instruction_following | on | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 21 | 100.0% | 1.000 | 14073 | 233 |
 | instruction_following | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 21 | 95.2% | 0.952 | 28620 | 609 |
+| instruction_following | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 21 | 100.0% | 1.000 | 53531 | 719 |
 | instruction_following | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 21 | 100.0% | 1.000 | 15410 | 616 |
 | instruction_following_hard | off | gemma4-26b-a4b-q8km__2026-05-11T22-05-22__SMOKE.jsonl | 2 | 100.0% | 1.000 | 3366 | 51 |
 | instruction_following_hard | off | gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl | 16 | 75.0% | 0.917 | 1225 | 32 |
 | instruction_following_hard | off | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 16 | 68.8% | 0.875 | 2176 | 30 |
 | instruction_following_hard | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 16 | 62.5% | 0.812 | 2880 | 42 |
+| instruction_following_hard | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 16 | 56.2% | 0.792 | 3589 | 40 |
 | instruction_following_hard | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 16 | 50.0% | 0.755 | 1581 | 40 |
 | instruction_following_hard | on | gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl | 16 | 75.0% | 0.844 | 98057 | 3334 |
 | instruction_following_hard | on | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 16 | 100.0% | 1.000 | 85797 | 1382 |
 | instruction_following_hard | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 16 | 75.0% | 0.844 | 137654 | 2906 |
+| instruction_following_hard | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 16 | 93.8% | 0.958 | 85935 | 1156 |
 | instruction_following_hard | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 16 | 87.5% | 0.896 | 49503 | 1990 |
 | long_context | off | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 14 | 100.0% | 1.000 | 12121 | 152 |
 | long_context | off | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 2 | 100.0% | 1.000 | 6964 | 117 |
@@ -881,6 +953,7 @@
 | long_context | off | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 14 | 100.0% | 1.000 | 14957 | 134 |
 | long_context | off | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 14 | 92.9% | 0.929 | 13864 | 73 |
 | long_context | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 14 | 100.0% | 1.000 | 4612 | 86 |
+| long_context | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 14 | 92.9% | 0.929 | 10379 | 131 |
 | long_context | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 14 | 92.9% | 0.929 | 3060 | 107 |
 | long_context | on | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 14 | 78.6% | 0.786 | 31575 | 694 |
 | long_context | on | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 2 | 100.0% | 1.000 | 14730 | 380 |
@@ -888,15 +961,18 @@
 | long_context | on | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 14 | 100.0% | 1.000 | 66353 | 685 |
 | long_context | on | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 14 | 100.0% | 1.000 | 33844 | 326 |
 | long_context | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 14 | 100.0% | 1.000 | 50882 | 660 |
+| long_context | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 14 | 100.0% | 1.000 | 48402 | 562 |
 | long_context | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 14 | 100.0% | 1.000 | 22408 | 394 |
 | long_context_hard | off | gemma4-26b-a4b-q8km__2026-05-11T22-05-22__SMOKE.jsonl | 2 | 100.0% | 1.000 | 20780 | 64 |
 | long_context_hard | off | gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl | 12 | 100.0% | 1.000 | 17985 | 238 |
 | long_context_hard | off | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 12 | 91.7% | 0.917 | 26350 | 170 |
 | long_context_hard | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 12 | 91.7% | 0.917 | 11257 | 202 |
+| long_context_hard | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 12 | 91.7% | 0.917 | 19605 | 238 |
 | long_context_hard | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 12 | 83.3% | 0.833 | 8417 | 292 |
 | long_context_hard | on | gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl | 12 | 91.7% | 0.917 | 118082 | 3230 |
 | long_context_hard | on | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 12 | 100.0% | 1.000 | 143073 | 1673 |
 | long_context_hard | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 12 | 100.0% | 1.000 | 86279 | 1194 |
+| long_context_hard | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 12 | 91.7% | 0.917 | 77708 | 843 |
 | long_context_hard | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 12 | 100.0% | 1.000 | 60532 | 1552 |
 | reasoning | off | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 21 | 100.0% | 1.000 | 5934 | 232 |
 | reasoning | off | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 2 | 100.0% | 1.000 | 7670 | 266 |
@@ -906,6 +982,8 @@
 | reasoning | off | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 21 | 100.0% | 1.000 | 10138 | 171 |
 | reasoning | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-20-57__SMOKE.jsonl | 2 | 100.0% | 1.000 | 16256 | 336 |
 | reasoning | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 21 | 100.0% | 1.000 | 11087 | 236 |
+| reasoning | off | qwen3.6-27b-q8kxl__2026-05-14T21-10-25__SMOKE.jsonl | 2 | 100.0% | 1.000 | 27141 | 358 |
+| reasoning | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 21 | 100.0% | 1.000 | 22015 | 291 |
 | reasoning | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-39-39__SMOKE.jsonl | 2 | 100.0% | 1.000 | 9628 | 380 |
 | reasoning | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 21 | 100.0% | 1.000 | 8709 | 338 |
 | reasoning | on | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 21 | 100.0% | 1.000 | 16137 | 652 |
@@ -916,6 +994,8 @@
 | reasoning | on | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 21 | 100.0% | 1.000 | 31228 | 526 |
 | reasoning | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-20-57__SMOKE.jsonl | 2 | 100.0% | 1.000 | 45987 | 912 |
 | reasoning | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 21 | 100.0% | 1.000 | 45228 | 975 |
+| reasoning | on | qwen3.6-27b-q8kxl__2026-05-14T21-10-25__SMOKE.jsonl | 2 | 100.0% | 1.000 | 75496 | 1004 |
+| reasoning | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 21 | 100.0% | 1.000 | 82848 | 1115 |
 | reasoning | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-39-39__SMOKE.jsonl | 2 | 100.0% | 1.000 | 18516 | 754 |
 | reasoning | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 21 | 100.0% | 1.000 | 24618 | 1017 |
 | reasoning_hard | off | _aborted_22-10-29_hardrun_4calls.jsonl | 2 | 100.0% | 1.000 | 10682 | 180 |
@@ -924,30 +1004,38 @@
 | reasoning_hard | off | gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl | 20 | 100.0% | 1.000 | 11478 | 404 |
 | reasoning_hard | off | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 20 | 100.0% | 1.000 | 20416 | 342 |
 | reasoning_hard | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 20 | 100.0% | 1.000 | 23919 | 502 |
+| reasoning_hard | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 20 | 100.0% | 1.000 | 44096 | 590 |
 | reasoning_hard | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 20 | 100.0% | 1.000 | 13653 | 539 |
 | reasoning_hard | on | _aborted_22-10-29_hardrun_4calls.jsonl | 2 | 100.0% | 1.000 | 25531 | 420 |
 | reasoning_hard | on | gemma4-26b-a4b-q8km__2026-05-12T03-21-56__SMOKE.jsonl | 2 | 100.0% | 1.000 | 15755 | 544 |
 | reasoning_hard | on | gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl | 20 | 95.0% | 0.950 | 32174 | 1134 |
 | reasoning_hard | on | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 20 | 100.0% | 1.000 | 59994 | 985 |
 | reasoning_hard | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 20 | 100.0% | 1.000 | 68426 | 1459 |
+| reasoning_hard | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 20 | 100.0% | 1.000 | 123565 | 1656 |
 | reasoning_hard | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 20 | 95.0% | 0.950 | 45247 | 1822 |
 | tool_calling | off | gemma4-26b-a4b-q8km__2026-05-14T00-42-42.jsonl | 13 | 100.0% | 1.000 | 999 | 21 |
 | tool_calling | off | gemma4-31b-q5kxl__2026-05-14T00-16-43.jsonl | 13 | 100.0% | 1.000 | 1930 | 20 |
 | tool_calling | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T22-54-51__SMOKE.jsonl | 2 | 100.0% | 1.000 | 1807 | 34 |
 | tool_calling | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T23-02-43.jsonl | 13 | 100.0% | 1.000 | 1721 | 33 |
+| tool_calling | off | qwen3.6-27b-q8kxl__2026-05-14T21-10-25__SMOKE.jsonl | 2 | 100.0% | 1.000 | 2345 | 28 |
+| tool_calling | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 13 | 100.0% | 1.000 | 3032 | 38 |
 | tool_calling | off | qwen3.6-35b-a3b-q8kxl__2026-05-14T00-04-36.jsonl | 13 | 100.0% | 1.000 | 1048 | 38 |
 | tool_calling | on | gemma4-26b-a4b-q8km__2026-05-14T00-42-42.jsonl | 13 | 100.0% | 1.000 | 3462 | 114 |
 | tool_calling | on | gemma4-31b-q5kxl__2026-05-14T00-16-43.jsonl | 13 | 100.0% | 1.000 | 5374 | 82 |
 | tool_calling | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T22-54-51__SMOKE.jsonl | 2 | 100.0% | 1.000 | 8239 | 112 |
 | tool_calling | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T23-02-43.jsonl | 13 | 100.0% | 1.000 | 7598 | 106 |
+| tool_calling | on | qwen3.6-27b-q8kxl__2026-05-14T21-10-25__SMOKE.jsonl | 2 | 100.0% | 1.000 | 9958 | 118 |
+| tool_calling | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 13 | 100.0% | 1.000 | 11141 | 136 |
 | tool_calling | on | qwen3.6-35b-a3b-q8kxl__2026-05-14T00-04-36.jsonl | 13 | 100.0% | 1.000 | 5355 | 153 |
 | tool_calling_hard | off | gemma4-26b-a4b-q8km__2026-05-14T00-42-42.jsonl | 13 | 100.0% | 1.000 | 1224 | 30 |
 | tool_calling_hard | off | gemma4-31b-q5kxl__2026-05-14T00-16-43.jsonl | 13 | 100.0% | 1.000 | 2340 | 30 |
 | tool_calling_hard | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T22-59-11.jsonl | 13 | 100.0% | 1.000 | 1924 | 37 |
+| tool_calling_hard | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 13 | 100.0% | 1.000 | 2973 | 37 |
 | tool_calling_hard | off | qwen3.6-35b-a3b-q8kxl__2026-05-14T00-04-36.jsonl | 13 | 92.3% | 0.923 | 1141 | 40 |
 | tool_calling_hard | on | gemma4-26b-a4b-q8km__2026-05-14T00-42-42.jsonl | 13 | 100.0% | 1.000 | 4100 | 143 |
 | tool_calling_hard | on | gemma4-31b-q5kxl__2026-05-14T00-16-43.jsonl | 13 | 92.3% | 0.923 | 6741 | 106 |
 | tool_calling_hard | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T22-59-11.jsonl | 13 | 92.3% | 0.923 | 8602 | 126 |
+| tool_calling_hard | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 13 | 100.0% | 1.000 | 13707 | 171 |
 | tool_calling_hard | on | qwen3.6-35b-a3b-q8kxl__2026-05-14T00-04-36.jsonl | 13 | 92.3% | 0.923 | 5198 | 159 |
 | writing | off | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 21 | 100.0% | 0.962 | 3345 | 118 |
 | writing | off | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 1 | — | — | 1136 | 19 |
@@ -955,86 +1043,90 @@
 | writing | off | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 21 | 100.0% | 0.964 | 6376 | 114 |
 | writing | off | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 21 | 100.0% | 0.967 | 6743 | 111 |
 | writing | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 21 | 100.0% | 0.960 | 5652 | 105 |
+| writing | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 21 | 100.0% | 0.936 | 9488 | 120 |
 | writing | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 21 | 95.2% | 0.926 | 3388 | 118 |
 | writing | on | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 21 | 85.7% | 0.855 | 31322 | 1261 |
 | writing | on | gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl | 2 | — | — | 19480 | 687 |
 | writing | on | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 21 | 95.2% | 0.929 | 68283 | 1246 |
 | writing | on | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 21 | 100.0% | 0.967 | 41810 | 701 |
 | writing | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 21 | 95.2% | 0.926 | 142664 | 3014 |
+| writing | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 21 | 100.0% | 0.981 | 108594 | 1462 |
 | writing | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 21 | 100.0% | 0.986 | 42296 | 1706 |
 | writing_hard | off | gemma4-26b-a4b-q8km__2026-05-11T22-05-22__SMOKE.jsonl | 2 | — | — | 8178 | 126 |
 | writing_hard | off | gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl | 14 | 100.0% | 0.954 | 4787 | 156 |
 | writing_hard | off | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 14 | 100.0% | 0.964 | 7078 | 116 |
 | writing_hard | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 14 | 85.7% | 0.829 | 8373 | 168 |
+| writing_hard | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 14 | 78.6% | 0.800 | 12091 | 156 |
 | writing_hard | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 14 | 85.7% | 0.832 | 3877 | 134 |
 | writing_hard | on | gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl | 14 | 64.3% | 0.696 | 224944 | 7311 |
 | writing_hard | on | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 14 | 92.9% | 0.918 | 163928 | 2536 |
 | writing_hard | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 14 | 64.3% | 0.693 | 238539 | 4904 |
+| writing_hard | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 14 | 100.0% | 0.946 | 254958 | 3383 |
 | writing_hard | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 14 | 100.0% | 0.925 | 94983 | 3744 |
 
 ## By thinking mode
 
 | thinking | n | pass rate | mean score | median latency (ms) | median out-tokens |
 |---|---|---|---|---|---|
-| off | 1132 | 93.9% | 0.954 | 5252 | 118 |
-| on | 1119 | 95.7% | 0.957 | 43591 | 1055 |
+| off | 1371 | 93.7% | 0.952 | 5879 | 119 |
+| on | 1358 | 96.0% | 0.960 | 49966 | 1115 |
 
 ## By capability
 
 | capability | n | pass rate | mean score | median latency (ms) | median out-tokens | pending |
 |---|---|---|---|---|---|---|
-| coding | 218 | 96.8% | 0.968 | 8436 | 223 |  |
-| coding_hard | 162 | 100.0% | 1.000 | 14053 | 311 |  |
-| coding_quality | 120 | 98.3% | 0.971 | 25871 | 617 |  |
-| coding_quality_hard | 124 | 84.7% | 0.907 | 53269 | 1034 |  |
+| coding | 260 | 96.9% | 0.969 | 9999 | 214 |  |
+| coding_hard | 202 | 100.0% | 1.000 | 17390 | 338 |  |
+| coding_quality | 148 | 98.0% | 0.972 | 28484 | 617 |  |
+| coding_quality_hard | 154 | 84.4% | 0.900 | 68877 | 1088 |  |
 | coherence | 90 | 96.2% | 0.950 | 31467 | 866 | 10 |
 | coherence_hard | 2 | — | — | 6584 | 102 | 2 |
-| instruction_following | 218 | 93.1% | 0.943 | 4049 | 113 |  |
-| instruction_following_hard | 130 | 74.6% | 0.870 | 6335 | 120 |  |
-| long_context | 148 | 96.6% | 0.966 | 17721 | 242 |  |
-| long_context_hard | 98 | 94.9% | 0.949 | 39722 | 530 |  |
-| reasoning | 230 | 100.0% | 1.000 | 15282 | 422 |  |
-| reasoning_hard | 170 | 98.8% | 0.988 | 24929 | 689 |  |
-| tool_calling | 108 | 100.0% | 1.000 | 2786 | 56 |  |
-| tool_calling_hard | 104 | 96.2% | 0.962 | 3416 | 66 |  |
-| writing | 215 | 97.1% | 0.944 | 15822 | 325 | 5 |
-| writing_hard | 114 | 86.6% | 0.851 | 24864 | 566 | 2 |
+| instruction_following | 260 | 93.5% | 0.947 | 4534 | 118 |  |
+| instruction_following_hard | 162 | 74.7% | 0.871 | 7163 | 125 |  |
+| long_context | 176 | 96.6% | 0.966 | 17865 | 224 |  |
+| long_context_hard | 122 | 94.3% | 0.943 | 39614 | 485 |  |
+| reasoning | 276 | 100.0% | 1.000 | 18888 | 438 |  |
+| reasoning_hard | 210 | 99.0% | 0.990 | 31973 | 730 |  |
+| tool_calling | 138 | 100.0% | 1.000 | 3180 | 56 |  |
+| tool_calling_hard | 130 | 96.9% | 0.969 | 3768 | 68 |  |
+| writing | 257 | 97.6% | 0.946 | 17481 | 325 | 5 |
+| writing_hard | 142 | 87.1% | 0.856 | 29792 | 566 | 2 |
 
 ## Capability × thinking mode
 
 | capability | thinking | n | pass rate | mean score | median latency (ms) | median out-tokens |
 |---|---|---|---|---|---|---|
-| coding | off | 109 | 94.5% | 0.945 | 3108 | 58 |
-| coding | on | 109 | 99.1% | 0.991 | 33125 | 923 |
-| coding_hard | off | 82 | 100.0% | 1.000 | 4839 | 119 |
-| coding_hard | on | 80 | 100.0% | 1.000 | 53027 | 1471 |
-| coding_quality | off | 60 | 96.7% | 0.959 | 10334 | 232 |
-| coding_quality | on | 60 | 100.0% | 0.983 | 92646 | 3164 |
-| coding_quality_hard | off | 62 | 77.4% | 0.903 | 17029 | 455 |
-| coding_quality_hard | on | 62 | 91.9% | 0.912 | 152268 | 4564 |
+| coding | off | 130 | 95.4% | 0.954 | 3296 | 64 |
+| coding | on | 130 | 98.5% | 0.985 | 39254 | 994 |
+| coding_hard | off | 102 | 100.0% | 1.000 | 5711 | 119 |
+| coding_hard | on | 100 | 100.0% | 1.000 | 70973 | 1720 |
+| coding_quality | off | 74 | 95.9% | 0.960 | 11177 | 232 |
+| coding_quality | on | 74 | 100.0% | 0.984 | 115890 | 3456 |
+| coding_quality_hard | off | 77 | 79.2% | 0.898 | 20075 | 463 |
+| coding_quality_hard | on | 77 | 89.6% | 0.902 | 170072 | 5169 |
 | coherence | off | 45 | 100.0% | 0.981 | 15145 | 490 |
 | coherence | on | 45 | 92.5% | 0.919 | 49370 | 1329 |
 | coherence_hard | off | 2 | — | — | 6584 | 102 |
-| instruction_following | off | 109 | 89.9% | 0.919 | 1213 | 20 |
-| instruction_following | on | 109 | 96.3% | 0.968 | 15410 | 367 |
-| instruction_following_hard | off | 66 | 65.2% | 0.845 | 1848 | 38 |
-| instruction_following_hard | on | 64 | 84.4% | 0.896 | 69287 | 2096 |
-| long_context | off | 74 | 97.3% | 0.973 | 10731 | 112 |
-| long_context | on | 74 | 95.9% | 0.959 | 40760 | 550 |
-| long_context_hard | off | 50 | 92.0% | 0.920 | 17963 | 232 |
-| long_context_hard | on | 48 | 97.9% | 0.979 | 86279 | 1569 |
-| reasoning | off | 115 | 100.0% | 1.000 | 10138 | 242 |
-| reasoning | on | 115 | 100.0% | 1.000 | 28372 | 725 |
-| reasoning_hard | off | 86 | 100.0% | 1.000 | 15066 | 400 |
-| reasoning_hard | on | 84 | 97.6% | 0.976 | 47745 | 1230 |
-| tool_calling | off | 54 | 100.0% | 1.000 | 1436 | 28 |
-| tool_calling | on | 54 | 100.0% | 1.000 | 5461 | 114 |
-| tool_calling_hard | off | 52 | 98.1% | 0.981 | 1453 | 36 |
-| tool_calling_hard | on | 52 | 94.2% | 0.942 | 6701 | 134 |
-| writing | off | 108 | 99.0% | 0.956 | 4620 | 114 |
-| writing | on | 107 | 95.2% | 0.932 | 53977 | 1459 |
-| writing_hard | off | 58 | 92.9% | 0.895 | 5367 | 142 |
-| writing_hard | on | 56 | 80.4% | 0.808 | 163910 | 3970 |
+| instruction_following | off | 130 | 90.0% | 0.922 | 1341 | 20 |
+| instruction_following | on | 130 | 96.9% | 0.973 | 20870 | 449 |
+| instruction_following_hard | off | 82 | 63.4% | 0.834 | 2040 | 38 |
+| instruction_following_hard | on | 80 | 86.2% | 0.908 | 78574 | 1765 |
+| long_context | off | 88 | 96.6% | 0.966 | 10731 | 115 |
+| long_context | on | 88 | 96.6% | 0.966 | 40760 | 550 |
+| long_context_hard | off | 62 | 91.9% | 0.919 | 18127 | 234 |
+| long_context_hard | on | 60 | 96.7% | 0.967 | 83965 | 1337 |
+| reasoning | off | 138 | 100.0% | 1.000 | 10848 | 262 |
+| reasoning | on | 138 | 100.0% | 1.000 | 33332 | 760 |
+| reasoning_hard | off | 106 | 100.0% | 1.000 | 18214 | 418 |
+| reasoning_hard | on | 104 | 98.1% | 0.981 | 59174 | 1375 |
+| tool_calling | off | 69 | 100.0% | 1.000 | 1499 | 31 |
+| tool_calling | on | 69 | 100.0% | 1.000 | 6522 | 120 |
+| tool_calling_hard | off | 65 | 98.5% | 0.985 | 1785 | 36 |
+| tool_calling_hard | on | 65 | 95.4% | 0.954 | 7853 | 143 |
+| writing | off | 129 | 99.2% | 0.952 | 5478 | 115 |
+| writing | on | 128 | 96.0% | 0.940 | 63881 | 1460 |
+| writing_hard | off | 72 | 90.0% | 0.876 | 5640 | 143 |
+| writing_hard | on | 70 | 84.3% | 0.836 | 177333 | 3874 |
 
 ## Rubric criteria (mean, normalized 0–1)
 
@@ -1081,115 +1173,115 @@
 | coherence | tldr_faithfulness | 4 | 1.000 |
 | coherence | tone_appropriate | 4 | 1.000 |
 | coherence | verdict_follows_from_arguments | 4 | 0.900 |
-| writing | adherence_to_prompt | 50 | 0.988 |
-| writing | age_appropriateness | 10 | 0.920 |
-| writing | appropriateness | 10 | 0.980 |
-| writing | atmosphere | 10 | 1.000 |
-| writing | balanced_critique | 10 | 1.000 |
-| writing | bookend_constraint_met | 10 | 0.760 |
-| writing | call_to_action | 10 | 1.000 |
-| writing | characterization | 10 | 0.980 |
-| writing | chorus_identical | 10 | 1.000 |
-| writing | clear_value_prop | 10 | 1.000 |
-| writing | completeness | 10 | 1.000 |
-| writing | concision | 30 | 0.833 |
-| writing | description_clarity | 10 | 0.980 |
-| writing | emotional_resonance | 10 | 1.000 |
-| writing | emotional_theme | 10 | 1.000 |
-| writing | encouragement | 10 | 1.000 |
-| writing | evokes_dawn | 10 | 1.000 |
-| writing | fluency | 100 | 0.982 |
-| writing | format | 10 | 1.000 |
-| writing | four_lines | 10 | 1.000 |
-| writing | hook | 10 | 1.000 |
-| writing | humor | 10 | 0.560 |
-| writing | imagery | 30 | 0.907 |
-| writing | length | 40 | 0.865 |
-| writing | length_adherence | 10 | 1.000 |
-| writing | lightness_humor | 10 | 0.980 |
-| writing | limerick_form | 10 | 0.820 |
-| writing | meaning_preserved | 10 | 0.860 |
-| writing | narrative_arc | 10 | 0.740 |
-| writing | narrative_completeness | 10 | 0.920 |
-| writing | narrative_quality | 10 | 0.980 |
-| writing | naturalistic_dialogue | 10 | 1.000 |
-| writing | on_topic | 10 | 0.920 |
-| writing | persuasiveness | 10 | 0.920 |
-| writing | professional_tone | 10 | 1.000 |
-| writing | prose_quality | 40 | 0.935 |
-| writing | realism | 10 | 1.000 |
-| writing | restraint | 10 | 0.780 |
-| writing | rhyme_and_meter | 10 | 0.640 |
-| writing | rhyme_scheme_correct | 10 | 1.000 |
-| writing | sensory_detail | 10 | 1.000 |
-| writing | sincerity | 10 | 1.000 |
-| writing | six_lines | 10 | 1.000 |
-| writing | soothing_tone | 10 | 0.920 |
-| writing | specific_detail | 10 | 1.000 |
-| writing | specificity | 10 | 0.840 |
-| writing | structure_correct | 10 | 1.000 |
-| writing | tagline_punchiness | 10 | 0.960 |
-| writing | three_line_form | 10 | 1.000 |
-| writing | three_sentences | 10 | 0.980 |
-| writing | tonal_continuity | 10 | 0.980 |
-| writing | tone | 60 | 1.000 |
-| writing | under_280_chars | 10 | 0.900 |
-| writing | variety | 10 | 0.980 |
-| writing | vividness_improved | 10 | 0.860 |
-| writing | warmth_humor_balance | 10 | 0.960 |
-| writing_hard | about_fifty_words | 8 | 0.650 |
-| writing_hard | acrostic_spells_WINTER | 8 | 0.900 |
-| writing_hard | actually_funny | 8 | 0.425 |
-| writing_hard | age_appropriate | 8 | 0.975 |
-| writing_hard | all_three_mention_locked_drawer | 8 | 0.925 |
-| writing_hard | bridge_is_a_genuine_departure | 8 | 1.000 |
-| writing_hard | chorus_identical_all_three_times | 8 | 1.000 |
-| writing_hard | coherent_poem | 8 | 1.000 |
-| writing_hard | coherent_poem_not_filler | 8 | 0.775 |
-| writing_hard | comic_version_genuinely_comic | 8 | 0.975 |
-| writing_hard | craft | 16 | 1.000 |
-| writing_hard | creepiness | 8 | 0.600 |
-| writing_hard | dialogue_only_no_narration | 8 | 1.000 |
-| writing_hard | each_line_iambic_pentameter | 8 | 0.725 |
-| writing_hard | each_opening_clearly_its_genre | 8 | 1.000 |
-| writing_hard | earlier_text_supports_twist | 8 | 0.550 |
-| writing_hard | emotional_coherence | 8 | 0.925 |
-| writing_hard | emotional_resonance | 8 | 0.900 |
-| writing_hard | events_identical_across_versions | 8 | 0.950 |
-| writing_hard | exactly_100_words | 8 | 0.750 |
-| writing_hard | exactly_four_lines | 8 | 0.900 |
-| writing_hard | exactly_six_lines | 8 | 1.000 |
-| writing_hard | final_word_recontextualizes | 8 | 0.525 |
-| writing_hard | fluency | 16 | 0.688 |
-| writing_hard | fourteen_lines | 8 | 1.000 |
-| writing_hard | has_narrative_arc | 8 | 0.825 |
-| writing_hard | imagery | 16 | 0.838 |
-| writing_hard | imagery_and_theme | 8 | 1.000 |
-| writing_hard | is_one_grammatical_sentence | 8 | 0.900 |
-| writing_hard | limerick_form_correct | 8 | 0.600 |
-| writing_hard | line_word_counts_1_through_8 | 8 | 0.700 |
-| writing_hard | love_conveyed_through_subtext | 8 | 1.000 |
-| writing_hard | meter_roughly_iambic_pentameter | 8 | 0.900 |
-| writing_hard | narrative_progresses | 8 | 0.900 |
-| writing_hard | narrative_quality | 8 | 0.975 |
-| writing_hard | no_jargon_no_lesson_tone | 8 | 0.950 |
-| writing_hard | no_love_words_used | 8 | 1.000 |
-| writing_hard | no_modern_slips | 8 | 0.875 |
-| writing_hard | persuasive_and_on_topic | 8 | 0.725 |
-| writing_hard | present_tense_throughout | 8 | 0.750 |
-| writing_hard | prose_quality | 24 | 0.800 |
-| writing_hard | pun_on_pitch_works_both_ways | 8 | 0.550 |
-| writing_hard | reads_naturally | 8 | 0.775 |
-| writing_hard | realization_lands_emotionally | 8 | 0.775 |
-| writing_hard | recursion_idea_conveyed | 8 | 1.000 |
-| writing_hard | register_matched_throughout | 8 | 0.875 |
-| writing_hard | rhyme_scheme_ABAB_CDCD_EFEF_GG | 8 | 0.900 |
-| writing_hard | second_person_throughout | 8 | 0.800 |
-| writing_hard | structure_VCVCBC | 8 | 1.000 |
-| writing_hard | three_distinct_voices | 8 | 1.000 |
-| writing_hard | tragic_version_genuinely_tragic | 8 | 1.000 |
+| writing | adherence_to_prompt | 60 | 0.977 |
+| writing | age_appropriateness | 12 | 0.933 |
+| writing | appropriateness | 12 | 0.967 |
+| writing | atmosphere | 12 | 1.000 |
+| writing | balanced_critique | 12 | 1.000 |
+| writing | bookend_constraint_met | 12 | 0.800 |
+| writing | call_to_action | 12 | 1.000 |
+| writing | characterization | 12 | 0.983 |
+| writing | chorus_identical | 12 | 1.000 |
+| writing | clear_value_prop | 12 | 1.000 |
+| writing | completeness | 12 | 1.000 |
+| writing | concision | 36 | 0.828 |
+| writing | description_clarity | 12 | 0.950 |
+| writing | emotional_resonance | 12 | 1.000 |
+| writing | emotional_theme | 12 | 1.000 |
+| writing | encouragement | 12 | 1.000 |
+| writing | evokes_dawn | 12 | 1.000 |
+| writing | fluency | 120 | 0.982 |
+| writing | format | 12 | 1.000 |
+| writing | four_lines | 12 | 1.000 |
+| writing | hook | 12 | 1.000 |
+| writing | humor | 12 | 0.600 |
+| writing | imagery | 36 | 0.922 |
+| writing | length | 48 | 0.862 |
+| writing | length_adherence | 12 | 0.967 |
+| writing | lightness_humor | 12 | 0.983 |
+| writing | limerick_form | 12 | 0.833 |
+| writing | meaning_preserved | 12 | 0.883 |
+| writing | narrative_arc | 12 | 0.783 |
+| writing | narrative_completeness | 12 | 0.933 |
+| writing | narrative_quality | 12 | 0.983 |
+| writing | naturalistic_dialogue | 12 | 1.000 |
+| writing | on_topic | 12 | 0.917 |
+| writing | persuasiveness | 12 | 0.900 |
+| writing | professional_tone | 12 | 1.000 |
+| writing | prose_quality | 48 | 0.946 |
+| writing | realism | 12 | 1.000 |
+| writing | restraint | 12 | 0.800 |
+| writing | rhyme_and_meter | 12 | 0.683 |
+| writing | rhyme_scheme_correct | 12 | 1.000 |
+| writing | sensory_detail | 12 | 1.000 |
+| writing | sincerity | 12 | 1.000 |
+| writing | six_lines | 12 | 1.000 |
+| writing | soothing_tone | 12 | 0.933 |
+| writing | specific_detail | 12 | 1.000 |
+| writing | specificity | 12 | 0.833 |
+| writing | structure_correct | 12 | 1.000 |
+| writing | tagline_punchiness | 12 | 0.967 |
+| writing | three_line_form | 12 | 1.000 |
+| writing | three_sentences | 12 | 0.983 |
+| writing | tonal_continuity | 12 | 0.983 |
+| writing | tone | 72 | 1.000 |
+| writing | under_280_chars | 12 | 0.917 |
+| writing | variety | 12 | 0.983 |
+| writing | vividness_improved | 12 | 0.850 |
+| writing | warmth_humor_balance | 12 | 0.967 |
+| writing_hard | about_fifty_words | 10 | 0.720 |
+| writing_hard | acrostic_spells_WINTER | 10 | 0.920 |
+| writing_hard | actually_funny | 10 | 0.440 |
+| writing_hard | age_appropriate | 10 | 0.960 |
+| writing_hard | all_three_mention_locked_drawer | 10 | 0.940 |
+| writing_hard | bridge_is_a_genuine_departure | 10 | 0.940 |
+| writing_hard | chorus_identical_all_three_times | 10 | 1.000 |
+| writing_hard | coherent_poem | 10 | 1.000 |
+| writing_hard | coherent_poem_not_filler | 10 | 0.760 |
+| writing_hard | comic_version_genuinely_comic | 10 | 0.980 |
+| writing_hard | craft | 20 | 1.000 |
+| writing_hard | creepiness | 10 | 0.660 |
+| writing_hard | dialogue_only_no_narration | 10 | 1.000 |
+| writing_hard | each_line_iambic_pentameter | 10 | 0.700 |
+| writing_hard | each_opening_clearly_its_genre | 10 | 1.000 |
+| writing_hard | earlier_text_supports_twist | 10 | 0.640 |
+| writing_hard | emotional_coherence | 10 | 0.920 |
+| writing_hard | emotional_resonance | 10 | 0.920 |
+| writing_hard | events_identical_across_versions | 10 | 0.960 |
+| writing_hard | exactly_100_words | 10 | 0.720 |
+| writing_hard | exactly_four_lines | 10 | 0.920 |
+| writing_hard | exactly_six_lines | 10 | 1.000 |
+| writing_hard | final_word_recontextualizes | 10 | 0.620 |
+| writing_hard | fluency | 20 | 0.700 |
+| writing_hard | fourteen_lines | 10 | 1.000 |
+| writing_hard | has_narrative_arc | 10 | 0.840 |
+| writing_hard | imagery | 20 | 0.850 |
+| writing_hard | imagery_and_theme | 10 | 0.980 |
+| writing_hard | is_one_grammatical_sentence | 10 | 0.840 |
+| writing_hard | limerick_form_correct | 10 | 0.580 |
+| writing_hard | line_word_counts_1_through_8 | 10 | 0.680 |
+| writing_hard | love_conveyed_through_subtext | 10 | 1.000 |
+| writing_hard | meter_roughly_iambic_pentameter | 10 | 0.880 |
+| writing_hard | narrative_progresses | 10 | 0.920 |
+| writing_hard | narrative_quality | 10 | 0.940 |
+| writing_hard | no_jargon_no_lesson_tone | 10 | 0.920 |
+| writing_hard | no_love_words_used | 10 | 1.000 |
+| writing_hard | no_modern_slips | 10 | 0.880 |
+| writing_hard | persuasive_and_on_topic | 10 | 0.740 |
+| writing_hard | present_tense_throughout | 10 | 0.740 |
+| writing_hard | prose_quality | 30 | 0.807 |
+| writing_hard | pun_on_pitch_works_both_ways | 10 | 0.540 |
+| writing_hard | reads_naturally | 10 | 0.800 |
+| writing_hard | realization_lands_emotionally | 10 | 0.800 |
+| writing_hard | recursion_idea_conveyed | 10 | 1.000 |
+| writing_hard | register_matched_throughout | 10 | 0.900 |
+| writing_hard | rhyme_scheme_ABAB_CDCD_EFEF_GG | 10 | 0.860 |
+| writing_hard | second_person_throughout | 10 | 0.840 |
+| writing_hard | structure_VCVCBC | 10 | 1.000 |
+| writing_hard | three_distinct_voices | 10 | 1.000 |
+| writing_hard | tragic_version_genuinely_tragic | 10 | 1.000 |
 
-## Failures (116)
+## Failures (139)
 
 | capability | prompt | mode | score | notes | finish/err |
 |---|---|---|---|---|---|
@@ -1276,6 +1368,29 @@
 | coding_quality_hard | cq-h-14 | on | 0.222 | X:rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line 3, in <module>\ | length |
 | coding_quality_hard | cq-h-14 | off | 0.893 | ok:tests pass \| ok:tests pass \| X:quality complexity=0.68, nesting=0.75, length=0.00, ruff | stop |
 | tool_calling_hard | tc-h-03 | on | 0.000 | X:emitted 1 call(s): ['translate'] | tool_calls |
+| coding | cod-12 | on | 0.000 | rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line 3, in <module>\n  | length |
+| coding_quality | cq-14 | off | 0.885 | ok:tests pass \| ok:tests pass \| X:quality complexity=0.25, length=0.00, ruff=0.00 | stop |
+| instruction_following | if-03 | off | 0.667 | ok:forbidden chars seen: none \| X:5 words (want 6..None) \| ok:match='.' | stop |
+| instruction_following | if-11 | off | 0.000 | 43 words (want 39..41) | stop |
+| long_context | lc-14 | off | 0.000 | got 56 want 55 (tol 0) | stop |
+| instruction_following_hard | if-h-01 | off | 0.667 | ok:7 non-empty lines (want 7..7) \| ok:pattern absent (good) \| X:forbidden chars seen: {'a' | stop |
+| instruction_following_hard | if-h-02 | on | 0.333 | X:0 words (want 50..50) \| ok:forbidden chars seen: none \| X:does not end with 'done' | length |
+| instruction_following_hard | if-h-02 | off | 0.333 | X:41 words (want 50..50) \| X:forbidden chars seen: {'s': 9} \| ok:ok | stop |
+| instruction_following_hard | if-h-05 | off | 0.750 | ok:6 non-empty lines (want 6..6) \| ok:hit=['silver'] miss=[] forbidden_seen=[] \| X:pattern | stop |
+| instruction_following_hard | if-h-08 | off | 0.667 | X:113 words (want 100..100) \| ok:ok \| ok:hit=['one hundred words'] miss=[] forbidden_seen= | stop |
+| instruction_following_hard | if-h-10 | off | 0.750 | ok:4 paragraphs (want 4..4) \| ok:8 sentences (want 8..8) \| X:57 words (want 60..80) \| ok:p | stop |
+| instruction_following_hard | if-h-13 | off | 0.500 | ok:3 sentences (want 3..3) \| ok:1x 'however' (want 1..1) \| X:pattern matched: ',' \| X:22 w | stop |
+| instruction_following_hard | if-h-16 | off | 0.000 | X:37 words (want 40..50) \| X:forbidden chars seen: {'e': 9} | stop |
+| long_context_hard | lc-h-09 | on | 0.000 | call/grade error: TimeoutError('timed out') | TimeoutError('timed out') |
+| long_context_hard | lc-h-09 | off | 0.000 | got 100 want 90 (tol 0) | stop |
+| writing_hard | wr-h-02 | off | 0.500 | rubric: exactly_100_words=1, is_one_grammatical_sentence=1, has_narrative_arc=4, prose_qua | stop |
+| writing_hard | wr-h-04 | off | 0.550 | rubric: line_word_counts_1_through_8=1, coherent_poem_not_filler=3, imagery=3, fluency=4 | stop |
+| writing_hard | wr-h-12 | off | 0.400 | rubric: limerick_form_correct=2, pun_on_pitch_works_both_ways=1, actually_funny=2, fluency | stop |
+| coding_quality_hard | cq-h-01 | on | 0.625 | ok:tests pass \| X:rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line | stop |
+| coding_quality_hard | cq-h-04 | off | 0.562 | X:rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line 126, in <module | stop |
+| coding_quality_hard | cq-h-05 | off | 0.269 | X:rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line 56, in <module> | stop |
+| coding_quality_hard | cq-h-13 | on | 0.222 | X:rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line 3, in <module>\ | length |
+| coding_quality_hard | cq-h-14 | on | 0.222 | X:rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line 3, in <module>\ | length |
 | coding | cod-05 | off | 0.000 | rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line 8, in <module>\n  | stop |
 | coding | cod-08 | off | 0.000 | rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line 22, in <module>\n | stop |
 | coding | cod-14 | off | 0.000 | rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line 51, in <module>\n | stop |
