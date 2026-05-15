@@ -18,8 +18,12 @@ results/*.log
 # per-run report copies (redundant with the top-level report*.md)
 results/*.report.md
 
-# optional: the superseded n_ctx=8192 first run (uncomment to exclude)
-# results/gemma4-26b-a4b-q8km__2026-05-11T17-04-05.*
+# archive subdir for superseded runs (kept locally, excluded from reports + git).
+# Currently holds the gemma-26b-a4b 2026-05-11T17-04-05 run, which used a
+# constrained thinking budget (3072/1536 vs the standard 8192/2048) at the
+# initial n_ctx=8192 server config. report.py's shell-glob is non-recursive
+# so the subdir is automatically excluded from any `results/*.jsonl` invocation.
+results/_archive/
 
 # orphan meta for the aborted concurrency=1 run (its .jsonl is _aborted_19-48-54_concurrency1.jsonl)
 results/gemma4-26b-a4b-q8km__2026-05-11T19-48-54.*

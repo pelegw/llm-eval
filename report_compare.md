@@ -1,10 +1,10 @@
 # Local model eval report
 
 - Model tag(s): gemma4-26b-a4b-q8km, gemma4-31b-q5kxl, qwen3.5-122b-a10b-q3kxl, qwen3.6-27b-q8kxl, qwen3.6-35b-a3b-q8kxl
-- Source file(s): _aborted_19-48-54_concurrency1.jsonl, _aborted_22-10-29_hardrun_4calls.jsonl, gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl, gemma4-26b-a4b-q8km__2026-05-11T22-05-22__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T03-21-56__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl, gemma4-26b-a4b-q8km__2026-05-12T06-13-52__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T06-18-31.jsonl, gemma4-26b-a4b-q8km__2026-05-12T11-49-54__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T12-44-12.jsonl, gemma4-26b-a4b-q8km__2026-05-14T00-42-42.jsonl, gemma4-31b-q5kxl__2026-05-11T22-14-41__SMOKE.jsonl, gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl, gemma4-31b-q5kxl__2026-05-12T15-07-51__SMOKE.jsonl, gemma4-31b-q5kxl__2026-05-12T15-12-37.jsonl, gemma4-31b-q5kxl__2026-05-14T00-16-43.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T12-20-57__SMOKE.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T22-54-51__SMOKE.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T22-59-11.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T23-02-43.jsonl, qwen3.6-27b-q8kxl__2026-05-14T21-10-25__SMOKE.jsonl, qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl, qwen3.6-35b-a3b-q8kxl__2026-05-12T16-39-39__SMOKE.jsonl, qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl, qwen3.6-35b-a3b-q8kxl__2026-05-14T00-04-36.jsonl
+- Source file(s): _aborted_19-48-54_concurrency1.jsonl, _aborted_22-10-29_hardrun_4calls.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl, gemma4-26b-a4b-q8km__2026-05-11T22-05-22__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T03-21-56__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T03-22-57.jsonl, gemma4-26b-a4b-q8km__2026-05-12T06-13-52__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T06-18-31.jsonl, gemma4-26b-a4b-q8km__2026-05-12T11-49-54__SMOKE.jsonl, gemma4-26b-a4b-q8km__2026-05-12T12-44-12.jsonl, gemma4-26b-a4b-q8km__2026-05-14T00-42-42.jsonl, gemma4-31b-q5kxl__2026-05-11T22-14-41__SMOKE.jsonl, gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl, gemma4-31b-q5kxl__2026-05-12T15-07-51__SMOKE.jsonl, gemma4-31b-q5kxl__2026-05-12T15-12-37.jsonl, gemma4-31b-q5kxl__2026-05-14T00-16-43.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T12-20-57__SMOKE.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T22-54-51__SMOKE.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T22-59-11.jsonl, qwen3.5-122b-a10b-q3kxl__2026-05-13T23-02-43.jsonl, qwen3.6-27b-q8kxl__2026-05-14T21-10-25__SMOKE.jsonl, qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl, qwen3.6-35b-a3b-q8kxl__2026-05-12T16-39-39__SMOKE.jsonl, qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl, qwen3.6-35b-a3b-q8kxl__2026-05-14T00-04-36.jsonl
 - Capabilities: coding, coding_hard, coding_quality, coding_quality_hard, coherence, coherence_hard, instruction_following, instruction_following_hard, long_context, long_context_hard, reasoning, reasoning_hard, tool_calling, tool_calling_hard, writing, writing_hard
 - Thinking modes: off, on
-- Total calls: 2729  (graded 2710, pending rubric 19)
+- Total calls: 2493  (graded 2474, pending rubric 19)
 
 ## Run configuration
 
@@ -32,35 +32,6 @@
 - capabilities: ['reasoning_hard', 'coding_hard', 'instruction_following_hard', 'long_context_hard', 'writing_hard']
 - thinking_modes: ['on', 'off']
 - calls_planned: 164
-
-### gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl
-
-- Model tag: gemma4-26b-a4b-q8km
-- Served model id: gemma-4-26b-a4b
-- Model file: gemma-4-26B-A4B-it-UD-Q8_K_XL.gguf
-- Quantization: Q8_K_XL (Unsloth dynamic; ~Q8_0 weights)
-- Architecture: Gemma 4 26B-A4B (sparse MoE, ~4B active params)
-- Parameters: 25,233,142,046 (~25.2 B)
-- File size: 27,620,407,416 bytes (~25.7 GiB)
-- Context (n_ctx): 8192
-- Trained context: 262144
-- Embedding dim: 2816
-- Vocab size: 262144
-- Inference server: llama.cpp
-- Server build: b9101-389ff61d7
-- Server cmdline: `llama-server -m /models/gemma-4-26B-A4B-it-UD-Q8_K_XL.gguf -ngl 99 -c 8192 -t 8 -sm layer -ts 1/1 --jinja --host 0.0.0.0 --port 8080 --metrics -a gemma-4-26b-a4b`
-- Endpoint: http://localhost:8080/v1/chat/completions
-- Hardware: 2x Intel Arc Battlemage G31 [PCI 8086:e223], 230 W cap each; AMD host CPU; model split across both GPUs (-sm layer -ts 1/1, all layers offloaded)
-- Measured GPU power (generation): ~267 W (both GPUs, card-level)
-- Sampling: temperature=1.0, top_p=0.95, top_k=64
-- Thinking-mode toggle: chat_template_kwargs.enable_thinking (true = thinking on, false = off); reasoning returned in reasoning_content field
-- Server slots (--parallel): 4
-- Context per slot: 8192
-- Client concurrency: 1 (run_eval.py issues requests strictly sequentially; at most one request in flight, so only 1 of the 4 server slots was ever active — latencies are uncontended single-request, not throughput-under-load)
-- max_tokens policy: per-prompt cap (default 3072 thinking-on / 1536 thinking-off, long_context up to 4096), clamped to fit n_ctx
-- Run started: 2026-05-11T17:04:05
-- Run duration (min): 75.9
-- Total calls: 236
 
 ### gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl
 
@@ -816,7 +787,7 @@
 
 | scope | n | pass rate | mean score | median latency (ms) | median out-tokens |
 |---|---|---|---|---|---|
-| all | 2729 | 94.9% | 0.956 | 16462 | 339 |
+| all | 2493 | 95.0% | 0.958 | 17284 | 336 |
 
 ## By run (source file)
 
@@ -824,7 +795,6 @@
 |---|---|---|---|---|---|---|---|
 | _aborted_19-48-54_concurrency1.jsonl | gemma4-26b-a4b-q8km |  | 2 | — | — | 25172 | 888 |
 | _aborted_22-10-29_hardrun_4calls.jsonl | gemma4-26b-a4b-q8km | 262144 | 4 | 100.0% | 1.000 | 16688 | 280 |
-| gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | gemma4-26b-a4b-q8km | 8192 | 236 | 93.6% | 0.935 | 10672 | 352 |
 | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | gemma4-26b-a4b-q8km | 262144 | 21 | 100.0% | 1.000 | 7498 | 234 |
 | gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl | gemma4-26b-a4b-q8km | 262144 | 24 | 100.0% | 1.000 | 9699 | 312 |
 | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | gemma4-26b-a4b-q8km | 262144 | 236 | 98.3% | 0.976 | 21540 | 352 |
@@ -856,7 +826,6 @@
 
 | capability | thinking | run | n | pass rate | mean score | median latency (ms) | median out-tokens |
 |---|---|---|---|---|---|---|---|
-| coding | off | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 21 | 95.2% | 0.952 | 2108 | 58 |
 | coding | off | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 2 | 100.0% | 1.000 | 2655 | 82 |
 | coding | off | gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl | 2 | 100.0% | 1.000 | 2630 | 82 |
 | coding | off | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 21 | 95.2% | 0.952 | 3676 | 58 |
@@ -864,7 +833,6 @@
 | coding | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 21 | 95.2% | 0.952 | 3288 | 64 |
 | coding | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 21 | 100.0% | 1.000 | 6246 | 77 |
 | coding | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 21 | 85.7% | 0.857 | 1766 | 64 |
-| coding | on | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 21 | 95.2% | 0.952 | 22957 | 927 |
 | coding | on | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 2 | 100.0% | 1.000 | 23294 | 817 |
 | coding | on | gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl | 2 | 100.0% | 1.000 | 12762 | 448 |
 | coding | on | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 21 | 100.0% | 1.000 | 49495 | 905 |
@@ -910,17 +878,14 @@
 | coding_quality_hard | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 15 | 80.0% | 0.858 | 443969 | 5773 |
 | coding_quality_hard | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 15 | 86.7% | 0.877 | 150599 | 5758 |
 | coherence | off | _aborted_19-48-54_concurrency1.jsonl | 1 | — | — | 16889 | 599 |
-| coherence | off | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 20 | 100.0% | 0.972 | 10772 | 431 |
 | coherence | off | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 2 | — | — | 11010 | 377 |
 | coherence | off | gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl | 2 | — | — | 12319 | 436 |
 | coherence | off | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 20 | 100.0% | 0.990 | 27710 | 498 |
 | coherence | on | _aborted_19-48-54_concurrency1.jsonl | 1 | — | — | 33456 | 1176 |
-| coherence | on | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 20 | 90.0% | 0.903 | 33583 | 1344 |
 | coherence | on | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 2 | — | — | 38967 | 1365 |
 | coherence | on | gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl | 2 | — | — | 117120 | 3906 |
 | coherence | on | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 20 | 95.0% | 0.935 | 74619 | 1321 |
 | coherence_hard | off | gemma4-26b-a4b-q8km__2026-05-11T22-05-22__SMOKE.jsonl | 2 | — | — | 6584 | 102 |
-| instruction_following | off | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 21 | 90.5% | 0.929 | 903 | 22 |
 | instruction_following | off | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 2 | 100.0% | 1.000 | 571 | 8 |
 | instruction_following | off | gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl | 2 | 100.0% | 1.000 | 681 | 13 |
 | instruction_following | off | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 21 | 95.2% | 0.952 | 1444 | 18 |
@@ -928,7 +893,6 @@
 | instruction_following | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 21 | 85.7% | 0.881 | 1730 | 21 |
 | instruction_following | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 21 | 90.5% | 0.937 | 2169 | 21 |
 | instruction_following | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 21 | 81.0% | 0.865 | 928 | 20 |
-| instruction_following | on | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 21 | 85.7% | 0.881 | 7280 | 290 |
 | instruction_following | on | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 2 | 100.0% | 1.000 | 5742 | 199 |
 | instruction_following | on | gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl | 2 | 100.0% | 1.000 | 5069 | 174 |
 | instruction_following | on | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 21 | 100.0% | 1.000 | 15352 | 266 |
@@ -947,7 +911,6 @@
 | instruction_following_hard | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 16 | 75.0% | 0.844 | 137654 | 2906 |
 | instruction_following_hard | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 16 | 93.8% | 0.958 | 85935 | 1156 |
 | instruction_following_hard | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 16 | 87.5% | 0.896 | 49503 | 1990 |
-| long_context | off | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 14 | 100.0% | 1.000 | 12121 | 152 |
 | long_context | off | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 2 | 100.0% | 1.000 | 6964 | 117 |
 | long_context | off | gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl | 2 | 100.0% | 1.000 | 7930 | 154 |
 | long_context | off | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 14 | 100.0% | 1.000 | 14957 | 134 |
@@ -955,7 +918,6 @@
 | long_context | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 14 | 100.0% | 1.000 | 4612 | 86 |
 | long_context | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 14 | 92.9% | 0.929 | 10379 | 131 |
 | long_context | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 14 | 92.9% | 0.929 | 3060 | 107 |
-| long_context | on | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 14 | 78.6% | 0.786 | 31575 | 694 |
 | long_context | on | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 2 | 100.0% | 1.000 | 14730 | 380 |
 | long_context | on | gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl | 2 | 100.0% | 1.000 | 55916 | 1711 |
 | long_context | on | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 14 | 100.0% | 1.000 | 66353 | 685 |
@@ -974,7 +936,6 @@
 | long_context_hard | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 12 | 100.0% | 1.000 | 86279 | 1194 |
 | long_context_hard | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 12 | 91.7% | 0.917 | 77708 | 843 |
 | long_context_hard | on | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 12 | 100.0% | 1.000 | 60532 | 1552 |
-| reasoning | off | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 21 | 100.0% | 1.000 | 5934 | 232 |
 | reasoning | off | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 2 | 100.0% | 1.000 | 7670 | 266 |
 | reasoning | off | gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl | 2 | 100.0% | 1.000 | 8686 | 304 |
 | reasoning | off | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 21 | 100.0% | 1.000 | 14389 | 258 |
@@ -986,7 +947,6 @@
 | reasoning | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 21 | 100.0% | 1.000 | 22015 | 291 |
 | reasoning | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-39-39__SMOKE.jsonl | 2 | 100.0% | 1.000 | 9628 | 380 |
 | reasoning | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 21 | 100.0% | 1.000 | 8709 | 338 |
-| reasoning | on | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 21 | 100.0% | 1.000 | 16137 | 652 |
 | reasoning | on | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 2 | 100.0% | 1.000 | 17553 | 619 |
 | reasoning | on | gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl | 2 | 100.0% | 1.000 | 20418 | 722 |
 | reasoning | on | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 21 | 100.0% | 1.000 | 35322 | 638 |
@@ -1037,7 +997,6 @@
 | tool_calling_hard | on | qwen3.5-122b-a10b-q3kxl__2026-05-13T22-59-11.jsonl | 13 | 92.3% | 0.923 | 8602 | 126 |
 | tool_calling_hard | on | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 13 | 100.0% | 1.000 | 13707 | 171 |
 | tool_calling_hard | on | qwen3.6-35b-a3b-q8kxl__2026-05-14T00-04-36.jsonl | 13 | 92.3% | 0.923 | 5198 | 159 |
-| writing | off | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 21 | 100.0% | 0.962 | 3345 | 118 |
 | writing | off | gemma4-26b-a4b-q8km__2026-05-11T19-13-05__SMOKE.jsonl | 1 | — | — | 1136 | 19 |
 | writing | off | gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl | 2 | — | — | 3871 | 125 |
 | writing | off | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 21 | 100.0% | 0.964 | 6376 | 114 |
@@ -1045,7 +1004,6 @@
 | writing | off | qwen3.5-122b-a10b-q3kxl__2026-05-13T12-23-32.jsonl | 21 | 100.0% | 0.960 | 5652 | 105 |
 | writing | off | qwen3.6-27b-q8kxl__2026-05-14T21-14-47.jsonl | 21 | 100.0% | 0.936 | 9488 | 120 |
 | writing | off | qwen3.6-35b-a3b-q8kxl__2026-05-12T16-41-05.jsonl | 21 | 95.2% | 0.926 | 3388 | 118 |
-| writing | on | gemma4-26b-a4b-q8km__2026-05-11T17-04-05.jsonl | 21 | 85.7% | 0.855 | 31322 | 1261 |
 | writing | on | gemma4-26b-a4b-q8km__2026-05-11T19-38-57__SMOKE.jsonl | 2 | — | — | 19480 | 687 |
 | writing | on | gemma4-26b-a4b-q8km__2026-05-11T19-51-18.jsonl | 21 | 95.2% | 0.929 | 68283 | 1246 |
 | writing | on | gemma4-31b-q5kxl__2026-05-11T22-16-53.jsonl | 21 | 100.0% | 0.967 | 41810 | 701 |
@@ -1068,63 +1026,63 @@
 
 | thinking | n | pass rate | mean score | median latency (ms) | median out-tokens |
 |---|---|---|---|---|---|
-| off | 1371 | 93.7% | 0.952 | 5879 | 119 |
-| on | 1358 | 96.0% | 0.960 | 49966 | 1115 |
+| off | 1253 | 93.4% | 0.951 | 6172 | 119 |
+| on | 1240 | 96.6% | 0.966 | 55692 | 1141 |
 
 ## By capability
 
 | capability | n | pass rate | mean score | median latency (ms) | median out-tokens | pending |
 |---|---|---|---|---|---|---|
-| coding | 260 | 96.9% | 0.969 | 9999 | 214 |  |
+| coding | 218 | 97.2% | 0.972 | 10723 | 242 |  |
 | coding_hard | 202 | 100.0% | 1.000 | 17390 | 338 |  |
 | coding_quality | 148 | 98.0% | 0.972 | 28484 | 617 |  |
 | coding_quality_hard | 154 | 84.4% | 0.900 | 68877 | 1088 |  |
-| coherence | 90 | 96.2% | 0.950 | 31467 | 866 | 10 |
+| coherence | 50 | 97.5% | 0.963 | 42422 | 866 | 10 |
 | coherence_hard | 2 | — | — | 6584 | 102 | 2 |
-| instruction_following | 260 | 93.5% | 0.947 | 4534 | 118 |  |
+| instruction_following | 218 | 94.5% | 0.956 | 5523 | 122 |  |
 | instruction_following_hard | 162 | 74.7% | 0.871 | 7163 | 125 |  |
-| long_context | 176 | 96.6% | 0.966 | 17865 | 224 |  |
+| long_context | 148 | 98.0% | 0.980 | 18463 | 216 |  |
 | long_context_hard | 122 | 94.3% | 0.943 | 39614 | 485 |  |
-| reasoning | 276 | 100.0% | 1.000 | 18888 | 438 |  |
+| reasoning | 234 | 100.0% | 1.000 | 21633 | 451 |  |
 | reasoning_hard | 210 | 99.0% | 0.990 | 31973 | 730 |  |
 | tool_calling | 138 | 100.0% | 1.000 | 3180 | 56 |  |
 | tool_calling_hard | 130 | 96.9% | 0.969 | 3768 | 68 |  |
-| writing | 257 | 97.6% | 0.946 | 17481 | 325 | 5 |
+| writing | 215 | 98.6% | 0.954 | 19105 | 301 | 5 |
 | writing_hard | 142 | 87.1% | 0.856 | 29792 | 566 | 2 |
 
 ## Capability × thinking mode
 
 | capability | thinking | n | pass rate | mean score | median latency (ms) | median out-tokens |
 |---|---|---|---|---|---|---|
-| coding | off | 130 | 95.4% | 0.954 | 3296 | 64 |
-| coding | on | 130 | 98.5% | 0.985 | 39254 | 994 |
+| coding | off | 109 | 95.4% | 0.954 | 3529 | 64 |
+| coding | on | 109 | 99.1% | 0.991 | 43996 | 1063 |
 | coding_hard | off | 102 | 100.0% | 1.000 | 5711 | 119 |
 | coding_hard | on | 100 | 100.0% | 1.000 | 70973 | 1720 |
 | coding_quality | off | 74 | 95.9% | 0.960 | 11177 | 232 |
 | coding_quality | on | 74 | 100.0% | 0.984 | 115890 | 3456 |
 | coding_quality_hard | off | 77 | 79.2% | 0.898 | 20075 | 463 |
 | coding_quality_hard | on | 77 | 89.6% | 0.902 | 170072 | 5169 |
-| coherence | off | 45 | 100.0% | 0.981 | 15145 | 490 |
-| coherence | on | 45 | 92.5% | 0.919 | 49370 | 1329 |
+| coherence | off | 25 | 100.0% | 0.990 | 20284 | 505 |
+| coherence | on | 25 | 95.0% | 0.935 | 74007 | 1313 |
 | coherence_hard | off | 2 | — | — | 6584 | 102 |
-| instruction_following | off | 130 | 90.0% | 0.922 | 1341 | 20 |
-| instruction_following | on | 130 | 96.9% | 0.973 | 20870 | 449 |
+| instruction_following | off | 109 | 89.9% | 0.920 | 1450 | 19 |
+| instruction_following | on | 109 | 99.1% | 0.991 | 22070 | 512 |
 | instruction_following_hard | off | 82 | 63.4% | 0.834 | 2040 | 38 |
 | instruction_following_hard | on | 80 | 86.2% | 0.908 | 78574 | 1765 |
-| long_context | off | 88 | 96.6% | 0.966 | 10731 | 115 |
-| long_context | on | 88 | 96.6% | 0.966 | 40760 | 550 |
+| long_context | off | 74 | 95.9% | 0.959 | 9838 | 111 |
+| long_context | on | 74 | 100.0% | 1.000 | 40873 | 550 |
 | long_context_hard | off | 62 | 91.9% | 0.919 | 18127 | 234 |
 | long_context_hard | on | 60 | 96.7% | 0.967 | 83965 | 1337 |
-| reasoning | off | 138 | 100.0% | 1.000 | 10848 | 262 |
-| reasoning | on | 138 | 100.0% | 1.000 | 33332 | 760 |
+| reasoning | off | 117 | 100.0% | 1.000 | 11914 | 264 |
+| reasoning | on | 117 | 100.0% | 1.000 | 38480 | 776 |
 | reasoning_hard | off | 106 | 100.0% | 1.000 | 18214 | 418 |
 | reasoning_hard | on | 104 | 98.1% | 0.981 | 59174 | 1375 |
 | tool_calling | off | 69 | 100.0% | 1.000 | 1499 | 31 |
 | tool_calling | on | 69 | 100.0% | 1.000 | 6522 | 120 |
 | tool_calling_hard | off | 65 | 98.5% | 0.985 | 1785 | 36 |
 | tool_calling_hard | on | 65 | 95.4% | 0.954 | 7853 | 143 |
-| writing | off | 129 | 99.2% | 0.952 | 5478 | 115 |
-| writing | on | 128 | 96.0% | 0.940 | 63881 | 1460 |
+| writing | off | 108 | 99.0% | 0.950 | 5764 | 114 |
+| writing | on | 107 | 98.1% | 0.958 | 77580 | 1606 |
 | writing_hard | off | 72 | 90.0% | 0.876 | 5640 | 143 |
 | writing_hard | on | 70 | 84.3% | 0.836 | 177333 | 3874 |
 
@@ -1132,103 +1090,103 @@
 
 | capability | criterion | n | mean |
 |---|---|---|---|
-| coherence | accuracy | 8 | 1.000 |
-| coherence | age_appropriateness | 4 | 1.000 |
-| coherence | argument_quality | 4 | 1.000 |
-| coherence | arithmetic_consistency | 4 | 1.000 |
-| coherence | balance | 4 | 1.000 |
-| coherence | causal_chain | 4 | 0.550 |
-| coherence | clarity | 76 | 0.961 |
-| coherence | completeness | 44 | 0.977 |
-| coherence | consistency_with_own_explanation | 4 | 0.900 |
-| coherence | consistent_application | 4 | 1.000 |
-| coherence | consistent_concept_use | 4 | 1.000 |
-| coherence | definition_accuracy | 4 | 1.000 |
-| coherence | definition_quality | 4 | 0.900 |
-| coherence | explanation_clarity | 4 | 1.000 |
-| coherence | follow_through | 4 | 1.000 |
-| coherence | food_web_consistency | 4 | 1.000 |
-| coherence | handles_tension_coherently | 4 | 1.000 |
-| coherence | inference_grounded | 4 | 1.000 |
-| coherence | inference_grounded_in_setup | 4 | 1.000 |
-| coherence | internal_consistency | 36 | 0.883 |
-| coherence | internal_consistency_each_side | 4 | 1.000 |
-| coherence | logical_flow | 8 | 1.000 |
-| coherence | no_new_claims | 4 | 1.000 |
-| coherence | numerical_correctness | 4 | 1.000 |
-| coherence | period_plausibility | 4 | 0.800 |
-| coherence | persuasiveness | 4 | 1.000 |
-| coherence | pitch_quality | 4 | 1.000 |
-| coherence | plot_coherence | 4 | 0.950 |
-| coherence | practical_correctness | 4 | 1.000 |
-| coherence | reasoning_quality | 8 | 1.000 |
-| coherence | resolution | 4 | 0.500 |
-| coherence | rule_completeness | 4 | 0.950 |
-| coherence | sample_game_obeys_rules | 4 | 0.750 |
-| coherence | scientific_accuracy | 4 | 0.950 |
-| coherence | section_separation | 4 | 1.000 |
-| coherence | self_consistency | 4 | 0.950 |
-| coherence | self_reference_accuracy | 4 | 0.950 |
-| coherence | steps_ingredients_consistency | 4 | 1.000 |
-| coherence | tldr_faithfulness | 4 | 1.000 |
-| coherence | tone_appropriate | 4 | 1.000 |
-| coherence | verdict_follows_from_arguments | 4 | 0.900 |
-| writing | adherence_to_prompt | 60 | 0.977 |
-| writing | age_appropriateness | 12 | 0.933 |
-| writing | appropriateness | 12 | 0.967 |
-| writing | atmosphere | 12 | 1.000 |
-| writing | balanced_critique | 12 | 1.000 |
-| writing | bookend_constraint_met | 12 | 0.800 |
-| writing | call_to_action | 12 | 1.000 |
-| writing | characterization | 12 | 0.983 |
-| writing | chorus_identical | 12 | 1.000 |
-| writing | clear_value_prop | 12 | 1.000 |
-| writing | completeness | 12 | 1.000 |
-| writing | concision | 36 | 0.828 |
-| writing | description_clarity | 12 | 0.950 |
-| writing | emotional_resonance | 12 | 1.000 |
-| writing | emotional_theme | 12 | 1.000 |
-| writing | encouragement | 12 | 1.000 |
-| writing | evokes_dawn | 12 | 1.000 |
-| writing | fluency | 120 | 0.982 |
-| writing | format | 12 | 1.000 |
-| writing | four_lines | 12 | 1.000 |
-| writing | hook | 12 | 1.000 |
-| writing | humor | 12 | 0.600 |
-| writing | imagery | 36 | 0.922 |
-| writing | length | 48 | 0.862 |
-| writing | length_adherence | 12 | 0.967 |
-| writing | lightness_humor | 12 | 0.983 |
-| writing | limerick_form | 12 | 0.833 |
-| writing | meaning_preserved | 12 | 0.883 |
-| writing | narrative_arc | 12 | 0.783 |
-| writing | narrative_completeness | 12 | 0.933 |
-| writing | narrative_quality | 12 | 0.983 |
-| writing | naturalistic_dialogue | 12 | 1.000 |
-| writing | on_topic | 12 | 0.917 |
-| writing | persuasiveness | 12 | 0.900 |
-| writing | professional_tone | 12 | 1.000 |
-| writing | prose_quality | 48 | 0.946 |
-| writing | realism | 12 | 1.000 |
-| writing | restraint | 12 | 0.800 |
-| writing | rhyme_and_meter | 12 | 0.683 |
-| writing | rhyme_scheme_correct | 12 | 1.000 |
-| writing | sensory_detail | 12 | 1.000 |
-| writing | sincerity | 12 | 1.000 |
-| writing | six_lines | 12 | 1.000 |
-| writing | soothing_tone | 12 | 0.933 |
-| writing | specific_detail | 12 | 1.000 |
-| writing | specificity | 12 | 0.833 |
-| writing | structure_correct | 12 | 1.000 |
-| writing | tagline_punchiness | 12 | 0.967 |
-| writing | three_line_form | 12 | 1.000 |
-| writing | three_sentences | 12 | 0.983 |
-| writing | tonal_continuity | 12 | 0.983 |
-| writing | tone | 72 | 1.000 |
-| writing | under_280_chars | 12 | 0.917 |
-| writing | variety | 12 | 0.983 |
-| writing | vividness_improved | 12 | 0.850 |
-| writing | warmth_humor_balance | 12 | 0.967 |
+| coherence | accuracy | 4 | 1.000 |
+| coherence | age_appropriateness | 2 | 1.000 |
+| coherence | argument_quality | 2 | 1.000 |
+| coherence | arithmetic_consistency | 2 | 1.000 |
+| coherence | balance | 2 | 1.000 |
+| coherence | causal_chain | 2 | 0.600 |
+| coherence | clarity | 38 | 0.974 |
+| coherence | completeness | 22 | 0.991 |
+| coherence | consistency_with_own_explanation | 2 | 0.900 |
+| coherence | consistent_application | 2 | 1.000 |
+| coherence | consistent_concept_use | 2 | 1.000 |
+| coherence | definition_accuracy | 2 | 1.000 |
+| coherence | definition_quality | 2 | 0.900 |
+| coherence | explanation_clarity | 2 | 1.000 |
+| coherence | follow_through | 2 | 1.000 |
+| coherence | food_web_consistency | 2 | 1.000 |
+| coherence | handles_tension_coherently | 2 | 1.000 |
+| coherence | inference_grounded | 2 | 1.000 |
+| coherence | inference_grounded_in_setup | 2 | 1.000 |
+| coherence | internal_consistency | 18 | 0.922 |
+| coherence | internal_consistency_each_side | 2 | 1.000 |
+| coherence | logical_flow | 4 | 1.000 |
+| coherence | no_new_claims | 2 | 1.000 |
+| coherence | numerical_correctness | 2 | 1.000 |
+| coherence | period_plausibility | 2 | 1.000 |
+| coherence | persuasiveness | 2 | 1.000 |
+| coherence | pitch_quality | 2 | 1.000 |
+| coherence | plot_coherence | 2 | 1.000 |
+| coherence | practical_correctness | 2 | 1.000 |
+| coherence | reasoning_quality | 4 | 1.000 |
+| coherence | resolution | 2 | 0.500 |
+| coherence | rule_completeness | 2 | 1.000 |
+| coherence | sample_game_obeys_rules | 2 | 0.800 |
+| coherence | scientific_accuracy | 2 | 0.900 |
+| coherence | section_separation | 2 | 1.000 |
+| coherence | self_consistency | 2 | 0.900 |
+| coherence | self_reference_accuracy | 2 | 1.000 |
+| coherence | steps_ingredients_consistency | 2 | 1.000 |
+| coherence | tldr_faithfulness | 2 | 1.000 |
+| coherence | tone_appropriate | 2 | 1.000 |
+| coherence | verdict_follows_from_arguments | 2 | 0.800 |
+| writing | adherence_to_prompt | 50 | 0.972 |
+| writing | age_appropriateness | 10 | 1.000 |
+| writing | appropriateness | 10 | 0.960 |
+| writing | atmosphere | 10 | 1.000 |
+| writing | balanced_critique | 10 | 1.000 |
+| writing | bookend_constraint_met | 10 | 0.840 |
+| writing | call_to_action | 10 | 1.000 |
+| writing | characterization | 10 | 0.980 |
+| writing | chorus_identical | 10 | 1.000 |
+| writing | clear_value_prop | 10 | 1.000 |
+| writing | completeness | 10 | 1.000 |
+| writing | concision | 30 | 0.833 |
+| writing | description_clarity | 10 | 0.940 |
+| writing | emotional_resonance | 10 | 1.000 |
+| writing | emotional_theme | 10 | 1.000 |
+| writing | encouragement | 10 | 1.000 |
+| writing | evokes_dawn | 10 | 1.000 |
+| writing | fluency | 100 | 0.982 |
+| writing | format | 10 | 1.000 |
+| writing | four_lines | 10 | 1.000 |
+| writing | hook | 10 | 1.000 |
+| writing | humor | 10 | 0.640 |
+| writing | imagery | 30 | 0.940 |
+| writing | length | 40 | 0.880 |
+| writing | length_adherence | 10 | 0.960 |
+| writing | lightness_humor | 10 | 0.980 |
+| writing | limerick_form | 10 | 0.880 |
+| writing | meaning_preserved | 10 | 0.900 |
+| writing | narrative_arc | 10 | 0.820 |
+| writing | narrative_completeness | 10 | 1.000 |
+| writing | narrative_quality | 10 | 0.980 |
+| writing | naturalistic_dialogue | 10 | 1.000 |
+| writing | on_topic | 10 | 0.980 |
+| writing | persuasiveness | 10 | 0.920 |
+| writing | professional_tone | 10 | 1.000 |
+| writing | prose_quality | 40 | 0.960 |
+| writing | realism | 10 | 1.000 |
+| writing | restraint | 10 | 0.820 |
+| writing | rhyme_and_meter | 10 | 0.720 |
+| writing | rhyme_scheme_correct | 10 | 1.000 |
+| writing | sensory_detail | 10 | 1.000 |
+| writing | sincerity | 10 | 1.000 |
+| writing | six_lines | 10 | 1.000 |
+| writing | soothing_tone | 10 | 1.000 |
+| writing | specific_detail | 10 | 1.000 |
+| writing | specificity | 10 | 0.840 |
+| writing | structure_correct | 10 | 1.000 |
+| writing | tagline_punchiness | 10 | 0.960 |
+| writing | three_line_form | 10 | 1.000 |
+| writing | three_sentences | 10 | 0.980 |
+| writing | tonal_continuity | 10 | 0.980 |
+| writing | tone | 60 | 1.000 |
+| writing | under_280_chars | 10 | 0.900 |
+| writing | variety | 10 | 0.980 |
+| writing | vividness_improved | 10 | 0.860 |
+| writing | warmth_humor_balance | 10 | 0.960 |
 | writing_hard | about_fifty_words | 10 | 0.720 |
 | writing_hard | acrostic_spells_WINTER | 10 | 0.920 |
 | writing_hard | actually_funny | 10 | 0.440 |
@@ -1281,25 +1239,10 @@
 | writing_hard | three_distinct_voices | 10 | 1.000 |
 | writing_hard | tragic_version_genuinely_tragic | 10 | 1.000 |
 
-## Failures (139)
+## Failures (124)
 
 | capability | prompt | mode | score | notes | finish/err |
 |---|---|---|---|---|---|
-| coherence | coh-02 | on | 0.200 | EMPTY response — thinking hit token cap (finish=length), 0 words | length |
-| coherence | coh-03 | on | 0.200 | EMPTY — thinking hit token cap | length |
-| coding | cod-14 | on | 0.000 | rc=1 stderr='File "<string>", line 1\n    ```python\n    ^\nSyntaxError: invalid syntax' | length |
-| coding | cod-15 | off | 0.000 | rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line 5, in <module>\n  | stop |
-| instruction_following | if-03 | on | 0.500 | ok:forbidden chars seen: none \| X:hit=[] miss=['ocean'] forbidden_seen=[] | length |
-| instruction_following | if-03 | off | 0.500 | ok:forbidden chars seen: none \| X:hit=[] miss=['ocean'] forbidden_seen=[] | stop |
-| instruction_following | if-11 | on | 0.000 | 0 words (want 39..41) | length |
-| instruction_following | if-11 | off | 0.000 | 38 words (want 39..41) | stop |
-| instruction_following | if-18 | on | 0.000 | X:0 non-empty lines (want 3..3) \| X:missing_patterns=['(?m)^\\s*(\\S+\\s+){4}\\S+[.!?\\"\' | length |
-| long_context | lc-11 | on | 0.000 | no number in response | length |
-| long_context | lc-12 | on | 0.000 | no number in response | length |
-| long_context | lc-14 | on | 0.000 | no number in response | length |
-| writing | wr-08 | on | 0.200 | EMPTY — thinking hit token cap (finish=length) | length |
-| writing | wr-11 | on | 0.200 | EMPTY — thinking hit token cap | length |
-| writing | wr-21 | on | 0.200 | EMPTY — thinking hit token cap | length |
 | coherence | coh-03 | on | 0.200 | rubric: EMPTY OUTPUT - thinking exhausted token budget (finish=length) | length |
 | coding | cod-15 | off | 0.000 | rc=1 stderr='Traceback (most recent call last):\n  File "<string>", line 5, in <module>\n  | stop |
 | instruction_following | if-11 | off | 0.000 | 38 words (want 39..41) | stop |

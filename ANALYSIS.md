@@ -19,22 +19,30 @@ quant-attributable.
 | model | architecture | quant | overall pass / mean | rank |
 |---|---|---|---|---|
 | **gemma-4-31b** | 31B dense | Q5_K_XL | **97.4%** / 0.975 mean (470 calls) | **🥇 1st** |
-| **gemma-4-26b-a4b** | 26B MoE, ~4B active | Q8_K_XL | 95.2% / 0.955 mean (746 calls, multi-run) | **🥈 2nd** |
-| **qwen3.6-27b** | 27B dense | Q8_K_XL | **95.1%** / 0.959 mean (470 calls) | **🥉 3rd — new model 2026-05-14** |
+| **gemma-4-26b-a4b** | 26B MoE, ~4B active | Q8_K_XL | **95.9%** / 0.964 mean (510 calls, multi-run) | **🥈 2nd** |
+| **qwen3.6-27b** | 27B dense | Q8_K_XL | 95.1% / 0.959 mean (470 calls) | **🥉 3rd — new model 2026-05-14** |
 | **qwen3.6-35b-a3b** | 35B MoE, ~3B active | Q8_K_XL | 93.0% / 0.943 mean (470 calls) | 4th |
 | **qwen3.5-122b-a10b** | 122B MoE, ~10B active | Q3_K_XL | 92.6% / 0.943 mean (470 calls) | 5th — Q3 quant penalty |
+
+> **n note**: an early Gemma-26B-A4B run (2026-05-11T17-04-05, n_ctx=8192, smaller 3072/1536 thinking budget) is
+> excluded from these aggregates and from `report_compare.md`. It used a constrained config that pre-dated the
+> standard 8192/2048 budget and produced 13 of the model's 26 raw truncations — keeping it would understate the
+> model by ~0.7pp. The file lives at `results/_archive/` for reproducibility but is not in the report glob.
 
 - **Gemma-4-31B is the outright #1.** Cleanest run across the board — only 1 truncation in 470 calls, lowest of
   any model. Best mean rubric score for writing. Wins or ties on every cap except tool_calling (where Gemma-26B-A4B
   pulled the perfect 52/52). The "dense-and-disciplined" pick.
-- **Gemma-26B-A4B (MoE) is 2nd** but with the *most* over-thinking truncations (26 across 746 calls — note the
-  inflated n comes from having two full base runs plus a separate code-quality run; per-run rate is ~3%). When it
-  produces output, quality is competitive with the 31B; the truncation pathology is the main thing keeping it from
-  tying. Won tool_calling outright (52/52 perfect).
-- **Qwen3.6 27B (the new dense Qwen) takes a strong 3rd.** Beats its 35B-A3B MoE sibling by 2pp despite being
-  smaller in total params — the dense-architecture-at-this-scale story. Tool_calling perfect 52/52. Writing-hard
-  thinking-on 14/14 (joining Gemma-31B as the only two models to clear that cell). Zero writing truncations of
-  any kind. Pays for it on instruction_following_hard off-mode (56.2%, weakest cell in its run).
+- **Gemma-26B-A4B (MoE) is 2nd** with the most over-thinking truncations of any model in the cohort at the standard
+  budget (13 across 510 calls = ~2.5%, vs the dense Gemma-31B's 0.2% and Qwen3.6-27B's 0.85%). When it produces
+  output, quality is right there with the 31B; the truncation pathology is the main thing keeping it from tying.
+  Won tool_calling outright (52/52 perfect).
+- **Qwen3.6 27B (the new dense Qwen) takes a strong 3rd, but it's essentially tied with the 26B** (0.8pp pass-rate
+  gap, 0.005 mean — within sampling noise). Beats its 35B-A3B MoE sibling by 2pp despite being smaller in total
+  params — the dense-architecture-at-this-scale story. Tool_calling perfect 52/52. Writing-hard thinking-on 14/14
+  (joining Gemma-31B as the only two models to clear that cell). Zero writing truncations of any kind. Pays for it
+  on instruction_following_hard off-mode (56.2%, weakest cell in its run). **Different failure profile from the
+  26B**: when it fails, it usually emits *wrong* output, not *no* output (only 4 of its 23 fails are truncations,
+  vs 13 of 21 for the 26B at the standard budget).
 - **Qwen3.6-35B-A3B (MoE) drops to 4th** behind its smaller-but-dense Qwen sibling. Same character as before:
   slips on basic coding-off (85.7%) and basic IF-off (81.0%), worst IF-hard-off in the cohort at 50%, plus the
   enum-pick and parallel-call discipline misses on tool_calling.
@@ -88,9 +96,11 @@ quant-attributable.
 
 ### gemma-4-26b-a4b (MoE, ~4B active, Q8_K_XL) — co-leader
 
-- **Base tier: ~98.3% / 0.976.** Reasoning 100% both modes (nailed every trap — bat-and-ball, Monty Hall,
-  lily-pads, harmonic-mean, 25-horses…). Coding ~95–100% off / 100% on. IF 95.2% off / 100% on. Long-context 100%
-  both modes. Writing 100% off / 95.2% on. Coherence (run only on this model) 100% off / 95% on.
+- **Base tier (n_ctx=262144 run, the canonical baseline): 98.3% / 0.976.** Reasoning 100% both modes (nailed every
+  trap — bat-and-ball, Monty Hall, lily-pads, harmonic-mean, 25-horses…). Coding ~95–100% off / 100% on. IF 95.2%
+  off / 100% on. Long-context 100% both modes. Writing 100% off / 95.2% on. Coherence (run only on this model)
+  100% off / 95% on. Just **2 truncations** in this 236-call run, both on deceptively-simple constraint prompts
+  (coh-03 on, wr-21 on).
 - **Hard tier: 90.9% / 0.935.** Reasoning_hard + coding_hard 100% each, both modes. The losses cluster in
   **thinking-on truncations** — 11 of ~15 hard-tier fails are `finish=length`: it spends the whole 8192-token
   budget reasoning and emits nothing (rea-h-11, if-h-01, if-h-02, if-h-08, if-h-16, lc-h-05, and 5 of the 14
@@ -278,10 +288,13 @@ The **Qwen3.6-35B-A3B red cells are all thinking-OFF capability gaps**, plus the
 
 ## Failure-pattern summary (the "what actually goes wrong" view)
 
-1. **Over-thinking → empty/truncated output** (`finish=length`, always thinking-ON). 26B-A4B: 11. Qwen3.6-A3B: 5.
-   **Qwen3.5-A10B-Q3: 13** (the new worst). 31B-dense: 1. The three MoEs all spend the whole 8192-token budget
-   reasoning and emit nothing on hard prompts; the larger active-param count of Qwen3.5 didn't help, possibly
-   because Q3 makes the deliberation pass less efficient per token. The 31B-dense reliably wraps up.
+1. **Over-thinking → empty/truncated output** (`finish=length`, always thinking-ON; counts at the standard
+   8192/2048 budget, excluding the early constrained-budget 26B run). 26B-A4B: **13** (across 510 calls).
+   Qwen3.6-27B: 4 (470 calls). Qwen3.6-A3B: 5 (470 calls). 31B-dense: **1** (470 calls). **Qwen3.5-A10B-Q3: 13**
+   (470 calls — the highest *rate* at 2.77%). The MoEs and the dense Qwens all spend the whole 8192-token budget
+   reasoning and emit nothing on hard prompts; the dense Gemma-31B reliably wraps up. (At the constrained 3072/1536
+   budget the 26B's early run added 13 more truncations — ~2.7× the rate at the same caps; that run is excluded
+   from these counts.)
 2. **Exact word/length counts, thinking-OFF.** All four slip here ("exactly 50 words", "exactly 100 words", "60–80
    words", etc.) — the 31B least, Qwen3.6 most (and Qwen3.6 consistently *overshoots*); Qwen3.5-Q3 misses some
    (wr-h-02-off: 89 words instead of exactly 100, wr-18-off: 103 instead of ≤100). Thinking-ON, all four count
@@ -316,12 +329,14 @@ The **Qwen3.6-35B-A3B red cells are all thinking-OFF capability gaps**, plus the
 loses to Gemma-26B-A4B and Qwen3.6-27B by a single prompt). Best mean rubric on writing. If you can fit Q5_K_XL
 (~20 GiB), this is the daily-driver pick.
 
-**Gemma-26B-A4B (MoE) is 2nd.** Output quality is competitive with the 31B; the *only* thing keeping it from
-tying is the 26 over-thinking truncations across its multiple runs (per-run rate ~3%, concentrated in writing_hard
-thinking-on where it loses 5 of 14). Won tool_calling outright (52/52). Mitigation if you want to use it: thinking-off
-for hard creative prompts, or bump `max_tokens` past 8192.
+**Gemma-26B-A4B (MoE) is 2nd.** 95.9% pass / 0.964 mean across 510 calls (excluding the early constrained-budget
+run). Output quality is competitive with the 31B; the only thing keeping it from tying is the 13 over-thinking
+truncations at the standard budget (~2.5% rate, concentrated in writing_hard thinking-on where it loses 5 of 14).
+Won tool_calling outright (52/52). Mitigation if you want to use it: thinking-off for hard creative prompts, or
+bump `max_tokens` past 8192.
 
-**Qwen3.6 27B (the new dense Qwen) takes a strong 3rd.** 95.1% pass, beating its 35B-A3B MoE sibling by 2pp
+**Qwen3.6 27B (the new dense Qwen) takes 3rd, essentially tied with the 26B-A4B.** 95.1% pass / 0.959 mean —
+within 0.8pp/0.005 of the 26B, which is sampling noise. Beating its 35B-A3B MoE sibling by 2pp
 despite being smaller in total params. Tool_calling perfect (52/52). Writing-hard thinking-on perfect (14/14, one
 of only two models to clear that cell). Zero writing truncations of any kind. Pays for it on
 `instruction_following_hard`-off (56%, the weakest cap in its run) and one timeout error on `long_context_hard`-on.

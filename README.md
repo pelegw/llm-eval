@@ -74,10 +74,11 @@ Runs done so far: `gemma-4-26b-a4b` (Q8), `gemma-4-31b` (Q5), `qwen3.6-27b` (Q8)
 `qwen3.5-122b-a10b` (Q3_K_XL) — base + hard tiers + both code-quality tiers + tool_calling, both thinking modes,
 coherence excluded. See [ANALYSIS.md](ANALYSIS.md).
 
-**Headline 5-way ranking** (overall pass rate, mean rubric score):
-1. gemma-4-31b (dense Q5) — **97.4% / 0.975** — outright winner, only 1 truncation
-2. gemma-4-26b-a4b (MoE Q8) — 95.2% / 0.955 — quality matches the 31B but 26 over-thinking truncations
-3. **qwen3.6-27b (dense Q8) — 95.1% / 0.959** — beats its 35B-A3B MoE sibling by 2pp; perfect tool_calling
+**Headline 5-way ranking** (overall pass rate, mean rubric score; an early Gemma-26B-A4B run at n_ctx=8192 with a
+constrained 3072/1536 thinking budget is excluded — preserved at `results/_archive/` but not in the report):
+1. gemma-4-31b (dense Q5) — **97.4% / 0.975** — outright winner, only 1 truncation in 470 calls
+2. gemma-4-26b-a4b (MoE Q8) — **95.9% / 0.964** (510 calls) — quality matches the 31B but 13 over-thinking truncs
+3. qwen3.6-27b (dense Q8) — 95.1% / 0.959 — essentially tied with the 26B; beats its 35B-A3B sibling by 2pp
 4. qwen3.6-35b-a3b (MoE Q8) — 93.0% / 0.943 — fastest off-mode but hard-tier weaknesses
 5. qwen3.5-122b-a10b (Q3_K_XL) — 92.6% / 0.943 — Q3 quant erases the parameter-count advantage
 
