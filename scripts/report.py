@@ -9,6 +9,13 @@ import argparse, json, statistics, sys
 from collections import defaultdict
 from pathlib import Path
 
+# Capabilities that produce qualitative-only records (no grader, no pass/fail).
+# Filtered out at load time so they never move score-rate numbers.
+# Their data lives in a parallel subfolder (e.g. political_bias/results/) with its
+# own README.md + ANALYSIS.md; this set is the belt-and-suspenders filter in case
+# someone passes a subfolder path explicitly. See METHODOLOGY.md §12.
+QUALITATIVE_CAPS = {"political_bias"}
+
 
 def load(paths):
     rows = []
@@ -16,7 +23,10 @@ def load(paths):
         for line in Path(p).read_text().splitlines():
             line = line.strip()
             if line:
-                rows.append(json.loads(line))
+                r = json.loads(line)
+                if r.get("capability") in QUALITATIVE_CAPS:
+                    continue
+                rows.append(r)
     return rows
 
 

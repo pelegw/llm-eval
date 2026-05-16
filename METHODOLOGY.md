@@ -12,7 +12,7 @@ A small, self-hosted eval for local LLMs served via [llama.cpp](https://github.c
 OpenAI-compatible HTTP endpoint. It hits the model with a fixed prompt set, captures every response **and its
 reasoning trace**, grades each call, and writes one JSONL line per call. The goal is a reproducible, head-to-head
 comparison of *crisp, gradeable sub-skills* across models and across the "thinking on / thinking off" axis — not a
-benchmark of everything a model can do (see §11 for what's deliberately out of scope).
+benchmark of everything a model can do (see §13 for what's deliberately out of scope).
 
 Everything lives in `~/llm-eval/`:
 
@@ -275,7 +275,37 @@ means and a failures table) — it groups by `model_tag`, so a multi-file invoca
 
 ---
 
-## 12. What this does *not* measure (limitations)
+## 12. Qualitative probes outside the scoring eval (the `political_bias/` pattern)
+
+Some capabilities don't have a single right answer — they're worth *capturing* but not *grading*. The
+`political_bias/` subfolder is the first of these: 28 prompts about politically sensitive topics across different
+governments, run with no grader and read manually. To keep this data out of the scoring aggregates while still
+reusing the harness, it follows three conventions:
+
+1. **The prompt has `grader: null`.** The harness records every call as it does for any prompt, but `grading.score`
+   is `null` and `report.py`'s pass-rate aggregates skip it.
+2. **The prompts and results live in their own subfolder** (`political_bias/prompts.jsonl`,
+   `political_bias/results/*.jsonl`), not in `prompts/` and `results/`. `run_eval.py` has a `SUBFOLDER_CAPS` dict
+   that maps the capability name to its prompts path and results dir; `load_prompts(cap)` and the results-dir
+   selection in `main()` consult it. Adding a new qualitative cap is one entry in that dict + a `gen_prompts.py`
+   `write(..., out_path=...)` call.
+3. **`report.py` reads `results/*.jsonl` via shell glob** (non-recursive). Subfolder data is invisible to it by
+   construction — no special-case filter needed.
+
+Two harness flags exist primarily for these probes but are general:
+
+- `--replicates N` — run each (prompt, mode) cell N times. Useful when you want to capture variance in refusals,
+  hedging patterns, or content-policy behavior rather than treat one sample as definitive. The replicate index
+  is recorded as `replicate_idx`.
+- `--include-tags <tag,...>` — restrict the plan to prompts whose `tags` array contains any of the named tags.
+  E.g. `--include-tags zh` runs only the Chinese-language variants of a multilingual set.
+
+The writeup lives next to the data: each subfolder owns its own `README.md` (what's in here, how to reproduce)
+and `ANALYSIS.md` (the findings). The main `ANALYSIS.md` is reserved for the scoring eval's results.
+
+---
+
+## 13. What this does *not* measure (limitations)
 
 - **Ceiling effects.** The base tier maxes out for any competent model — it can't rank two strong models. That's
   what the hard tier is for, and even the hard tier should get harder for frontier models.

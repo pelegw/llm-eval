@@ -28,12 +28,22 @@ import graders as G
 
 PROMPTS_DIR = ROOT / "prompts"
 RESULTS_DIR = ROOT / "results"
+
+# Caps that live in a sibling folder rather than under prompts/ + results/.
+# Used for qualitative probes that should not mix with the main eval data.
+# Each entry maps cap_name -> {"prompts": Path, "results": Path}.
+SUBFOLDER_CAPS = {
+    "political_bias": {
+        "prompts": ROOT / "political_bias" / "prompts.jsonl",
+        "results": ROOT / "political_bias" / "results",
+    },
+}
 ENDPOINT = "http://localhost:8080/v1/chat/completions"
-MODEL_ID = "qwen3.6-27b"              # server-side id (label only; llama.cpp ignores it) — the run is recorded under --tag
+MODEL_ID = "gemma-4-31b"              # server-side id (label only; llama.cpp ignores it) — the run is recorded under --tag
 N_CTX = 8192                          # served context per slot; auto-detected at startup (fallback)
 # Sampling: set per the loaded model's vendor recommendation (recorded in each run's .meta.json).
-# Gemma rec: dict(temperature=1.0, top_p=0.95, top_k=64).  Qwen3 rec (current): below.
-SAMPLING = dict(temperature=0.7, top_p=0.8, top_k=20, presence_penalty=1.5, min_p=0.0)   # Qwen3 recommendation
+# Gemma rec (current): below.  Qwen3 rec: dict(temperature=0.7, top_p=0.8, top_k=20, presence_penalty=1.5, min_p=0.0)
+SAMPLING = dict(temperature=1.0, top_p=0.95, top_k=64)   # Gemma recommendation
 SAFETY_TOKENS = 96                    # leave a little headroom under n_ctx
 # default per-prompt generation cap (clamped to fit n_ctx); thinking needs lots of room
 MAXTOK_THINKING = 8192
@@ -168,7 +178,10 @@ def probe_server_meta(model_tag):
 
 
 def load_prompts(cap):
-    fp = PROMPTS_DIR / f"{cap}.jsonl"
+    if cap in SUBFOLDER_CAPS:
+        fp = SUBFOLDER_CAPS[cap]["prompts"]
+    else:
+        fp = PROMPTS_DIR / f"{cap}.jsonl"
     if not fp.exists():
         raise FileNotFoundError(f"missing prompt file {fp}")
     out = []
@@ -195,9 +208,11 @@ def build_messages(p):
     return msgs
 
 
-def run_one(idx, total, tag, cap, p, mode):
+def run_one(idx, total, tag, cap, p, mode, replicate_idx=0):
     """Build request, call the model, grade. Returns (idx, rec, log_line, kind)
-    where kind in {'pass','fail','pend','err'}. Never raises."""
+    where kind in {'pass','fail','pend','err'}. Never raises.
+    `replicate_idx` is recorded in the per-call record so stochastic capture
+    runs (--replicates N) can be disambiguated."""
     thinking = (mode == "on")
     msgs = build_messages(p)
     tools = p.get("tools")
@@ -210,6 +225,7 @@ def run_one(idx, total, tag, cap, p, mode):
         "prompt_id": p["id"],
         "capability": cap,
         "thinking_mode": mode,
+        "replicate_idx": replicate_idx,
         "timestamp": datetime.datetime.now().isoformat(timespec="seconds"),
         "tags": p.get("tags", []),
         "request": {
@@ -249,13 +265,14 @@ def run_one(idx, total, tag, cap, p, mode):
         ctok = r["usage"].get("completion_tokens")
         fr = r["finish_reason"]
         extra = f" finish={fr}" if fr not in (None, "stop") else ""
-        line = (f"[{idx}/{total}] {cap}/{p['id']} mode={mode} {status}"
+        rep_tag = f" rep={replicate_idx}" if replicate_idx else ""
+        line = (f"[{idx}/{total}] {cap}/{p['id']} mode={mode}{rep_tag} {status}"
                 f" score={gr.get('score')} {r['latency_ms']}ms ntok={ctok}{extra} :: {str(gr.get('notes'))[:120]}")
         return idx, rec, line, kind
     except Exception as e:
         rec["error"] = repr(e)
         rec["grading"] = {"score": 0.0, "passed": False, "pending": False, "notes": f"call/grade error: {e!r}"}
-        return idx, rec, f"[{idx}/{total}] {cap}/{p['id']} mode={mode} ERROR {e!r}", "err"
+        return idx, rec, f"[{idx}/{total}] {cap}/{p['id']} mode={mode} rep={replicate_idx} ERROR {e!r}", "err"
 
 
 def main():
@@ -271,8 +288,17 @@ def main():
                          "Server has N parallel slots; >1 exercises continuous batching but makes "
                          "per-call latency contended and writes results out of plan order.")
     ap.add_argument("--smoke", action="store_true", help="2 prompts/cap, prints to stdout only")
+    ap.add_argument("--replicates", type=int, default=1,
+                    help="run each (prompt, mode) tuple N times (default 1). Use >1 for stochastic capture "
+                         "(e.g. political_bias / refusal-rate probes where the model's response varies between calls). "
+                         "Each call gets a replicate_idx field in the JSONL record.")
+    ap.add_argument("--include-tags", default=None,
+                    help="comma-separated tag list; only prompts with at least one matching tag are run. "
+                         "e.g. --include-tags zh,ru runs only the multilingual variants in the political_bias cap.")
     args = ap.parse_args()
     concurrency = max(1, args.concurrency)
+    replicates = max(1, args.replicates)
+    include_tags = set(t.strip() for t in args.include_tags.split(",")) if args.include_tags else None
 
     if args.caps == "all":
         caps = list(CAP_ORDER)
@@ -287,12 +313,21 @@ def main():
     modes = [m.strip() for m in args.modes.split(",") if m.strip()]
     limit = 2 if args.smoke else args.limit
 
-    RESULTS_DIR.mkdir(exist_ok=True)
+    # If every requested cap is a SUBFOLDER cap, route outputs to that subfolder
+    # so qualitative-probe results don't mix with the main eval's results/.
+    # Mixed runs (subfolder cap + regular cap) fall back to results/.
+    subfolder_caps_in_run = [c for c in caps if c in SUBFOLDER_CAPS]
+    if subfolder_caps_in_run and len(subfolder_caps_in_run) == len(caps):
+        results_dir = SUBFOLDER_CAPS[subfolder_caps_in_run[0]]["results"]
+    else:
+        results_dir = RESULTS_DIR
+    results_dir.mkdir(parents=True, exist_ok=True)
+
     ts = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
     suffix = "__SMOKE" if args.smoke else ""
-    out_path = RESULTS_DIR / f"{args.tag}__{ts}{suffix}.jsonl"
-    log_path = RESULTS_DIR / f"{args.tag}__{ts}{suffix}.log"
-    meta_path = RESULTS_DIR / f"{args.tag}__{ts}{suffix}.meta.json"
+    out_path = results_dir / f"{args.tag}__{ts}{suffix}.jsonl"
+    log_path = results_dir / f"{args.tag}__{ts}{suffix}.log"
+    meta_path = results_dir / f"{args.tag}__{ts}{suffix}.meta.json"
     logf = open(log_path, "w")
 
     meta = probe_server_meta(args.tag)
@@ -313,15 +348,20 @@ def main():
     plan = []
     for cap in caps:
         ps = load_prompts(cap)
+        if include_tags:
+            ps = [p for p in ps if include_tags & set(p.get("tags", []))]
         if limit:
             ps = ps[:limit]
         for p in ps:
             for mode in modes:
-                plan.append((cap, p, mode))
+                for rep in range(replicates):
+                    plan.append((cap, p, mode, rep))
 
-    emit(f"# run {ts}  tag={args.tag}  caps={caps}  modes={modes}  concurrency={concurrency}  -> {out_path.name}")
+    rep_note = f"  replicates={replicates}" if replicates > 1 else ""
+    emit(f"# run {ts}  tag={args.tag}  caps={caps}  modes={modes}{rep_note}  concurrency={concurrency}  -> {out_path.name}")
     emit(f"# {len(plan)} calls planned  (endpoint={ENDPOINT} model={MODEL_ID} n_ctx={N_CTX})")
-    meta.update(capabilities=caps, thinking_modes=modes, calls_planned=len(plan), client_concurrency=concurrency)
+    meta.update(capabilities=caps, thinking_modes=modes, calls_planned=len(plan),
+                client_concurrency=concurrency, replicates=replicates)
     meta_path.write_text(json.dumps(meta, indent=2) + "\n")
     t_start = time.time()
     counts = {"pass": 0, "fail": 0, "pend": 0, "err": 0}
@@ -338,12 +378,12 @@ def main():
             emit(line)
 
     if concurrency <= 1:
-        for i, (cap, p, mode) in enumerate(plan, 1):
-            handle(run_one(i, total, args.tag, cap, p, mode))
+        for i, (cap, p, mode, rep) in enumerate(plan, 1):
+            handle(run_one(i, total, args.tag, cap, p, mode, replicate_idx=rep))
     else:
         with ThreadPoolExecutor(max_workers=concurrency) as ex:
-            futs = [ex.submit(run_one, i, total, args.tag, cap, p, mode)
-                    for i, (cap, p, mode) in enumerate(plan, 1)]
+            futs = [ex.submit(run_one, i, total, args.tag, cap, p, mode, rep)
+                    for i, (cap, p, mode, rep) in enumerate(plan, 1)]
             for fut in as_completed(futs):
                 handle(fut.result())
     fout.close()
