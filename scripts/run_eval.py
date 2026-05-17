@@ -50,9 +50,9 @@ MAXTOK_THINKING = 8192
 MAXTOK_PLAIN = 2048
 
 CAP_ORDER = ["coherence", "reasoning", "coding", "coding_quality", "instruction_following",
-             "long_context", "writing", "tool_calling"]
+             "long_context", "writing", "tool_calling", "security_review"]
 _HARD_BASE = ["coherence", "reasoning", "coding", "instruction_following", "long_context",
-              "writing", "tool_calling"]
+              "writing", "tool_calling", "security_review"]
 HARD_CAPS = [c + "_hard" for c in _HARD_BASE] + ["coding_quality_hard"]   # discriminating "hard tier" (separate prompt files)
 FULL_ORDER = CAP_ORDER + HARD_CAPS
 

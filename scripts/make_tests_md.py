@@ -65,6 +65,11 @@ def grader_summary(g):
         elif t == "tool_calls_set":
             names = ",".join(c.get("name") for c in s.get("calls", []))
             out.append(f"tool_calls_set[{names}]")
+        elif t == "sec_review":
+            n_bugs = len(s.get("bugs", []))
+            n_dec  = len(s.get("decoys", []))
+            tail = f"+{n_dec}decoy" if n_dec else ""
+            out.append(f"sec_review({n_bugs}bug{tail})")
         else:
             out.append(t or "?")
     return " + ".join(out)

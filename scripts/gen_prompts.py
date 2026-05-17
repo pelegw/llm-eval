@@ -1060,6 +1060,259 @@ tool_calling_hard = [
               "ignorecase": True}]},
 ]
 
+# ====================================================================== security_review
+# Two-tier scored capability: code-snippet review for known vulnerability classes.
+# Grader is a hybrid (programmatic floor + rubric layer), same shape as coding_quality:
+#   - `sec_review`: CWE-class identification + line/function pinpoint + decoy guard +
+#     multi-bug precision/recall (the programmatic floor — ~70% of weight via the list-grader)
+#   - `rubric`:     fix_soundness + explanation_correctness + no_false_positives + actionability
+#                   (the ~30% Claude reads later)
+# Phase 1 = 6 representative prompts spanning the difficulty axes (Python+C, base/hard,
+# single-file/multi-file). Phase 2 will fill to ~22 base + ~18 hard.
+
+SR_SYS = ("You are reviewing the code below for security vulnerabilities. For each issue you "
+          "find: (1) name the vulnerability class (e.g. \"SQL injection\", \"buffer overflow\", "
+          "\"use after free\") and the CWE number if you know it, (2) cite the file and line "
+          "number where the bug is, (3) briefly explain why it is exploitable, (4) propose a "
+          "concrete fix. If the code has no security issues, say so explicitly. Do not flag "
+          "code-style, performance, or naming issues — only security vulnerabilities.")
+
+def sr_rub(name):
+    return rub(name, "fix_soundness", "explanation_correctness", "no_false_positives", "actionability")
+
+def sr(bugs, decoys=None):
+    """Build the programmatic floor of a sec_review grader."""
+    g = {"type": "sec_review", "bugs": bugs}
+    if decoys: g["decoys"] = decoys
+    return g
+
+# Convenience CWE-pattern lists (case-insensitive substring regex):
+_CWE_SQLI    = [r"CWE-?89", r"SQL\s*injection", r"\bsqli\b"]
+_CWE_CMDI    = [r"CWE-?78", r"command\s*injection", r"shell\s*injection", r"OS\s*command\s*injection"]
+_CWE_BUFOF   = [r"CWE-?(120|121|122|787)", r"buffer\s*overflow", r"stack\s*overflow", r"out-of-bounds\s*write"]
+_CWE_TIMING  = [r"CWE-?208", r"timing\s*attack", r"non[-\s]?constant[-\s]?time", r"constant[-\s]?time", r"compare_digest"]
+_CWE_INTOF   = [r"CWE-?(190|191)", r"integer\s*overflow", r"integer\s*underflow", r"size_?t\s*(wrap|overflow|cast)", r"atoi.{0,40}(negative|signed|unchecked)"]
+_CWE_MISSAUTH= [r"CWE-?(862|285|306)", r"missing\s*auth", r"unauthenticated\s*access", r"no\s*auth(orization|entication)?\s*(check|decorator)", r"missing\s*@?require_auth", r"broken\s*access\s*control"]
+_CWE_XSS     = [r"CWE-?79", r"\bXSS\b", r"cross[-\s]?site\s*scripting"]
+_CWE_FORMAT  = [r"CWE-?134", r"format\s*string"]
+
+# helper: render a multi-file prompt body — each file as a fenced block with a header
+def sr_files(*files):
+    """sr_files(('admin.py','python', '<code>'), ...) -> markdown body."""
+    out = []
+    for path, lang, code in files:
+        out.append(f"## File: {path}\n```{lang}\n{code.rstrip()}\n```")
+    return "\n\n".join(out)
+
+# ---- prompts ----
+
+_PY_SQLI = '''\
+from flask import Flask, request, g
+app = Flask(__name__)
+
+@app.route("/user")
+def get_user():
+    user_id = request.args.get("id")
+    cur = g.db.cursor()
+    cur.execute(f"SELECT name, email FROM users WHERE id = {user_id}")
+    row = cur.fetchone()
+    return {"name": row[0], "email": row[1]}
+'''
+
+_C_STRCPY = '''\
+#include <stdio.h>
+#include <string.h>
+
+void greet(const char *name) {
+    char buf[16];
+    strcpy(buf, name);
+    printf("Hello, %s!\\n", buf);
+}
+
+int main(int argc, char **argv) {
+    if (argc > 1) greet(argv[1]);
+    return 0;
+}
+'''
+
+_PY_HMAC_TIMING = '''\
+import hmac, hashlib
+
+SECRET = b"\\x9a\\xb1\\x42\\x07\\xed\\xa3\\x5f\\xc8\\x10\\x6c\\xde\\x71\\x88\\x4f\\x32\\x90"
+
+def verify_signature(message: bytes, signature_hex: str) -> bool:
+    expected = hmac.new(SECRET, message, hashlib.sha256).hexdigest()
+    return expected == signature_hex
+'''
+
+_C_INTOF = '''\
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+/* Reads a `len`-byte message from fd. `len_header` is an attacker-controlled
+   ASCII length field (e.g. an HTTP Content-Length). Returns a malloc'd,
+   NUL-terminated buffer the caller must free. */
+void *read_message(int fd, const char *len_header) {
+    size_t len = (size_t)atoi(len_header);
+    char *buf = malloc(len + 1);
+    if (!buf) return NULL;
+    read(fd, buf, len);
+    buf[len] = '\\0';
+    return buf;
+}
+'''
+
+# Multi-file Python: admin route missing the @require_auth decorator
+_PY_MISSAUTH_MIDDLEWARE = '''\
+from functools import wraps
+from flask import session
+
+def require_auth(fn):
+    @wraps(fn)
+    def wrap(*a, **kw):
+        if not session.get("user_id"):
+            return "unauthorized", 401
+        return fn(*a, **kw)
+    return wrap
+'''
+_PY_MISSAUTH_PUBLIC = '''\
+from flask import jsonify, session
+from middleware import require_auth
+from db import db
+
+@app.route("/posts")
+@require_auth
+def list_posts():
+    return jsonify(db.get_posts(session["user_id"]))
+
+@app.route("/posts/<int:post_id>")
+@require_auth
+def get_post(post_id):
+    return jsonify(db.get_post_for_user(post_id, session["user_id"]))
+'''
+_PY_MISSAUTH_ADMIN = '''\
+from db import db
+
+@app.route("/admin/delete_post/<int:post_id>", methods=["POST"])
+def admin_delete_post(post_id):
+    db.delete_post(post_id)
+    return {"ok": True}
+'''
+
+# Multi-file C: header defines MAX_PACKET, but parser doesn't bound against it
+_C_HDRSKEW_BUFFER_H = '''\
+#ifndef BUFFER_H
+#define BUFFER_H
+#include <stddef.h>
+
+#define MAX_PACKET 1024
+
+typedef struct {
+    char   data[MAX_PACKET];
+    size_t len;
+} packet_t;
+
+#endif
+'''
+_C_HDRSKEW_PARSER_C = '''\
+#include "buffer.h"
+#include <string.h>
+
+/* Copy `raw_len` bytes of `raw` into the packet's data field. */
+void parse_packet(packet_t *p, const char *raw, size_t raw_len) {
+    memcpy(p->data, raw, raw_len);
+    p->len = raw_len;
+}
+'''
+_C_HDRSKEW_HANDLER_C = '''\
+#include "buffer.h"
+
+extern void parse_packet(packet_t *p, const char *raw, size_t raw_len);
+
+/* Called with raw network input; raw_len is attacker-controlled. */
+int handle(const char *raw, size_t raw_len) {
+    packet_t p;
+    parse_packet(&p, raw, raw_len);
+    /* ... process p ... */
+    return 0;
+}
+'''
+
+security_review = [
+    # ---- BASE TIER ----
+    {"id": "sr-01", "system": SR_SYS,
+     "user": f"## File: views.py\n```python\n{_PY_SQLI.rstrip()}\n```",
+     "tags": ["python", "web", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_SQLI,
+                          "location": [r"\bcur\.execute\b", r"\bf['\"]", r"line\s*8", r"get_user\b"]}]),
+                sr_rub("sr-01-sqli")]},
+
+    {"id": "sr-02", "system": SR_SYS,
+     "user": f"## File: greet.c\n```c\n{_C_STRCPY.rstrip()}\n```",
+     "tags": ["c", "memory", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_BUFOF,
+                          "location": [r"\bstrcpy\b", r"\bgreet\b", r"line\s*6", r"buf\[16\]"]}]),
+                sr_rub("sr-02-strcpy")]},
+
+    # ---- HARD TIER (single-file subtle) ----
+    {"id": "sr-h-01", "system": SR_SYS,
+     "user": f"## File: signing.py\n```python\n{_PY_HMAC_TIMING.rstrip()}\n```",
+     "tags": ["python", "crypto", "single-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_TIMING,
+                          "location": [r"==", r"verify_signature", r"compare_digest", r"line\s*6"]}],
+                   # the obvious read is "HMAC looks fine"; if the model claims
+                   # the SECRET is weak that's wrong (it's 128 bits of entropy)
+                   decoys=[[r"weak\s*key", r"insufficient\s*key\s*length", r"short\s*secret"],
+                           [r"\bMD5\b.*broken", r"SHA-?256.*broken", r"hash\s*collision"]]),
+                sr_rub("sr-h-01-timing")]},
+
+    {"id": "sr-h-02", "system": SR_SYS,
+     "user": f"## File: net.c\n```c\n{_C_INTOF.rstrip()}\n```",
+     "tags": ["c", "integer", "memory", "single-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_INTOF,
+                          "location": [r"\batoi\b", r"\bmalloc\b", r"read_message", r"len\s*\+\s*1"]}],
+                   decoys=[[r"format\s*string"],   # there is no printf with user-controlled fmt
+                           _CWE_BUFOF + [r"\bstrcpy\b"]]),  # not the bug class — it's int->size_t
+                sr_rub("sr-h-02-intof")]},
+
+    # ---- HARD TIER (multi-file) ----
+    {"id": "sr-h-03", "system": SR_SYS,
+     "user": sr_files(
+         ("middleware.py", "python", _PY_MISSAUTH_MIDDLEWARE),
+         ("public.py",     "python", _PY_MISSAUTH_PUBLIC),
+         ("admin.py",      "python", _PY_MISSAUTH_ADMIN)),
+     "tags": ["python", "web", "auth", "multi-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_MISSAUTH,
+                          "location": [r"admin\.py", r"admin_delete_post",
+                                       r"missing\s*@?require_auth", r"no\s*decorator"]}],
+                   # there's no SQL anywhere; flagging SQLi = hallucination
+                   decoys=[_CWE_SQLI,
+                           _CWE_XSS]),  # no HTML rendered either
+                sr_rub("sr-h-03-missauth")]},
+
+    {"id": "sr-h-04", "system": SR_SYS,
+     "user": sr_files(
+         ("buffer.h",  "c", _C_HDRSKEW_BUFFER_H),
+         ("parser.c",  "c", _C_HDRSKEW_PARSER_C),
+         ("handler.c", "c", _C_HDRSKEW_HANDLER_C)),
+     "tags": ["c", "memory", "multi-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_BUFOF,
+                          "location": [r"parse_packet", r"parser\.c",
+                                       r"MAX_PACKET", r"\bmemcpy\b", r"raw_len"]}],
+                   decoys=[_CWE_FORMAT,    # no printf with fmt
+                           _CWE_CMDI]),   # no system/exec
+                sr_rub("sr-h-04-hdrskew")]},
+]
+
+# Split into the two files: capability == "security_review" -> base; "_hard" -> hard
+security_review_hard = [p for p in security_review if p.get("capability") == "security_review_hard"]
+security_review      = [p for p in security_review if p.get("capability") != "security_review_hard"]
+
 # ====================================================================== political_bias
 # QUALITATIVE-ONLY capability — NOT a grading category for the model comparison.
 # No grader; each call captures the raw response + thinking trace for manual review.
@@ -1176,5 +1429,7 @@ write("long_context_hard", long_context_hard)
 write("writing_hard", writing_hard)
 write("tool_calling", tool_calling)
 write("tool_calling_hard", tool_calling_hard)
+write("security_review", security_review)
+write("security_review_hard", security_review_hard)
 write("political_bias", political_bias, out_path=ROOT / "political_bias" / "prompts.jsonl")
 print("done.")

@@ -12,7 +12,7 @@ A small, self-hosted eval for local LLMs served via [llama.cpp](https://github.c
 OpenAI-compatible HTTP endpoint. It hits the model with a fixed prompt set, captures every response **and its
 reasoning trace**, grades each call, and writes one JSONL line per call. The goal is a reproducible, head-to-head
 comparison of *crisp, gradeable sub-skills* across models and across the "thinking on / thinking off" axis — not a
-benchmark of everything a model can do (see §13 for what's deliberately out of scope).
+benchmark of everything a model can do (see §14 for what's deliberately out of scope).
 
 Everything lives in `~/llm-eval/`:
 
@@ -96,6 +96,7 @@ before a real run).
 | **writing** | craft tasks — haiku, sonnet (ABAB CDCD EFEF GG), cover letter, mystery opening, limerick, bedtime story, "rewrite this sentence", flash fiction with a bookend constraint, song lyric with an identical chorus, acrostic, 100-word single-sentence story, second-person/present-tense scene, archaic-register continuation… | rubric (Claude scores 1–5 per named criterion — see §6) |
 | **coherence** | internal consistency under self-imposed structure — invent terms and reason from them, interleaved causal chains, a dungeon with a provably-shortest path, invent a base-6 numeral system and verify the arithmetic, a 4-generation family tree + distant-relation queries, necessary-vs-sufficient classification. *(Currently excluded from the comparison runs by choice — it's a "is it broken" floor that strong models ceiling.)* | rubric |
 | **tool_calling** | does the model emit the *right* OpenAI-style function call given a tool spec? — single-tool happy path, multi-tool selection from 5+ tools, argument extraction from prose, type-strict args (catches `"150"` vs `150`), enum constraints, refusal when no tool fits, parallel calls, multi-turn integration of a pre-injected tool result, ambiguous tool descriptions, seductive but wrong tools (e.g. `delete_database` for "clean up my desktop"), `tool_choice:"required"` discipline | programmatic (`tool_call`, `no_tool_call`, `tool_calls_set` — match by function name + per-arg constraints; see §6 and §8) |
+| **security_review** | given a code snippet (Python, JS, C, or C++), find the security vulnerabilities — name the CWE class, pinpoint the file/line, propose a fix. Covers injection (SQLi, command, XSS, SSTI), memory safety (buffer overflow, UAF, double-free, format string), integer bugs (overflow → heap overflow, signed↔unsigned), crypto misuse (weak hash, ECB, timing attacks), auth bugs (missing checks, IDOR, TOCTOU). Hard tier adds *recognize-absence* prompts (missing auth decorator), "looks fixed but isn't" (e.g. `if ".." in path` bypassable), multi-file prompts (vulnerability only visible across two files), and multi-bug-with-decoy prompts scored by precision × recall | hybrid: programmatic `sec_review` (CWE-class regex + line/function pinpoint + decoy false-positive guard, per-bug 0/0.5/1.0 then mean − 0.25/decoy) composed with `rubric` (fix_soundness, explanation_correctness, no_false_positives, actionability) — same shape as `coding_quality`; see §9 |
 
 The exact prompts, ids, and graders for every one of these are in **[`TESTS.md`](TESTS.md)**.
 
@@ -227,7 +228,67 @@ prompt loudly (`"no tool call emitted"`), which is itself the right signal.
 
 ---
 
-## 9. Sampling
+## 9. The `security_review` tiers (find the vulnerability)
+
+This tier asks the model to act as a security code reviewer: given a code snippet, identify each
+vulnerability (CWE class + line/function), explain why it is exploitable, and propose a fix. It is
+distinct from `coding_quality` (which asks "is this *clean* code") in that it asks "is this *safe*
+code". The two share a hybrid grader shape.
+
+**Languages, in v1.** Python, JavaScript/Node, C, C++. Different vulnerability shapes per language:
+Python/JS lean on injection (SQLi, command, XSS), auth bugs, deserialization, crypto misuse; C/C++
+lean on memory safety (buffer overflow, UAF, double-free, format string) and integer arithmetic
+(signed→unsigned cast, size_t wrap, malloc overflow). The base tier covers the obvious patterns; the
+hard tier targets the subtle versions that pattern-matchers miss.
+
+**System prompt (shared, `SR_SYS`).** A short instruction: identify each issue, name the CWE class
+and number, cite file + line, explain why it's exploitable, propose a fix; ignore style/perf issues.
+Set once in `gen_prompts.py` so the per-prompt entries only carry the code.
+
+**Multi-file prompts.** The hard tier includes prompts where the vulnerability is only visible
+across two or three files (missing `@require_auth` on one route while the middleware exists in
+another file; header defining `MAX_PACKET` while the parser in a sibling `.c` file doesn't bound a
+`memcpy` against it; UAF where one translation unit frees and another retains). These are rendered
+into a single user message using a `## File: path/foo.c\n` + fenced-block convention — same shape
+that PR review tools and GitHub feed models. No schema change; the user field just contains the
+multi-file body.
+
+**The `sec_review` grader (programmatic floor).** Per prompt:
+- `bugs: [{cwe: [regex,...], location: [regex,...]}, ...]` — the model must name *any* CWE
+  pattern from the list AND match *any* location pattern. Per-bug score: 1.0 if both, 0.5 if only
+  CWE matched ("named but not pinpointed"), 0.0 if CWE missed. If `location` is omitted, only the
+  CWE match is required. Raw = mean of per-bug scores; raw=1.0 if `bugs` is empty (clean-code
+  prompt).
+- `decoys: [[regex,...], ...]` — CWE classes the model must NOT flag (false-positive guards). Each
+  decoy that the response matches subtracts 0.25 from raw. Final score floored at 0.0. Pass ≥ 0.6.
+- Multi-bug prompts (3 real + 1 decoy etc.) score as precision×recall in effect: missing a real
+  bug drops the per-bug mean, flagging the decoy subtracts the 0.25 penalty.
+
+The grader operates on the response text alone (no `rec` needed; it follows the standard
+`fn(g, text)` shape, same as the 16 pre-tool-calling graders).
+
+**Rubric layer.** Each prompt also carries a `rubric` grader with 4 standard criteria —
+`fix_soundness`, `explanation_correctness`, `no_false_positives`, `actionability` — composed via
+the list-grader (the prompt's full grader spec is `[sec_review, rubric]`, the call's score is the
+mean of the two). The rubric catches "named the right CWE but proposed a cosmetic fix" (e.g.,
+"add a regex to strip quotes" instead of parameterized queries). The programmatic floor catches the
+opposite ("eloquently described the wrong vulnerability class"). The hybrid is the same shape as
+`coding_quality` — programmatic + rubric → mean of sub-scores in the list-grader.
+
+**What is deliberately out of scope (v1).** Memory-safety in Rust (`unsafe` blocks), concurrency
+primitives beyond simple races, supply-chain (typosquatted dependencies, postinstall scripts),
+secrets-in-git-history, infrastructure-as-code (terraform, k8s manifests), and "exploit this code
+to get RCE" (we score *recognition*, not exploit development). Race conditions are covered only at
+the TOCTOU level.
+
+**Phase notes.** Phase 1 of this capability shipped with 6 representative prompts (2 base + 4
+hard) spanning Python+C × single-file+multi-file × obvious+subtle. Phase 2 expands to ~22 base +
+~18 hard to hit the full coverage matrix. Backfilling the 5 already-evaluated models is a separate
+session (each gets ~40 prompts × 2 modes ≈ 80 calls + a `grade_rubrics.py` pass).
+
+---
+
+## 10. Sampling
 
 Sampling parameters are set per the **loaded model's vendor recommendation** and recorded in each run's
 `.meta.json` (so it's never ambiguous which run used which). Gemma rec: `temperature=1.0, top_p=0.95, top_k=64`.
@@ -238,7 +299,7 @@ first.
 
 ---
 
-## 10. The results schema (the cross-run contract)
+## 11. The results schema (the cross-run contract)
 
 Each line of `results/<tag>__<ts>.jsonl` is one call. Keep this shape stable — it's what makes runs comparable:
 
@@ -262,7 +323,7 @@ means and a failures table) — it groups by `model_tag`, so a multi-file invoca
 
 ---
 
-## 11. Reproducibility & adding a model
+## 12. Reproducibility & adding a model
 
 - **Prompt generation is deterministic** — `scripts/gen_prompts.py` is seeded, so `python3 scripts/gen_prompts.py`
   regenerates byte-identical prompt files (including the synthetic long-context haystacks). Re-run it after editing
@@ -275,7 +336,7 @@ means and a failures table) — it groups by `model_tag`, so a multi-file invoca
 
 ---
 
-## 12. Qualitative probes outside the scoring eval (the `political_bias/` pattern)
+## 13. Qualitative probes outside the scoring eval (the `political_bias/` pattern)
 
 Some capabilities don't have a single right answer — they're worth *capturing* but not *grading*. The
 `political_bias/` subfolder is the first of these: 28 prompts about politically sensitive topics across different
@@ -305,7 +366,7 @@ and `ANALYSIS.md` (the findings). The main `ANALYSIS.md` is reserved for the sco
 
 ---
 
-## 13. What this does *not* measure (limitations)
+## 14. What this does *not* measure (limitations)
 
 - **Ceiling effects.** The base tier maxes out for any competent model — it can't rank two strong models. That's
   what the hard tier is for, and even the hard tier should get harder for frontier models.

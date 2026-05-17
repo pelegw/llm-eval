@@ -457,6 +457,62 @@ def g_tool_calls_set(g, text, rec):
         return _res(False, f"unwanted extra calls: {extras}")
     return _res(True, f"matched {len(want)}/{len(want)} calls (order={g.get('order','any')})")
 
+# --------------------------------------------------------- security review ---
+def g_sec_review(g, text):
+    """Programmatic floor for security_review prompts.
+
+    Spec: {
+      bugs:   [{cwe:[regex,...], location:[regex,...]}, ...]   # bugs the model should find
+      decoys: [[regex,...], ...]                                # CWE classes it must NOT flag
+    }
+
+    Per-bug score:
+      1.0   if any `cwe` pattern matches AND any `location` pattern matches
+      0.5   if only `cwe` matched (named but not pinpointed)
+      0.0   if no `cwe` pattern matched (bug missed entirely)
+      If `location` is omitted for a bug, only the CWE match is required (1.0 / 0.0).
+    raw = mean of per-bug scores; raw=1.0 if `bugs` is empty (clean-code prompt).
+    Each decoy false-positive (any of its patterns matched) subtracts 0.25 from raw.
+    Final score floored at 0.0. Pass at score >= 0.6.
+
+    All patterns are regex, evaluated case-insensitively against the response text.
+    This is the programmatic half of the security_review hybrid; the rubric half
+    (fix_soundness + explanation_clarity) is a separate `rubric` grader composed
+    via the list-grader, same as `coding_quality`.
+    """
+    t = text or ""
+    bugs = g.get("bugs", [])
+    decoys = g.get("decoys", [])
+
+    per_bug, notes = [], []
+    for i, bug in enumerate(bugs):
+        cwes = bug.get("cwe", [])
+        locs = bug.get("location", [])
+        named = any(re.search(p, t, re.I) for p in cwes)
+        if not named:
+            per_bug.append(0.0)
+            notes.append(f"bug{i}({cwes[0] if cwes else '?'}):MISSED")
+            continue
+        if not locs:
+            per_bug.append(1.0)
+            notes.append(f"bug{i}({cwes[0]}):named(no-loc-req)")
+            continue
+        located = any(re.search(p, t, re.I) for p in locs)
+        per_bug.append(1.0 if located else 0.5)
+        notes.append(f"bug{i}({cwes[0]}):{'both' if located else 'named-not-located'}")
+
+    raw = (sum(per_bug) / len(per_bug)) if per_bug else 1.0
+
+    fp = 0
+    for j, decoy in enumerate(decoys):
+        if any(re.search(p, t, re.I) for p in decoy):
+            fp += 1
+            notes.append(f"decoy{j}({decoy[0] if decoy else '?'}):FP")
+    score = max(0.0, raw - 0.25 * fp)
+    return dict(score=round(score, 4), passed=score >= 0.6, pending=False,
+                notes="; ".join(notes) or "ok")
+
+
 GRADERS = {
     "contains": g_contains, "regex": g_regex, "regex_all": g_regex_all, "numeric": g_numeric,
     "word_count": g_word_count, "line_count": g_line_count, "bullets": g_bullets, "json": g_json,
@@ -464,4 +520,5 @@ GRADERS = {
     "count": g_count, "sentence_count": g_sentence_count, "paragraph_count": g_paragraph_count,
     "code_quality": g_code_quality,
     "tool_call": g_tool_call, "no_tool_call": g_no_tool_call, "tool_calls_set": g_tool_calls_set,
+    "sec_review": g_sec_review,
 }
