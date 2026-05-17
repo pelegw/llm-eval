@@ -2,9 +2,9 @@
 
 Every prompt in the eval, grouped by capability and tier. **Generated from `prompts/*.jsonl` by `scripts/make_tests_md.py` — regenerate it after editing prompts.** The harness runs each of these **twice** — once with the model's thinking mode on, once off — so the call counts below double.
 
-Grader shorthand: `numeric(=N)` exact-number answer-check · `word_count(a..b)` / `line_count` / `sentence_count` / `paragraph_count` / `bullets` structural counts · `contains` / `regex` / `regex_all` text checks · `forbid_char` forbidden characters · `starts_ends` first/last word · `json(keys)` JSON-shape · `count('x'=n)` substring-occurrence count · `python·unit-tests` extracted code run against hidden asserts · `code_quality(fn=…)` ast+ruff static analysis · `tool_call(fn)` / `no_tool_call` / `tool_calls_set[…]` checks the model's emitted tool calls (function name + arg constraints; for `no_tool_call`, asserts none was emitted) · `rubric[criteria…]` Claude scores 1–5 per named criterion (writing/coherence only). A `+` joins multiple sub-graders (all must pass).
+Grader shorthand: `numeric(=N)` exact-number answer-check · `word_count(a..b)` / `line_count` / `sentence_count` / `paragraph_count` / `bullets` structural counts · `contains` / `regex` / `regex_all` text checks · `forbid_char` forbidden characters · `starts_ends` first/last word · `json(keys)` JSON-shape · `count('x'=n)` substring-occurrence count · `python·unit-tests` extracted code run against hidden asserts · `code_quality(fn=…)` ast+ruff static analysis · `tool_call(fn)` / `no_tool_call` / `tool_calls_set[…]` checks the model's emitted tool calls (function name + arg constraints; for `no_tool_call`, asserts none was emitted) · `sec_review(Nbug+Mdecoy)` security-review grader: per-bug CWE-class regex + line/function pinpoint, minus 0.25 per decoy false-positive flagged · `rubric[criteria…]` Claude scores 1–5 per named criterion (writing/coherence/security_review). A `+` joins multiple sub-graders (all must pass).
 
-**269 prompts** across **16 capability sets** → **538 calls** per full run (both thinking modes).
+**309 prompts** across **18 capability sets** → **618 calls** per full run (both thinking modes).
 
 | set | # prompts |
 |---|---|
@@ -16,6 +16,7 @@ Grader shorthand: `numeric(=N)` exact-number answer-check · `word_count(a..b)` 
 | writing — base | 21 |
 | coherence — base | 20 |
 | tool_calling — base | 13 |
+| security_review — base | 21 |
 | reasoning — hard | 20 |
 | coding — hard | 20 |
 | coding_quality — hard | 15 |
@@ -24,6 +25,7 @@ Grader shorthand: `numeric(=N)` exact-number answer-check · `word_count(a..b)` 
 | writing — hard | 14 |
 | coherence — hard | 14 |
 | tool_calling — hard | 13 |
+| security_review — hard | 19 |
 
 ## reasoning — base  (21 prompts)
 
@@ -198,7 +200,7 @@ Grader shorthand: `numeric(=N)` exact-number answer-check · `word_count(a..b)` 
 
 ## tool_calling — base  (13 prompts)
 
-*System prompt:* You have access to function tools. Call a function when it would help the user. If no tool is appropriate, answer the user directly in plain text. Use only the named tools provided. Today's date is 2026-05-13.
+*System prompt:* You have access to function tools. Call a function when it would help the user. If no tool is appropriate, answer the user directly in plain text. Use only the named tools provided. Today's date is 2026-05-18.
 
 | id | what it probes | grader |
 |---|---|---|
@@ -215,6 +217,34 @@ Grader shorthand: `numeric(=N)` exact-number answer-check · `word_count(a..b)` 
 | `tc-11` | What's the current weather in Paris AND in Tokyo? Use celsius for both. | tool_calls_set[get_weather,get_weather] |
 | `tc-12` | [multi-turn] What is the current price of MSFT? Answer in one short sentence. | no_tool_call + contains(410,MSFT) |
 | `tc-13` | Find flights from New York to London on July 4, 2026. | tool_call(search_flights) |
+
+## security_review — base  (21 prompts)
+
+*System prompt:* You are reviewing the code below for security vulnerabilities. For each issue you find: (1) name the vulnerability class (e.g. "SQL injection", "buffer overflow", "use after free") and the CWE number if you know it, (2) cite the file and line number where the bug is, (3) briefly explain why it is ex…
+
+| id | what it probes | grader |
+|---|---|---|
+| `sr-01` | ## File: views.py ```python from flask import Flask, request, g app = Flask(__name__)  @app.route("/user") def get_user():     user_id = request.args.get("id") … | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-02` | ## File: greet.c ```c #include <stdio.h> #include <string.h>  void greet(const char *name) {     char buf[16];     strcpy(buf, name);     printf("Hello, %s!\n",… | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-03` | ## File: routes.py ```python import os from flask import request  @app.route("/ping") def ping():     host = request.args.get("host")     output = os.popen(f"pi… | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-04` | ## File: routes.py ```python from flask import request, send_file  @app.route("/download") def download():     name = request.args.get("name")     return send_f… | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-05` | ## File: routes.py ```python import requests from flask import request  @app.route("/fetch") def fetch_url():     url = request.args.get("url")     r = requests… | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-06` | ## File: auth.py ```python import hashlib from db import db  def store_password(username: str, password: str) -> None:     hashed = hashlib.md5(password.encode(… | sec_review(1bug+1decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-07` | ## File: routes.py ```python import pickle, base64 from flask import request  @app.route("/restore_session", methods=["POST"]) def restore_session():     blob =… | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-08` | ## File: billing.py ```python import requests  # (Synthetic placeholders for an eval prompt; the bug is "hardcoded credentials in #  source", regardless of the … | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-09` | ## File: auth.py ```python from flask import request, redirect  @app.route("/login") def login_page():     return "<form action='/do_login' method='post'>...</f… | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-10` | ## File: auth.py ```python import random, string from db import db  def issue_password_reset_token(user_id: int) -> str:     token = "".join(random.choices(stri… | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-11` | ## File: comments.js ```javascript function renderComment(comment) {     const div = document.createElement("div");     div.className = "comment";     div.inner… | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-12` | ## File: server.js ```javascript const express = require("express"); const { exec } = require("child_process"); const app = express();  app.get("/whois", (req, … | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-13` | ## File: server.js ```javascript const express = require("express"); const fs = require("fs"); const path = require("path"); const app = express();  app.get("/a… | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-14` | ## File: server.js ```javascript const express = require("express"); const axios = require("axios"); const app = express();  app.get("/preview", async (req, res… | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-15` | ## File: prompt.c ```c #include <stdio.h>  void prompt_name(void) {     char name[64];     printf("Enter your name: ");     gets(name);     printf("Hello, %s!\n… | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-16` | ## File: log.c ```c #include <stdio.h> #include <syslog.h>  void log_request(const char *user_agent) {     char msg[256];     snprintf(msg, sizeof(msg), "reques… | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-17` | ## File: greet.c ```c #include <stdio.h> #include <string.h>  void build_greeting(const char *first, const char *last) {     char greeting[64];     sprintf(gree… | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-18` | ## File: lookup.cpp ```cpp #include <vector> #include <iostream>  int lookup(const std::vector<int>& table, int index_from_user) {     return table[index_from_u… | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-19` | ## File: log_user.cpp ```cpp #include <string> #include <cstring> #include <cstdio>  std::string build_label(int id) {     return "user-" + std::to_string(id); … | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-20` | ## File: app.py ```python import secrets, hmac, hashlib from flask import Flask, request, jsonify, abort import bcrypt from db import db app = Flask(__name__)  … | sec_review(0bug+7decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-21` | ## File: name.c ```c #include <stdio.h> #include <string.h> #include <stdlib.h>  #define NAME_MAX_LEN 63  /* Copies up to NAME_MAX_LEN bytes from src into dst (… | sec_review(0bug+4decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
 
 ## reasoning — hard  (20 prompts)
 
@@ -368,7 +398,7 @@ Grader shorthand: `numeric(=N)` exact-number answer-check · `word_count(a..b)` 
 
 ## tool_calling — hard  (13 prompts)
 
-*System prompt:* You have access to function tools. Call a function when it would help the user. If no tool is appropriate, answer the user directly in plain text. Use only the named tools provided. Today's date is 2026-05-13.
+*System prompt:* You have access to function tools. Call a function when it would help the user. If no tool is appropriate, answer the user directly in plain text. Use only the named tools provided. Today's date is 2026-05-18.
 
 | id | what it probes | grader |
 |---|---|---|
@@ -385,4 +415,30 @@ Grader shorthand: `numeric(=N)` exact-number answer-check · `word_count(a..b)` 
 | `tc-h-11` | Set a timer for two and a half minutes. | tool_call(set_timer) |
 | `tc-h-12` | Weather in Paris. | tool_call(get_weather) |
 | `tc-h-13` | [multi-turn] What's the current price of XYZQ? | no_tool_call + regex |
+
+## security_review — hard  (19 prompts)
+
+*System prompt:* You are reviewing the code below for security vulnerabilities. For each issue you find: (1) name the vulnerability class (e.g. "SQL injection", "buffer overflow", "use after free") and the CWE number if you know it, (2) cite the file and line number where the bug is, (3) briefly explain why it is ex…
+
+| id | what it probes | grader |
+|---|---|---|
+| `sr-h-01` | ## File: signing.py ```python import hmac, hashlib  SECRET = b"\x9a\xb1\x42\x07\xed\xa3\x5f\xc8\x10\x6c\xde\x71\x88\x4f\x32\x90"  def verify_signature(message: … | sec_review(1bug+2decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-02` | ## File: net.c ```c #include <stdlib.h> #include <string.h> #include <unistd.h>  /* Reads a `len`-byte message from fd. `len_header` is an attacker-controlled  … | sec_review(1bug+2decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-03` | ## File: middleware.py ```python from functools import wraps from flask import session  def require_auth(fn):     @wraps(fn)     def wrap(*a, **kw):         if … | sec_review(1bug+2decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-04` | ## File: buffer.h ```c #ifndef BUFFER_H #define BUFFER_H #include <stddef.h>  #define MAX_PACKET 1024  typedef struct {     char   data[MAX_PACKET];     size_t … | sec_review(1bug+2decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-05` | ## File: archiver.py ```python import os, shutil  def archive_if_present(path: str, archive_dir: str) -> bool:     """Move `path` into `archive_dir` if it exist… | sec_review(1bug+1decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-06` | ## File: routes.py ```python import yaml from flask import request  @app.route("/import", methods=["POST"]) def import_config():     raw = request.get_data(as_t… | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-07` | ## File: routes.py ```python from flask import request, send_file  @app.route("/docs") def serve_doc():     name = request.args.get("name", "")     # block path… | sec_review(1bug+2decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-08` | ## File: settings.js ```javascript const express = require("express"); const _ = require("lodash"); const app = express(); app.use(express.json());  const defau… | sec_review(1bug+1decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-09` | ## File: server.js ```javascript const express = require("express"); const app = express();  const EMAIL_RE = /^([a-zA-Z0-9]+)+@[a-zA-Z0-9]+\.[a-zA-Z]{2,}$/;  a… | sec_review(1bug+1decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-10` | ## File: session.c ```c #include <stdlib.h> #include <string.h>  struct session {     char *token;     int   user_id; };  void close_session(struct session *s) … | sec_review(1bug+2decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-11` | ## File: storage.py ```python from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes from cryptography.hazmat.backends import default_back… | sec_review(1bug+2decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-12` | ## File: log.c ```c #include <stdio.h> #include <string.h>  /* loaded from /etc/myapp.conf at startup */ extern const char *g_log_format;  void log_request(cons… | sec_review(1bug) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-13` | ## File: squares.cpp ```cpp #include <vector>  /* For each element in `xs`, append its square to `xs`. */ void append_squares(std::vector<int> &xs) {     for (a… | sec_review(1bug+1decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-14` | ## File: buffer.cpp ```cpp #include <cstring> #include <cstdio>  class Buffer { public:     Buffer(size_t n) : size_(n), data_(new char[n]) {}     ~Buffer() { d… | sec_review(1bug+1decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-15` | ## File: app.js ```javascript const express = require("express"); const session = require("express-session"); const csurf = require("csurf"); const app = expres… | sec_review(1bug+2decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-16` | ## File: record.h ```cpp #ifndef RECORD_H #define RECORD_H #include <cstdint>  struct Record {     uint32_t id;     uint32_t flags;     char     name[32];     u… | sec_review(1bug+3decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-17` | ## File: validators.py ```python """Shared validators. ALLOWED_REDIRECTS is the single source of truth for where /go is permitted to redirect."""  ALLOWED_REDIR… | sec_review(1bug+2decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-18` | ## File: app.py ```python import hashlib, pickle, base64 from flask import Flask, request, jsonify, redirect  app = Flask(__name__)  @app.route("/api/users/<int… | sec_review(4bug+2decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
+| `sr-h-19` | ## File: util.c ```c #include <stdio.h> #include <stdlib.h> #include <string.h>  /* Returns a newly allocated copy. Caller frees. */ char *dup_n(const char *s, … | sec_review(3bug+1decoy) + rubric[fix_soundness, explanation_correctness, no_false_positives, actionability] |
 

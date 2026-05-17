@@ -13,9 +13,9 @@ PROMPTS = ROOT / "prompts"
 
 # display order + titles for the capability sets
 ORDER = ["reasoning", "coding", "coding_quality", "instruction_following", "long_context", "writing", "coherence",
-         "tool_calling",
+         "tool_calling", "security_review",
          "reasoning_hard", "coding_hard", "coding_quality_hard", "instruction_following_hard",
-         "long_context_hard", "writing_hard", "coherence_hard", "tool_calling_hard"]
+         "long_context_hard", "writing_hard", "coherence_hard", "tool_calling_hard", "security_review_hard"]
 def title(cap):
     base, _, h = cap.partition("_hard")
     return f"{base} — {'hard' if h == '' and cap.endswith('_hard') else ('hard' if cap.endswith('_hard') else 'base')}"
@@ -109,8 +109,9 @@ def build():
       "`count('x'=n)` substring-occurrence count · `python·unit-tests` extracted code run against hidden asserts · "
       "`code_quality(fn=…)` ast+ruff static analysis · `tool_call(fn)` / `no_tool_call` / `tool_calls_set[…]` checks "
       "the model's emitted tool calls (function name + arg constraints; for `no_tool_call`, asserts none was emitted) · "
+      "`sec_review(Nbug+Mdecoy)` security-review grader: per-bug CWE-class regex + line/function pinpoint, minus 0.25 per decoy false-positive flagged · "
       "`rubric[criteria…]` Claude scores 1–5 per named criterion "
-      "(writing/coherence only). A `+` joins multiple sub-graders (all must pass).\n")
+      "(writing/coherence/security_review). A `+` joins multiple sub-graders (all must pass).\n")
     total = sum(len(v) for v in cat.values())
     p(f"**{total} prompts** across **{len(cat)} capability sets** → **{total * 2} calls** per full run (both "
       "thinking modes).\n")

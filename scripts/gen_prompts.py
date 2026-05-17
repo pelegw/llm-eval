@@ -1088,13 +1088,32 @@ def sr(bugs, decoys=None):
 
 # Convenience CWE-pattern lists (case-insensitive substring regex):
 _CWE_SQLI    = [r"CWE-?89", r"SQL\s*injection", r"\bsqli\b"]
-_CWE_CMDI    = [r"CWE-?78", r"command\s*injection", r"shell\s*injection", r"OS\s*command\s*injection"]
+_CWE_CMDI    = [r"CWE-?78", r"command\s*injection", r"shell\s*injection", r"OS\s*command\s*injection", r"shell=True"]
 _CWE_BUFOF   = [r"CWE-?(120|121|122|787)", r"buffer\s*overflow", r"stack\s*overflow", r"out-of-bounds\s*write"]
 _CWE_TIMING  = [r"CWE-?208", r"timing\s*attack", r"non[-\s]?constant[-\s]?time", r"constant[-\s]?time", r"compare_digest"]
 _CWE_INTOF   = [r"CWE-?(190|191)", r"integer\s*overflow", r"integer\s*underflow", r"size_?t\s*(wrap|overflow|cast)", r"atoi.{0,40}(negative|signed|unchecked)"]
 _CWE_MISSAUTH= [r"CWE-?(862|285|306)", r"missing\s*auth", r"unauthenticated\s*access", r"no\s*auth(orization|entication)?\s*(check|decorator)", r"missing\s*@?require_auth", r"broken\s*access\s*control"]
 _CWE_XSS     = [r"CWE-?79", r"\bXSS\b", r"cross[-\s]?site\s*scripting"]
 _CWE_FORMAT  = [r"CWE-?134", r"format\s*string"]
+_CWE_PATHTRAV= [r"CWE-?(22|23|36)", r"path\s*traversal", r"directory\s*traversal", r"\.\./", r"unrestricted\s*file"]
+_CWE_SSRF    = [r"CWE-?918", r"\bSSRF\b", r"server[-\s]?side\s*request\s*forgery"]
+_CWE_DESER   = [r"CWE-?502", r"insecure\s*deser", r"unsafe\s*deser", r"unsafe\s*pickle", r"pickle.{0,30}untrusted", r"yaml\.load.{0,40}(Loader|safe)"]
+_CWE_WEAKHASH= [r"CWE-?(327|328|916)", r"weak\s*hash", r"broken\s*hash", r"\bMD5\b", r"\bSHA-?1\b", r"insecure\s*hash"]
+_CWE_HARDCODE= [r"CWE-?798", r"hardcoded\s*(credential|password|secret|key|token)", r"secret.{0,20}in\s*(code|source)"]
+_CWE_OPENREDIR = [r"CWE-?601", r"open\s*redirect", r"unvalidated\s*redirect"]
+_CWE_INSECRND= [r"CWE-?(330|338)", r"insecure\s*random", r"weak\s*random", r"predictable\s*(random|token|nonce)", r"non[-\s]?cryptographic\s*random", r"secrets\.token"]
+_CWE_TOCTOU  = [r"CWE-?(367|362)", r"\bTOCTOU\b", r"time[-\s]?of[-\s]?check", r"race\s*condition.{0,40}(file|exists|open)"]
+_CWE_UAF     = [r"CWE-?416", r"use[-\s]?after[-\s]?free", r"dangling\s*pointer", r"freed\s*memory"]
+_CWE_DOUBLEFREE = [r"CWE-?415", r"double[-\s]?free", r"free.{0,10}twice"]
+_CWE_NULLDEREF = [r"CWE-?476", r"null\s*pointer\s*deref", r"\bNULL\b\s*deref"]
+_CWE_PROTOPOLL = [r"CWE-?1321", r"prototype\s*pollution"]
+_CWE_REDOS   = [r"CWE-?(1333|400)", r"\bReDoS\b", r"catastrophic\s*backtracking", r"regex(?:p)?\s*denial\s*of\s*service"]
+_CWE_ECB     = [r"\bECB\s*mode\b", r"electronic\s*codebook", r"CWE-?327"]
+_CWE_CSRF    = [r"CWE-?352", r"\bCSRF\b", r"cross[-\s]?site\s*request\s*forgery", r"missing\s*CSRF"]
+_CWE_ITERINV = [r"iterator\s*invalidation", r"invalid(?:ated)?\s*iterator", r"push_back.{0,40}(invalidat|while\s*iter)"]
+_CWE_RULE3   = [r"rule\s*of\s*(three|3|five|5)", r"missing\s*(copy\s*constructor|destructor|assignment\s*operator)", r"shallow\s*copy.{0,40}(double|delete|free)"]
+_CWE_OOB_READ= [r"CWE-?125", r"out-of-bounds\s*read", r"vector::operator\[\]", r"no\s*bounds\s*check"]
+_CWE_DANGLING= [r"CWE-?(562|416)", r"dangling\s*(reference|pointer)", r"c_str\(\).{0,40}(lifetime|temporary|outlived)", r"return.{0,30}local.{0,30}(address|reference)"]
 
 # helper: render a multi-file prompt body — each file as a fenced block with a header
 def sr_files(*files):
@@ -1239,6 +1258,641 @@ int handle(const char *raw, size_t raw_len) {
 }
 '''
 
+# ---- Phase 2 snippets: Python web base ----
+_PY_CMDI = '''\
+import os
+from flask import request
+
+@app.route("/ping")
+def ping():
+    host = request.args.get("host")
+    output = os.popen(f"ping -c 1 {host}").read()
+    return {"output": output}
+'''
+
+_PY_PATHTRAV = '''\
+from flask import request, send_file
+
+@app.route("/download")
+def download():
+    name = request.args.get("name")
+    return send_file(f"/var/app/uploads/{name}")
+'''
+
+_PY_SSRF = '''\
+import requests
+from flask import request
+
+@app.route("/fetch")
+def fetch_url():
+    url = request.args.get("url")
+    r = requests.get(url, timeout=5)
+    return r.text
+'''
+
+_PY_WEAKHASH = '''\
+import hashlib
+from db import db
+
+def store_password(username: str, password: str) -> None:
+    hashed = hashlib.md5(password.encode()).hexdigest()
+    db.execute("INSERT INTO users(username, password_hash) VALUES (?, ?)",
+               (username, hashed))
+
+def check_password(username: str, password: str) -> bool:
+    row = db.execute("SELECT password_hash FROM users WHERE username = ?",
+                     (username,)).fetchone()
+    return row and row[0] == hashlib.md5(password.encode()).hexdigest()
+'''
+
+_PY_PICKLE = '''\
+import pickle, base64
+from flask import request
+
+@app.route("/restore_session", methods=["POST"])
+def restore_session():
+    blob = base64.b64decode(request.form["session"])
+    state = pickle.loads(blob)
+    return {"loaded": list(state.keys())}
+'''
+
+_PY_HARDCODE = '''\
+import requests
+
+# (Synthetic placeholders for an eval prompt; the bug is "hardcoded credentials in
+#  source", regardless of the exact value here.)
+PAYMENTS_API_KEY = "<HARDCODED-PAYMENTS-PROVIDER-LIVE-SECRET-KEY-IN-SOURCE>"
+DB_PASSWORD      = "<HARDCODED-PRODUCTION-DB-PASSWORD-IN-SOURCE>"
+
+def charge(amount_cents: int, customer_token: str) -> dict:
+    r = requests.post("https://api.payments-provider.example/v1/charges",
+                      auth=(PAYMENTS_API_KEY, ""),
+                      data={"amount": amount_cents, "source": customer_token})
+    return r.json()
+'''
+
+_PY_OPENREDIR = '''\
+from flask import request, redirect
+
+@app.route("/login")
+def login_page():
+    return "<form action='/do_login' method='post'>...</form>"
+
+@app.route("/do_login", methods=["POST"])
+def do_login():
+    # ... authenticate user ...
+    next_url = request.args.get("next", "/")
+    return redirect(next_url)
+'''
+
+_PY_INSECRND = '''\
+import random, string
+from db import db
+
+def issue_password_reset_token(user_id: int) -> str:
+    token = "".join(random.choices(string.ascii_letters + string.digits, k=32))
+    db.execute("UPDATE users SET reset_token = ? WHERE id = ?", (token, user_id))
+    return token
+'''
+
+# ---- Phase 2 snippets: JS / Node base ----
+_JS_XSS = '''\
+function renderComment(comment) {
+    const div = document.createElement("div");
+    div.className = "comment";
+    div.innerHTML = "<b>" + comment.author + ":</b> " + comment.body;
+    document.getElementById("comments").appendChild(div);
+}
+
+fetch("/api/comments").then(r => r.json()).then(cs => cs.forEach(renderComment));
+'''
+
+_JS_CMDI = '''\
+const express = require("express");
+const { exec } = require("child_process");
+const app = express();
+
+app.get("/whois", (req, res) => {
+    const domain = req.query.domain;
+    exec(`whois ${domain}`, (err, stdout) => {
+        if (err) return res.status(500).send(err.message);
+        res.type("text/plain").send(stdout);
+    });
+});
+'''
+
+_JS_PATHTRAV = '''\
+const express = require("express");
+const fs = require("fs");
+const path = require("path");
+const app = express();
+
+app.get("/avatar", (req, res) => {
+    const name = req.query.name;
+    fs.readFile(path.join("/var/app/avatars", name), (err, data) => {
+        if (err) return res.status(404).end();
+        res.type("image/png").send(data);
+    });
+});
+'''
+
+_JS_SSRF = '''\
+const express = require("express");
+const axios = require("axios");
+const app = express();
+
+app.get("/preview", async (req, res) => {
+    const url = req.query.url;
+    const r = await axios.get(url, { timeout: 5000 });
+    res.send(`<title>${r.data.slice(0, 200)}</title>`);
+});
+'''
+
+# ---- Phase 2 snippets: C / C++ base ----
+_C_GETS = '''\
+#include <stdio.h>
+
+void prompt_name(void) {
+    char name[64];
+    printf("Enter your name: ");
+    gets(name);
+    printf("Hello, %s!\\n", name);
+}
+'''
+
+_C_FMTSTR = '''\
+#include <stdio.h>
+#include <syslog.h>
+
+void log_request(const char *user_agent) {
+    char msg[256];
+    snprintf(msg, sizeof(msg), "request from %s", user_agent);
+    syslog(LOG_INFO, msg);
+    printf(msg);
+    printf("\\n");
+}
+'''
+
+_C_SPRINTF = '''\
+#include <stdio.h>
+#include <string.h>
+
+void build_greeting(const char *first, const char *last) {
+    char greeting[64];
+    sprintf(greeting, "Welcome back, %s %s! We hope you enjoy your visit.",
+            first, last);
+    printf("%s\\n", greeting);
+}
+'''
+
+_CPP_OOB = '''\
+#include <vector>
+#include <iostream>
+
+int lookup(const std::vector<int>& table, int index_from_user) {
+    return table[index_from_user];
+}
+
+int main() {
+    std::vector<int> scores = {10, 20, 30, 40, 50};
+    int idx;
+    std::cin >> idx;
+    std::cout << "score = " << lookup(scores, idx) << std::endl;
+}
+'''
+
+_CPP_DANGLING = '''\
+#include <string>
+#include <cstring>
+#include <cstdio>
+
+std::string build_label(int id) {
+    return "user-" + std::to_string(id);
+}
+
+void log_user(int id) {
+    const char *label = build_label(id).c_str();
+    /* ... many lines later, the temporary std::string is gone ... */
+    printf("logging in: %s\\n", label);
+}
+'''
+
+# ---- Phase 2 snippets: clean-code decoys (base tier) ----
+_PY_CLEAN = '''\
+import secrets, hmac, hashlib
+from flask import Flask, request, jsonify, abort
+import bcrypt
+from db import db
+app = Flask(__name__)
+
+def require_login(fn):
+    from functools import wraps
+    from flask import session
+    @wraps(fn)
+    def wrap(*a, **kw):
+        if not session.get("user_id"): abort(401)
+        return fn(*a, **kw)
+    return wrap
+
+@app.route("/me/posts")
+@require_login
+def my_posts():
+    from flask import session
+    rows = db.execute("SELECT id, title FROM posts WHERE user_id = ?",
+                      (session["user_id"],)).fetchall()
+    return jsonify([{"id": r[0], "title": r[1]} for r in rows])
+
+def create_password_reset_token() -> str:
+    return secrets.token_urlsafe(32)
+
+def verify_password(plain: str, hashed: bytes) -> bool:
+    return bcrypt.checkpw(plain.encode(), hashed)
+
+def verify_webhook_signature(body: bytes, sig_hex: str, secret: bytes) -> bool:
+    expected = hmac.new(secret, body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, sig_hex)
+'''
+
+_C_CLEAN = '''\
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define NAME_MAX_LEN 63
+
+/* Copies up to NAME_MAX_LEN bytes from src into dst (which must be NAME_MAX_LEN+1
+   bytes) and NUL-terminates. Returns 0 on success, -1 if src is too long. */
+int copy_name(char dst[NAME_MAX_LEN + 1], const char *src) {
+    size_t n = strnlen(src, NAME_MAX_LEN + 1);
+    if (n > NAME_MAX_LEN) return -1;
+    memcpy(dst, src, n);
+    dst[n] = '\\0';
+    return 0;
+}
+
+void greet(const char *raw_name) {
+    char name[NAME_MAX_LEN + 1];
+    if (copy_name(name, raw_name) != 0) {
+        fprintf(stderr, "name too long\\n");
+        return;
+    }
+    printf("Hello, %s!\\n", name);
+}
+'''
+
+# ---- Phase 2 snippets: hard tier — Python ----
+_PY_TOCTOU = '''\
+import os, shutil
+
+def archive_if_present(path: str, archive_dir: str) -> bool:
+    """Move `path` into `archive_dir` if it exists. Returns True on success."""
+    if not os.path.exists(path):
+        return False
+    name = os.path.basename(path)
+    shutil.move(path, os.path.join(archive_dir, name))
+    return True
+'''
+
+_PY_YAML = '''\
+import yaml
+from flask import request
+
+@app.route("/import", methods=["POST"])
+def import_config():
+    raw = request.get_data(as_text=True)
+    cfg = yaml.load(raw)
+    apply_config(cfg)
+    return {"ok": True}
+'''
+
+_PY_PATHTRAV_BYPASSABLE = '''\
+from flask import request, send_file
+
+@app.route("/docs")
+def serve_doc():
+    name = request.args.get("name", "")
+    # block path traversal
+    if ".." in name or name.startswith("/"):
+        return "bad path", 400
+    return send_file(f"/var/app/docs/{name}")
+'''
+
+_PY_AES_ECB = '''\
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+import os
+
+KEY = os.urandom(32)
+
+def encrypt_record(plaintext: bytes) -> bytes:
+    """AES-encrypt a fixed-shape record (e.g. {user_id, email, role}) for at-rest storage."""
+    pad = 16 - (len(plaintext) % 16)
+    plaintext = plaintext + bytes([pad] * pad)
+    cipher = Cipher(algorithms.AES(KEY), modes.ECB(), backend=default_backend())
+    enc = cipher.encryptor()
+    return enc.update(plaintext) + enc.finalize()
+'''
+
+# ---- Phase 2 snippets: hard tier — JS ----
+_JS_PROTOPOLL = '''\
+const express = require("express");
+const _ = require("lodash");
+const app = express();
+app.use(express.json());
+
+const defaults = { theme: "light", lang: "en", pageSize: 20 };
+
+app.post("/api/settings", (req, res) => {
+    const merged = _.merge({}, defaults, req.body);
+    saveSettings(req.user.id, merged);
+    res.json(merged);
+});
+'''
+
+_JS_REDOS = '''\
+const express = require("express");
+const app = express();
+
+const EMAIL_RE = /^([a-zA-Z0-9]+)+@[a-zA-Z0-9]+\\.[a-zA-Z]{2,}$/;
+
+app.get("/check_email", (req, res) => {
+    const email = req.query.email || "";
+    res.json({ valid: EMAIL_RE.test(email) });
+});
+'''
+
+# ---- Phase 2 snippets: hard tier — C/C++ ----
+_C_UAF = '''\
+#include <stdlib.h>
+#include <string.h>
+
+struct session {
+    char *token;
+    int   user_id;
+};
+
+void close_session(struct session *s) {
+    free(s->token);
+    s->token = NULL;
+}
+
+const char *session_token_for_log(struct session *s) {
+    return s->token;
+}
+
+void teardown_and_log(struct session *s, void (*log_fn)(const char *)) {
+    close_session(s);
+    log_fn(session_token_for_log(s));
+}
+'''
+
+_C_FMTSTR_CONFIG = '''\
+#include <stdio.h>
+#include <string.h>
+
+/* loaded from /etc/myapp.conf at startup */
+extern const char *g_log_format;
+
+void log_request(const char *method, const char *path, int status) {
+    char line[512];
+    snprintf(line, sizeof(line), g_log_format, method, path, status);
+    fputs(line, stderr);
+}
+'''
+
+_CPP_ITERINV = '''\
+#include <vector>
+
+/* For each element in `xs`, append its square to `xs`. */
+void append_squares(std::vector<int> &xs) {
+    for (auto it = xs.begin(); it != xs.end(); ++it) {
+        xs.push_back((*it) * (*it));
+    }
+}
+'''
+
+_CPP_RULE3 = '''\
+#include <cstring>
+#include <cstdio>
+
+class Buffer {
+public:
+    Buffer(size_t n) : size_(n), data_(new char[n]) {}
+    ~Buffer() { delete[] data_; }
+
+    char *raw() { return data_; }
+    size_t size() const { return size_; }
+
+private:
+    size_t size_;
+    char  *data_;
+};
+
+void copy_and_log(Buffer src) {
+    Buffer dst = src;
+    std::memcpy(dst.raw(), "hello", 5);
+    std::puts(dst.raw());
+}
+'''
+
+# ---- Phase 2 snippets: hard tier — multi-file ----
+_JS_CSRF_APP = '''\
+const express = require("express");
+const session = require("express-session");
+const csurf = require("csurf");
+const app = express();
+
+app.use(express.json());
+app.use(session({ secret: process.env.SESSION_SECRET, cookie: { httpOnly: true } }));
+app.use(csurf());
+
+app.use("/api", require("./routes/api"));
+app.use("/webhook", require("./routes/webhook"));
+'''
+
+_JS_CSRF_API = '''\
+const router = require("express").Router();
+const csurf = require("csurf");
+
+// disable CSRF for this entire mounted path — webhooks need it off
+router.use(csurf({ ignoreMethods: ["GET", "HEAD", "OPTIONS", "POST", "PUT", "DELETE"] }));
+
+router.post("/transfer", (req, res) => {
+    if (!req.session.user_id) return res.status(401).end();
+    transferFunds(req.session.user_id, req.body.to_account, req.body.amount);
+    res.json({ ok: true });
+});
+
+module.exports = router;
+'''
+
+_JS_CSRF_WEBHOOK = '''\
+const router = require("express").Router();
+router.post("/stripe", (req, res) => {
+    /* signature-verified upstream; CSRF correctly off for this endpoint */
+    handleStripeEvent(req.body);
+    res.json({ ok: true });
+});
+module.exports = router;
+'''
+
+_CPP_HDRSKEW_HEADER = '''\
+#ifndef RECORD_H
+#define RECORD_H
+#include <cstdint>
+
+struct Record {
+    uint32_t id;
+    uint32_t flags;
+    char     name[32];
+    uint64_t created_at;   /* added in v2 */
+    uint64_t updated_at;   /* added in v2 */
+};
+
+constexpr size_t RECORD_WIRE_SIZE = 40;   /* legacy v1 size; v2 added 16 bytes */
+
+#endif
+'''
+
+_CPP_HDRSKEW_SERIALIZE = '''\
+#include "record.h"
+#include <cstring>
+
+/* Pack a Record into the provided buffer (must be at least RECORD_WIRE_SIZE). */
+void serialize(const Record &r, char *buf) {
+    std::memcpy(buf, &r, sizeof(Record));
+}
+
+/* Unpack RECORD_WIRE_SIZE bytes into a Record. */
+void deserialize(Record &r, const char *buf) {
+    std::memcpy(&r, buf, RECORD_WIRE_SIZE);
+}
+'''
+
+_CPP_HDRSKEW_NET = '''\
+#include "record.h"
+#include <cstring>
+
+extern void deserialize(Record &r, const char *buf);
+
+/* Reads RECORD_WIRE_SIZE bytes off the wire into a freshly-allocated Record.
+   Caller owns the returned pointer. */
+Record *read_record(const char *wire) {
+    Record *r = new Record();
+    deserialize(*r, wire);
+    return r;
+}
+'''
+
+_PY_ALLOWLIST_VALIDATORS = '''\
+"""Shared validators. ALLOWED_REDIRECTS is the single source of truth for
+where /go is permitted to redirect."""
+
+ALLOWED_REDIRECTS = ["/", "/dashboard", "/help", "/profile"]
+
+def is_allowed_redirect(path: str) -> bool:
+    return path in ALLOWED_REDIRECTS
+'''
+
+_PY_ALLOWLIST_PLUGINS = '''\
+"""Plugins can register their own landing pages at install time.
+Loaded once at app startup."""
+from validators import ALLOWED_REDIRECTS
+
+def register_plugin(plugin_manifest: dict) -> None:
+    for page in plugin_manifest.get("landing_pages", []):
+        if page not in ALLOWED_REDIRECTS:
+            ALLOWED_REDIRECTS.append(page)
+'''
+
+_PY_ALLOWLIST_ROUTES = '''\
+from flask import request, redirect, abort
+from validators import is_allowed_redirect
+
+@app.route("/go")
+def go():
+    target = request.args.get("to", "/")
+    if not is_allowed_redirect(target):
+        abort(400)
+    return redirect(target)
+
+@app.route("/install_plugin", methods=["POST"])
+def install_plugin():
+    """Site admins can drop a plugin manifest here at runtime."""
+    if not session.get("is_admin"):
+        abort(403)
+    from plugins import register_plugin
+    register_plugin(request.get_json())
+    return {"ok": True}
+'''
+
+# ---- Phase 2 snippets: hard tier — multi-bug + decoy ----
+_PY_MULTIBUG = '''\
+import hashlib, pickle, base64
+from flask import Flask, request, jsonify, redirect
+
+app = Flask(__name__)
+
+@app.route("/api/users/<int:uid>")
+def get_user(uid):
+    """Return public profile. Anyone can fetch any public profile."""
+    cur = g.db.cursor()
+    cur.execute("SELECT name, bio FROM users WHERE id = ? AND public = 1", (uid,))
+    row = cur.fetchone()
+    if not row:
+        return jsonify({"error": "not found"}), 404
+    return jsonify({"name": row[0], "bio": row[1]})
+
+@app.route("/api/admin/run_query", methods=["POST"])
+def run_query():
+    q = request.form.get("q", "")
+    cur = g.db.cursor()
+    cur.execute(f"SELECT * FROM logs WHERE message LIKE '%{q}%'")
+    return jsonify(cur.fetchall())
+
+@app.route("/api/restore", methods=["POST"])
+def restore():
+    blob = base64.b64decode(request.form["state"])
+    state = pickle.loads(blob)
+    return jsonify(list(state.keys()))
+
+@app.route("/api/hash_password", methods=["POST"])
+def hash_password():
+    pw = request.form["password"]
+    return jsonify({"hash": hashlib.md5(pw.encode()).hexdigest()})
+'''
+
+_C_MULTIBUG = '''\
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* Returns a newly allocated copy. Caller frees. */
+char *dup_n(const char *s, size_t n) {
+    char *p = malloc(n + 1);
+    memcpy(p, s, n);
+    p[n] = 0;
+    return p;
+}
+
+void greet_user(const char *raw_name) {
+    char name[32];
+    strncpy(name, raw_name, sizeof(name));
+    printf("Welcome, ");
+    printf(name);
+    printf("\\n");
+}
+
+int parse_and_alloc(const char *len_hdr, const char *raw) {
+    int len = atoi(len_hdr);
+    char *buf = malloc(len);
+    memcpy(buf, raw, len);
+    free(buf);
+    return 0;
+}
+'''
+
+
 security_review = [
     # ---- BASE TIER ----
     {"id": "sr-01", "system": SR_SYS,
@@ -1274,8 +1928,10 @@ security_review = [
      "capability": "security_review_hard",
      "grader": [sr(bugs=[{"cwe": _CWE_INTOF,
                           "location": [r"\batoi\b", r"\bmalloc\b", r"read_message", r"len\s*\+\s*1"]}],
-                   decoys=[[r"format\s*string"],   # there is no printf with user-controlled fmt
-                           _CWE_BUFOF + [r"\bstrcpy\b"]]),  # not the bug class — it's int->size_t
+                   # Naming the downstream heap overflow is CORRECT, not a false positive.
+                   # Only flag clearly-wrong attributions: APIs that aren't in the snippet.
+                   decoys=[[r"\bstrcpy\b", r"\bstrcat\b", r"\bgets\b"],   # none of these called
+                           [r"format\s*string"]]),                          # no user-controlled fmt
                 sr_rub("sr-h-02-intof")]},
 
     # ---- HARD TIER (multi-file) ----
@@ -1307,6 +1963,352 @@ security_review = [
                    decoys=[_CWE_FORMAT,    # no printf with fmt
                            _CWE_CMDI]),   # no system/exec
                 sr_rub("sr-h-04-hdrskew")]},
+
+    # ===== Phase 2: BASE TIER additions (Python web) =====
+    {"id": "sr-03", "system": SR_SYS,
+     "user": f"## File: routes.py\n```python\n{_PY_CMDI.rstrip()}\n```",
+     "tags": ["python", "web", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_CMDI,
+                          "location": [r"\bos\.popen\b", r"\bping\b", r"\bhost\b", r"f['\"]"]}]),
+                sr_rub("sr-03-cmdi")]},
+
+    {"id": "sr-04", "system": SR_SYS,
+     "user": f"## File: routes.py\n```python\n{_PY_PATHTRAV.rstrip()}\n```",
+     "tags": ["python", "web", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_PATHTRAV,
+                          "location": [r"send_file", r"\bname\b", r"/var/app/uploads", r"\bdownload\b"]}]),
+                sr_rub("sr-04-pathtrav")]},
+
+    {"id": "sr-05", "system": SR_SYS,
+     "user": f"## File: routes.py\n```python\n{_PY_SSRF.rstrip()}\n```",
+     "tags": ["python", "web", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_SSRF,
+                          "location": [r"requests\.get", r"\burl\b", r"fetch_url"]}]),
+                sr_rub("sr-05-ssrf")]},
+
+    {"id": "sr-06", "system": SR_SYS,
+     "user": f"## File: auth.py\n```python\n{_PY_WEAKHASH.rstrip()}\n```",
+     "tags": ["python", "crypto", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_WEAKHASH,
+                          "location": [r"\bmd5\b", r"hashlib", r"store_password", r"check_password",
+                                       r"password_hash"]}],
+                   # the right fix mentions bcrypt/argon2 + salt; missing salt is a real
+                   # concern but it's the *same* root issue (don't use raw md5 for passwords),
+                   # not a separate vuln, so no decoy for "missing salt"
+                   decoys=[[r"timing\s*attack"]]),  # the row[0]==md5 compare is a separate finding
+                sr_rub("sr-06-weakhash")]},
+
+    {"id": "sr-07", "system": SR_SYS,
+     "user": f"## File: routes.py\n```python\n{_PY_PICKLE.rstrip()}\n```",
+     "tags": ["python", "web", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_DESER,
+                          "location": [r"pickle\.loads", r"restore_session", r"\bblob\b"]}]),
+                sr_rub("sr-07-pickle")]},
+
+    {"id": "sr-08", "system": SR_SYS,
+     "user": f"## File: billing.py\n```python\n{_PY_HARDCODE.rstrip()}\n```",
+     "tags": ["python", "secrets", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_HARDCODE,
+                          "location": [r"PAYMENTS_API_KEY", r"DB_PASSWORD",
+                                       r"in (?:source|code)", r"hardcod", r"line\s*[567]"]}]),
+                sr_rub("sr-08-hardcode")]},
+
+    {"id": "sr-09", "system": SR_SYS,
+     "user": f"## File: auth.py\n```python\n{_PY_OPENREDIR.rstrip()}\n```",
+     "tags": ["python", "web", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_OPENREDIR,
+                          "location": [r"\bredirect\b", r"\bnext\b", r"do_login", r"next_url"]}]),
+                sr_rub("sr-09-openredir")]},
+
+    {"id": "sr-10", "system": SR_SYS,
+     "user": f"## File: auth.py\n```python\n{_PY_INSECRND.rstrip()}\n```",
+     "tags": ["python", "crypto", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_INSECRND,
+                          "location": [r"random\.choices", r"\brandom\b", r"reset_token",
+                                       r"issue_password_reset_token"]}]),
+                sr_rub("sr-10-insecrnd")]},
+
+    # ===== Phase 2: BASE TIER additions (JS/Node) =====
+    {"id": "sr-11", "system": SR_SYS,
+     "user": f"## File: comments.js\n```javascript\n{_JS_XSS.rstrip()}\n```",
+     "tags": ["js", "web", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_XSS,
+                          "location": [r"\binnerHTML\b", r"renderComment", r"comment\.(author|body)"]}]),
+                sr_rub("sr-11-xss")]},
+
+    {"id": "sr-12", "system": SR_SYS,
+     "user": f"## File: server.js\n```javascript\n{_JS_CMDI.rstrip()}\n```",
+     "tags": ["js", "web", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_CMDI,
+                          "location": [r"\bexec\b", r"\bwhois\b", r"\$\{domain\}", r"child_process"]}]),
+                sr_rub("sr-12-cmdi")]},
+
+    {"id": "sr-13", "system": SR_SYS,
+     "user": f"## File: server.js\n```javascript\n{_JS_PATHTRAV.rstrip()}\n```",
+     "tags": ["js", "web", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_PATHTRAV,
+                          "location": [r"fs\.readFile", r"path\.join", r"avatar", r"req\.query\.name"]}]),
+                sr_rub("sr-13-pathtrav")]},
+
+    {"id": "sr-14", "system": SR_SYS,
+     "user": f"## File: server.js\n```javascript\n{_JS_SSRF.rstrip()}\n```",
+     "tags": ["js", "web", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_SSRF,
+                          "location": [r"axios\.get", r"req\.query\.url", r"preview"]}]),
+                sr_rub("sr-14-ssrf")]},
+
+    # ===== Phase 2: BASE TIER additions (C / C++) =====
+    {"id": "sr-15", "system": SR_SYS,
+     "user": f"## File: prompt.c\n```c\n{_C_GETS.rstrip()}\n```",
+     "tags": ["c", "memory", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_BUFOF,
+                          "location": [r"\bgets\b", r"prompt_name", r"name\[64\]"]}]),
+                sr_rub("sr-15-gets")]},
+
+    {"id": "sr-16", "system": SR_SYS,
+     "user": f"## File: log.c\n```c\n{_C_FMTSTR.rstrip()}\n```",
+     "tags": ["c", "memory", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_FORMAT,
+                          "location": [r"\bprintf\b", r"\bsyslog\b", r"\bmsg\b", r"log_request",
+                                       r"user_agent"]}]),
+                sr_rub("sr-16-fmtstr")]},
+
+    {"id": "sr-17", "system": SR_SYS,
+     "user": f"## File: greet.c\n```c\n{_C_SPRINTF.rstrip()}\n```",
+     "tags": ["c", "memory", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_BUFOF,
+                          "location": [r"\bsprintf\b", r"greeting\[64\]", r"build_greeting"]}]),
+                sr_rub("sr-17-sprintf")]},
+
+    {"id": "sr-18", "system": SR_SYS,
+     "user": f"## File: lookup.cpp\n```cpp\n{_CPP_OOB.rstrip()}\n```",
+     "tags": ["cpp", "memory", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_OOB_READ + _CWE_BUFOF,
+                          "location": [r"\blookup\b", r"table\[index", r"std::cin",
+                                       r"index_from_user", r"\.at\("]}]),
+                sr_rub("sr-18-vector-oob")]},
+
+    {"id": "sr-19", "system": SR_SYS,
+     "user": f"## File: log_user.cpp\n```cpp\n{_CPP_DANGLING.rstrip()}\n```",
+     "tags": ["cpp", "memory", "single-file"],
+     "grader": [sr(bugs=[{"cwe": _CWE_DANGLING + _CWE_UAF,
+                          "location": [r"\bc_str\b", r"\blabel\b", r"build_label",
+                                       r"temporary", r"log_user"]}]),
+                sr_rub("sr-19-dangling-cstr")]},
+
+    # ===== Phase 2: BASE TIER — clean-code decoys (model MUST NOT flag anything) =====
+    {"id": "sr-20", "system": SR_SYS,
+     "user": f"## File: app.py\n```python\n{_PY_CLEAN.rstrip()}\n```",
+     "tags": ["python", "clean", "decoy", "single-file"],
+     # bugs=[] -> raw starts at 1.0; if model flags any of the listed CWE classes, -0.25 each.
+     "grader": [sr(bugs=[],
+                   decoys=[_CWE_SQLI, _CWE_TIMING, _CWE_WEAKHASH, _CWE_INSECRND,
+                           _CWE_MISSAUTH, _CWE_PATHTRAV, _CWE_HARDCODE]),
+                sr_rub("sr-20-clean-py")]},
+
+    {"id": "sr-21", "system": SR_SYS,
+     "user": f"## File: name.c\n```c\n{_C_CLEAN.rstrip()}\n```",
+     "tags": ["c", "clean", "decoy", "single-file"],
+     "grader": [sr(bugs=[],
+                   decoys=[_CWE_BUFOF, _CWE_INTOF, _CWE_FORMAT, _CWE_NULLDEREF]),
+                sr_rub("sr-21-clean-c")]},
+
+    # ===== Phase 2: HARD TIER (single-file subtle, Python) =====
+    {"id": "sr-h-05", "system": SR_SYS,
+     "user": f"## File: archiver.py\n```python\n{_PY_TOCTOU.rstrip()}\n```",
+     "tags": ["python", "race", "single-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_TOCTOU,
+                          "location": [r"os\.path\.exists", r"shutil\.move", r"archive_if_present",
+                                       r"check.{0,20}use", r"between.{0,30}exists.{0,30}move"]}],
+                   decoys=[_CWE_PATHTRAV]),  # not the bug — paths are server-built; race is the bug
+                sr_rub("sr-h-05-toctou")]},
+
+    {"id": "sr-h-06", "system": SR_SYS,
+     "user": f"## File: routes.py\n```python\n{_PY_YAML.rstrip()}\n```",
+     "tags": ["python", "web", "deser", "single-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_DESER,
+                          "location": [r"yaml\.load\b", r"import_config", r"safe_load",
+                                       r"Loader=", r"FullLoader"]}]),
+                sr_rub("sr-h-06-yaml")]},
+
+    {"id": "sr-h-07", "system": SR_SYS,
+     "user": f"## File: routes.py\n```python\n{_PY_PATHTRAV_BYPASSABLE.rstrip()}\n```",
+     "tags": ["python", "web", "single-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_PATHTRAV,
+                          # the model needs to recognize the filter is INCOMPLETE/BYPASSABLE,
+                          # not just notice path traversal exists as a category
+                          "location": [r"bypass", r"URL[-\s]?encod", r"%2[eE]", r"%2[fF]",
+                                       r"incomplete\s*(check|filter|validation)", r"\\\\",
+                                       r"absolute\s*path", r"send_file", r"normpath", r"realpath"]}],
+                   decoys=[_CWE_SQLI, _CWE_XSS]),  # neither present
+                sr_rub("sr-h-07-pathtrav-bypass")]},
+
+    {"id": "sr-h-08", "system": SR_SYS,
+     "user": f"## File: settings.js\n```javascript\n{_JS_PROTOPOLL.rstrip()}\n```",
+     "tags": ["js", "web", "single-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_PROTOPOLL,
+                          "location": [r"_\.merge", r"req\.body", r"__proto__", r"settings",
+                                       r"prototype"]}],
+                   decoys=[_CWE_MISSAUTH]),  # req.user.id implies auth happened upstream
+                sr_rub("sr-h-08-protopoll")]},
+
+    {"id": "sr-h-09", "system": SR_SYS,
+     "user": f"## File: server.js\n```javascript\n{_JS_REDOS.rstrip()}\n```",
+     "tags": ["js", "web", "regex", "single-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_REDOS,
+                          "location": [r"EMAIL_RE", r"\(\[a-z", r"check_email", r"\+\)\+",
+                                       r"nested\s*quantif"]}],
+                   decoys=[_CWE_XSS]),  # no DOM rendering
+                sr_rub("sr-h-09-redos")]},
+
+    # ===== Phase 2: HARD TIER (single-file subtle, C/C++) =====
+    {"id": "sr-h-10", "system": SR_SYS,
+     "user": f"## File: session.c\n```c\n{_C_UAF.rstrip()}\n```",
+     "tags": ["c", "memory", "single-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_UAF,
+                          "location": [r"session_token_for_log", r"close_session",
+                                       r"teardown_and_log", r"after.{0,20}free",
+                                       r"s->token", r"NULL\s*deref"]}],
+                   decoys=[_CWE_BUFOF, _CWE_FORMAT]),
+                sr_rub("sr-h-10-uaf")]},
+
+    {"id": "sr-h-11", "system": SR_SYS,
+     "user": f"## File: storage.py\n```python\n{_PY_AES_ECB.rstrip()}\n```",
+     "tags": ["python", "crypto", "single-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_ECB,
+                          "location": [r"modes\.ECB", r"\bECB\b", r"encrypt_record",
+                                       r"GCM", r"CBC.{0,30}IV", r"AEAD"]}],
+                   decoys=[[r"weak\s*key.{0,30}AES", r"key\s*too\s*short"],   # 256-bit is fine
+                           _CWE_TIMING]),  # no comparison happens
+                sr_rub("sr-h-11-ecb")]},
+
+    {"id": "sr-h-12", "system": SR_SYS,
+     "user": f"## File: log.c\n```c\n{_C_FMTSTR_CONFIG.rstrip()}\n```",
+     "tags": ["c", "memory", "single-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_FORMAT,
+                          "location": [r"g_log_format", r"snprintf", r"log_request",
+                                       r"config.{0,30}format", r"attacker.{0,30}config"]}]),
+                sr_rub("sr-h-12-fmtstr-config")]},
+
+    {"id": "sr-h-13", "system": SR_SYS,
+     "user": f"## File: squares.cpp\n```cpp\n{_CPP_ITERINV.rstrip()}\n```",
+     "tags": ["cpp", "memory", "single-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_ITERINV + _CWE_UAF,
+                          "location": [r"push_back", r"append_squares", r"iter.{0,15}invalidat",
+                                       r"reallocat", r"infinite\s*loop"]}],
+                   decoys=[_CWE_INTOF]),  # int*int overflow is real but not the security focus here
+                sr_rub("sr-h-13-iterinv")]},
+
+    {"id": "sr-h-14", "system": SR_SYS,
+     "user": f"## File: buffer.cpp\n```cpp\n{_CPP_RULE3.rstrip()}\n```",
+     "tags": ["cpp", "memory", "single-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_DOUBLEFREE + _CWE_RULE3,
+                          "location": [r"copy\s*constructor", r"rule\s*of\s*(three|3)",
+                                       r"\bBuffer\b.{0,30}copy", r"shallow", r"delete\[\].{0,30}twice",
+                                       r"copy_and_log", r"by\s*value"]}],
+                   decoys=[_CWE_BUFOF + [r"memcpy.{0,20}5"]]),  # the memcpy of 5 bytes is fine
+                sr_rub("sr-h-14-rule3")]},
+
+    # ===== Phase 2: HARD TIER (multi-file) =====
+    {"id": "sr-h-15", "system": SR_SYS,
+     "user": sr_files(
+         ("app.js",                "javascript", _JS_CSRF_APP),
+         ("routes/api.js",         "javascript", _JS_CSRF_API),
+         ("routes/webhook.js",     "javascript", _JS_CSRF_WEBHOOK)),
+     "tags": ["js", "web", "csrf", "multi-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_CSRF,
+                          "location": [r"routes/api\.js", r"ignoreMethods", r"transfer",
+                                       r"session", r"POST", r"CSRF", r"disabl"]}],
+                   decoys=[_CWE_SQLI, _CWE_MISSAUTH]),  # auth is checked; no SQL
+                sr_rub("sr-h-15-csrf")]},
+
+    {"id": "sr-h-16", "system": SR_SYS,
+     "user": sr_files(
+         ("record.h",       "cpp", _CPP_HDRSKEW_HEADER),
+         ("serialize.cpp",  "cpp", _CPP_HDRSKEW_SERIALIZE),
+         ("net.cpp",        "cpp", _CPP_HDRSKEW_NET)),
+     "tags": ["cpp", "memory", "multi-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_BUFOF + _CWE_OOB_READ,
+                          "location": [r"deserialize", r"RECORD_WIRE_SIZE", r"sizeof\(Record\)",
+                                       r"mismatch", r"v1.{0,15}v2", r"40.{0,15}(bytes|size)",
+                                       r"serialize"]}],
+                   decoys=[_CWE_UAF, _CWE_DOUBLEFREE,   # new'd once, leaked but not security
+                           _CWE_FORMAT]),
+                sr_rub("sr-h-16-hdrskew-cpp")]},
+
+    {"id": "sr-h-17", "system": SR_SYS,
+     "user": sr_files(
+         ("validators.py", "python", _PY_ALLOWLIST_VALIDATORS),
+         ("plugins.py",    "python", _PY_ALLOWLIST_PLUGINS),
+         ("routes.py",     "python", _PY_ALLOWLIST_ROUTES)),
+     "tags": ["python", "web", "auth", "multi-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[{"cwe": _CWE_OPENREDIR,
+                          # The bug: ALLOWED_REDIRECTS is mutated at runtime by a route an admin can call;
+                          # an attacker who hijacks an admin session (or social-engineers one) can inject
+                          # arbitrary URLs. Compounded by the fact that the allow-list contains relative
+                          # paths but no scheme/host check — install_plugin could add "http://evil.com".
+                          "location": [r"install_plugin", r"register_plugin", r"ALLOWED_REDIRECTS",
+                                       r"mutate", r"runtime", r"plugins\.py", r"validators\.py",
+                                       r"scheme|host|netloc", r"absolute\s*URL"]}],
+                   decoys=[_CWE_SQLI, _CWE_XSS]),
+                sr_rub("sr-h-17-allowlist-mutation")]},
+
+    # ===== Phase 2: HARD TIER (multi-bug + decoy) =====
+    {"id": "sr-h-18", "system": SR_SYS,
+     "user": f"## File: app.py\n```python\n{_PY_MULTIBUG.rstrip()}\n```",
+     "tags": ["python", "web", "multi-bug", "single-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[
+                    # bug 1: SQLi in run_query via f-string in LIKE
+                    {"cwe": _CWE_SQLI,
+                     "location": [r"run_query", r"f['\"]SELECT", r"LIKE.{0,15}%\{q\}%", r"format string"]},
+                    # bug 2: Missing auth on /api/admin/run_query (URL prefix != auth)
+                    {"cwe": _CWE_MISSAUTH,
+                     "location": [r"run_query", r"/admin", r"no\s*auth", r"missing.{0,20}decorator",
+                                  r"URL\s*prefix"]},
+                    # bug 3: Pickle deserialization
+                    {"cwe": _CWE_DESER,
+                     "location": [r"\brestore\b", r"pickle\.loads"]},
+                    # bug 4: MD5 for password hashing
+                    {"cwe": _CWE_WEAKHASH,
+                     "location": [r"hash_password", r"\bmd5\b", r"hashlib"]},
+                 ],
+                 decoys=[_CWE_SSRF,         # no URL fetching anywhere
+                         _CWE_PATHTRAV]),   # no file paths
+                sr_rub("sr-h-18-multibug-py")]},
+
+    {"id": "sr-h-19", "system": SR_SYS,
+     "user": f"## File: util.c\n```c\n{_C_MULTIBUG.rstrip()}\n```",
+     "tags": ["c", "memory", "multi-bug", "single-file", "hard"],
+     "capability": "security_review_hard",
+     "grader": [sr(bugs=[
+                    # bug 1: format string in printf(name)
+                    {"cwe": _CWE_FORMAT,
+                     "location": [r"printf\(name", r"greet_user", r"\bname\b"]},
+                    # bug 2: strncpy doesn't NUL-terminate when src >= n
+                    {"cwe": _CWE_BUFOF + [r"CWE-?170", r"missing\s*(NUL|null)\s*term",
+                                          r"strncpy.{0,30}(NUL|null|terminat)", r"non[-\s]?terminated"],
+                     "location": [r"strncpy", r"greet_user", r"name\[32\]"]},
+                    # bug 3: integer overflow in parse_and_alloc
+                    {"cwe": _CWE_INTOF,
+                     "location": [r"parse_and_alloc", r"\batoi\b", r"\bint\b.{0,15}len",
+                                  r"malloc.{0,30}negative"]},
+                 ],
+                 decoys=[_CWE_CMDI]),       # no system/exec
+                sr_rub("sr-h-19-multibug-c")]},
 ]
 
 # Split into the two files: capability == "security_review" -> base; "_hard" -> hard
