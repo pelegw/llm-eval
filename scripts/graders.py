@@ -462,8 +462,9 @@ def g_sec_review(g, text):
     """Programmatic floor for security_review prompts.
 
     Spec: {
-      bugs:   [{cwe:[regex,...], location:[regex,...]}, ...]   # bugs the model should find
-      decoys: [[regex,...], ...]                                # CWE classes it must NOT flag
+      bugs:     [{cwe:[regex,...], location:[regex,...]}, ...]   # bugs the model should find
+      decoys:   [[regex,...], ...]                                # CWE classes it must NOT flag
+      must_say: [regex, ...]                                      # optional: any-match required
     }
 
     Per-bug score:
@@ -509,6 +510,21 @@ def g_sec_review(g, text):
             fp += 1
             notes.append(f"decoy{j}({decoy[0] if decoy else '?'}):FP")
     score = max(0.0, raw - 0.25 * fp)
+
+    # `must_say` is an optional any-match affirmation gate, used by clean-code
+    # decoy prompts where flat CWE-name decoy regexes can't distinguish "model
+    # claims X is present" from "model correctly says X is absent". If any of
+    # the given patterns matches the response, the gate passes; otherwise the
+    # model didn't clearly affirm cleanliness and score is set to 0.
+    must_say = g.get("must_say") or []
+    if must_say:
+        affirmed = any(re.search(p, t, re.I) for p in must_say)
+        if not affirmed:
+            notes.append(f"must_say: none of {len(must_say)} affirmation patterns matched")
+            score = 0.0
+        else:
+            notes.append("must_say:ok")
+
     return dict(score=round(score, 4), passed=score >= 0.6, pending=False,
                 notes="; ".join(notes) or "ok")
 

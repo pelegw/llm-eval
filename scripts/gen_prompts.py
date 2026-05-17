@@ -1080,11 +1080,19 @@ SR_SYS = ("You are reviewing the code below for security vulnerabilities. For ea
 def sr_rub(name):
     return rub(name, "fix_soundness", "explanation_correctness", "no_false_positives", "actionability")
 
-def sr(bugs, decoys=None):
+def sr(bugs, decoys=None, must_say=None):
     """Build the programmatic floor of a sec_review grader."""
     g = {"type": "sec_review", "bugs": bugs}
-    if decoys: g["decoys"] = decoys
+    if decoys:   g["decoys"]   = decoys
+    if must_say: g["must_say"] = must_say
     return g
+
+# Affirmation patterns for clean-code prompts (sr-20, sr-21): the model must
+# explicitly assert the code is secure / has no issues. Used via sr(..., must_say=).
+_SR_AFFIRM = [r"no\s+(security\s+)?(vulnerab|issue|flaw|bug|problem|risk)",
+              r"\bsecure\b", r"correctly\s+(use|implement|appl|handl)",
+              r"properly\s+(use|implement|appl|handl|valid|escape|sanitiz)",
+              r"\bsafe\b", r"not\s+vulnerab"]
 
 # Convenience CWE-pattern lists (case-insensitive substring regex):
 _CWE_SQLI    = [r"CWE-?89", r"SQL\s*injection", r"\bsqli\b"]
@@ -2096,21 +2104,23 @@ security_review = [
                                        r"temporary", r"log_user"]}]),
                 sr_rub("sr-19-dangling-cstr")]},
 
-    # ===== Phase 2: BASE TIER — clean-code decoys (model MUST NOT flag anything) =====
+    # ===== Phase 2: BASE TIER — clean-code prompts (model MUST NOT flag anything) =====
+    # `must_say` (any-match) gate, NOT decoys: a thorough reviewer often writes
+    # "this code CORRECTLY prevents SQL injection", and a flat decoy regex on the
+    # CWE name fires on that approving mention. The affirmation gate sidesteps that
+    # — a model that flags imaginary bugs in this code will not write an "is secure"
+    # phrase, and the score collapses to 0. _SR_AFFIRM is defined above with the
+    # other sec_review helpers.
     {"id": "sr-20", "system": SR_SYS,
      "user": f"## File: app.py\n```python\n{_PY_CLEAN.rstrip()}\n```",
      "tags": ["python", "clean", "decoy", "single-file"],
-     # bugs=[] -> raw starts at 1.0; if model flags any of the listed CWE classes, -0.25 each.
-     "grader": [sr(bugs=[],
-                   decoys=[_CWE_SQLI, _CWE_TIMING, _CWE_WEAKHASH, _CWE_INSECRND,
-                           _CWE_MISSAUTH, _CWE_PATHTRAV, _CWE_HARDCODE]),
+     "grader": [sr(bugs=[], must_say=_SR_AFFIRM),
                 sr_rub("sr-20-clean-py")]},
 
     {"id": "sr-21", "system": SR_SYS,
      "user": f"## File: name.c\n```c\n{_C_CLEAN.rstrip()}\n```",
      "tags": ["c", "clean", "decoy", "single-file"],
-     "grader": [sr(bugs=[],
-                   decoys=[_CWE_BUFOF, _CWE_INTOF, _CWE_FORMAT, _CWE_NULLDEREF]),
+     "grader": [sr(bugs=[], must_say=_SR_AFFIRM),
                 sr_rub("sr-21-clean-c")]},
 
     # ===== Phase 2: HARD TIER (single-file subtle, Python) =====
