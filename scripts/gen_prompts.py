@@ -1094,34 +1094,36 @@ _SR_AFFIRM = [r"no\s+(security\s+)?(vulnerab|issue|flaw|bug|problem|risk)",
               r"properly\s+(use|implement|appl|handl|valid|escape|sanitiz)",
               r"\bsafe\b", r"not\s+vulnerab"]
 
-# Convenience CWE-pattern lists (case-insensitive substring regex):
-_CWE_SQLI    = [r"CWE-?89", r"SQL\s*injection", r"\bsqli\b"]
-_CWE_CMDI    = [r"CWE-?78", r"command\s*injection", r"shell\s*injection", r"OS\s*command\s*injection", r"shell=True"]
-_CWE_BUFOF   = [r"CWE-?(120|121|122|787)", r"buffer\s*overflow", r"stack\s*overflow", r"out-of-bounds\s*write"]
-_CWE_TIMING  = [r"CWE-?208", r"timing\s*attack", r"non[-\s]?constant[-\s]?time", r"constant[-\s]?time", r"compare_digest"]
-_CWE_INTOF   = [r"CWE-?(190|191)", r"integer\s*overflow", r"integer\s*underflow", r"size_?t\s*(wrap|overflow|cast)", r"atoi.{0,40}(negative|signed|unchecked)"]
-_CWE_MISSAUTH= [r"CWE-?(862|285|306)", r"missing\s*auth", r"unauthenticated\s*access", r"no\s*auth(orization|entication)?\s*(check|decorator)", r"missing\s*@?require_auth", r"broken\s*access\s*control"]
-_CWE_XSS     = [r"CWE-?79", r"\bXSS\b", r"cross[-\s]?site\s*scripting"]
-_CWE_FORMAT  = [r"CWE-?134", r"format\s*string"]
-_CWE_PATHTRAV= [r"CWE-?(22|23|36)", r"path\s*traversal", r"directory\s*traversal", r"\.\./", r"unrestricted\s*file"]
-_CWE_SSRF    = [r"CWE-?918", r"\bSSRF\b", r"server[-\s]?side\s*request\s*forgery"]
-_CWE_DESER   = [r"CWE-?502", r"insecure\s*deser", r"unsafe\s*deser", r"unsafe\s*pickle", r"pickle.{0,30}untrusted", r"yaml\.load.{0,40}(Loader|safe)"]
-_CWE_WEAKHASH= [r"CWE-?(327|328|916)", r"weak\s*hash", r"broken\s*hash", r"\bMD5\b", r"\bSHA-?1\b", r"insecure\s*hash"]
-_CWE_HARDCODE= [r"CWE-?798", r"hardcoded\s*(credential|password|secret|key|token)", r"secret.{0,20}in\s*(code|source)"]
-_CWE_OPENREDIR = [r"CWE-?601", r"open\s*redirect", r"unvalidated\s*redirect"]
-_CWE_INSECRND= [r"CWE-?(330|338)", r"insecure\s*random", r"weak\s*random", r"predictable\s*(random|token|nonce)", r"non[-\s]?cryptographic\s*random", r"secrets\.token"]
-_CWE_TOCTOU  = [r"CWE-?(367|362)", r"\bTOCTOU\b", r"time[-\s]?of[-\s]?check", r"race\s*condition.{0,40}(file|exists|open)"]
-_CWE_UAF     = [r"CWE-?416", r"use[-\s]?after[-\s]?free", r"dangling\s*pointer", r"freed\s*memory"]
-_CWE_DOUBLEFREE = [r"CWE-?415", r"double[-\s]?free", r"free.{0,10}twice"]
-_CWE_NULLDEREF = [r"CWE-?476", r"null\s*pointer\s*deref", r"\bNULL\b\s*deref"]
-_CWE_PROTOPOLL = [r"CWE-?1321", r"prototype\s*pollution"]
-_CWE_REDOS   = [r"CWE-?(1333|400)", r"\bReDoS\b", r"catastrophic\s*backtracking", r"regex(?:p)?\s*denial\s*of\s*service"]
-_CWE_ECB     = [r"\bECB\s*mode\b", r"electronic\s*codebook", r"CWE-?327"]
-_CWE_CSRF    = [r"CWE-?352", r"\bCSRF\b", r"cross[-\s]?site\s*request\s*forgery", r"missing\s*CSRF"]
+# Convenience CWE-pattern lists (case-insensitive). The CWE-### patterns are
+# word-bounded (\b) so e.g. CWE-78 doesn't match inside CWE-787 — that substring
+# collision caused spurious decoy-FPs in early Phase-3 results.
+_CWE_SQLI    = [r"\bCWE-?89\b", r"SQL\s*injection", r"\bsqli\b"]
+_CWE_CMDI    = [r"\bCWE-?78\b", r"command\s*injection", r"shell\s*injection", r"OS\s*command\s*injection", r"shell=True"]
+_CWE_BUFOF   = [r"\bCWE-?(120|121|122|787)\b", r"buffer\s*overflow", r"stack\s*overflow", r"out-of-bounds\s*write"]
+_CWE_TIMING  = [r"\bCWE-?208\b", r"timing\s*attack", r"non[-\s]?constant[-\s]?time", r"constant[-\s]?time", r"compare_digest"]
+_CWE_INTOF   = [r"\bCWE-?(190|191)\b", r"integer\s*overflow", r"integer\s*underflow", r"size_?t\s*(wrap|overflow|cast)", r"atoi.{0,40}(negative|signed|unchecked)"]
+_CWE_MISSAUTH= [r"\bCWE-?(862|285|306)\b", r"missing\s*auth", r"unauthenticated\s*access", r"no\s*auth(orization|entication)?\s*(check|decorator)", r"missing\s*@?require_auth", r"broken\s*access\s*control"]
+_CWE_XSS     = [r"\bCWE-?79\b", r"\bXSS\b", r"cross[-\s]?site\s*scripting"]
+_CWE_FORMAT  = [r"\bCWE-?134\b", r"format\s*string"]
+_CWE_PATHTRAV= [r"\bCWE-?(22|23|36)\b", r"path\s*traversal", r"directory\s*traversal", r"\.\./", r"unrestricted\s*file"]
+_CWE_SSRF    = [r"\bCWE-?918\b", r"\bSSRF\b", r"server[-\s]?side\s*request\s*forgery"]
+_CWE_DESER   = [r"\bCWE-?502\b", r"insecure\s*deser", r"unsafe\s*deser", r"unsafe\s*pickle", r"pickle.{0,30}untrusted", r"yaml\.load.{0,40}(Loader|safe)"]
+_CWE_WEAKHASH= [r"\bCWE-?(327|328|916)\b", r"weak\s*hash", r"broken\s*hash", r"\bMD5\b", r"\bSHA-?1\b", r"insecure\s*hash"]
+_CWE_HARDCODE= [r"\bCWE-?798\b", r"hardcoded\s*(credential|password|secret|key|token)", r"secret.{0,20}in\s*(code|source)"]
+_CWE_OPENREDIR = [r"\bCWE-?601\b", r"open\s*redirect", r"unvalidated\s*redirect"]
+_CWE_INSECRND= [r"\bCWE-?(330|338)\b", r"insecure\s*random", r"weak\s*random", r"predictable\s*(random|token|nonce)", r"non[-\s]?cryptographic\s*random", r"secrets\.token"]
+_CWE_TOCTOU  = [r"\bCWE-?(367|362)\b", r"\bTOCTOU\b", r"time[-\s]?of[-\s]?check", r"race\s*condition.{0,40}(file|exists|open)"]
+_CWE_UAF     = [r"\bCWE-?416\b", r"use[-\s]?after[-\s]?free", r"dangling\s*pointer", r"freed\s*memory"]
+_CWE_DOUBLEFREE = [r"\bCWE-?415\b", r"double[-\s]?free", r"free.{0,10}twice"]
+_CWE_NULLDEREF = [r"\bCWE-?476\b", r"null\s*pointer\s*deref", r"\bNULL\b\s*deref"]
+_CWE_PROTOPOLL = [r"\bCWE-?1321\b", r"prototype\s*pollution"]
+_CWE_REDOS   = [r"\bCWE-?(1333|400)\b", r"\bReDoS\b", r"catastrophic\s*backtracking", r"regex(?:p)?\s*denial\s*of\s*service"]
+_CWE_ECB     = [r"\bECB\s*mode\b", r"electronic\s*codebook", r"\bCWE-?327\b"]
+_CWE_CSRF    = [r"\bCWE-?352\b", r"\bCSRF\b", r"cross[-\s]?site\s*request\s*forgery", r"missing\s*CSRF"]
 _CWE_ITERINV = [r"iterator\s*invalidation", r"invalid(?:ated)?\s*iterator", r"push_back.{0,40}(invalidat|while\s*iter)"]
 _CWE_RULE3   = [r"rule\s*of\s*(three|3|five|5)", r"missing\s*(copy\s*constructor|destructor|assignment\s*operator)", r"shallow\s*copy.{0,40}(double|delete|free)"]
-_CWE_OOB_READ= [r"CWE-?125", r"out-of-bounds\s*read", r"vector::operator\[\]", r"no\s*bounds\s*check"]
-_CWE_DANGLING= [r"CWE-?(562|416)", r"dangling\s*(reference|pointer)", r"c_str\(\).{0,40}(lifetime|temporary|outlived)", r"return.{0,30}local.{0,30}(address|reference)"]
+_CWE_OOB_READ= [r"\bCWE-?125\b", r"out-of-bounds\s*read", r"vector::operator\[\]", r"no\s*bounds\s*check"]
+_CWE_DANGLING= [r"\bCWE-?(562|416)\b", r"dangling\s*(reference|pointer)", r"c_str\(\).{0,40}(lifetime|temporary|outlived)", r"return.{0,30}local.{0,30}(address|reference)"]
 
 # helper: render a multi-file prompt body — each file as a fenced block with a header
 def sr_files(*files):
@@ -1299,7 +1301,7 @@ def fetch_url():
 '''
 
 _PY_WEAKHASH = '''\
-import hashlib
+import hashlib, hmac
 from db import db
 
 def store_password(username: str, password: str) -> None:
@@ -1310,7 +1312,11 @@ def store_password(username: str, password: str) -> None:
 def check_password(username: str, password: str) -> bool:
     row = db.execute("SELECT password_hash FROM users WHERE username = ?",
                      (username,)).fetchone()
-    return row and row[0] == hashlib.md5(password.encode()).hexdigest()
+    if not row:
+        return False
+    expected = hashlib.md5(password.encode()).hexdigest()
+    # constant-time compare so MD5 remains the only bug here
+    return hmac.compare_digest(row[0], expected)
 '''
 
 _PY_PICKLE = '''\
@@ -1671,16 +1677,15 @@ void log_request(const char *method, const char *path, int status) {
 _CPP_ITERINV = '''\
 #include <vector>
 
-/* For each element in `xs`, append its square to `xs`. */
-void append_squares(std::vector<int> &xs) {
+/* For each element in `xs`, append a duplicate to `xs`. */
+void duplicate_each(std::vector<int> &xs) {
     for (auto it = xs.begin(); it != xs.end(); ++it) {
-        xs.push_back((*it) * (*it));
+        xs.push_back(*it);
     }
 }
 '''
 
 _CPP_RULE3 = '''\
-#include <cstring>
 #include <cstdio>
 
 class Buffer {
@@ -1698,8 +1703,8 @@ private:
 
 void copy_and_log(Buffer src) {
     Buffer dst = src;
-    std::memcpy(dst.raw(), "hello", 5);
-    std::puts(dst.raw());
+    std::printf("buffer size: %zu\\n", dst.size());
+    // when copy_and_log returns, both dst and src go out of scope
 }
 '''
 
@@ -1997,13 +2002,11 @@ security_review = [
     {"id": "sr-06", "system": SR_SYS,
      "user": f"## File: auth.py\n```python\n{_PY_WEAKHASH.rstrip()}\n```",
      "tags": ["python", "crypto", "single-file"],
+     # Code was updated to use hmac.compare_digest, removing the timing-attack
+     # concern; missing-salt is the same-root-cause as the MD5 bug; no decoys.
      "grader": [sr(bugs=[{"cwe": _CWE_WEAKHASH,
                           "location": [r"\bmd5\b", r"hashlib", r"store_password", r"check_password",
-                                       r"password_hash"]}],
-                   # the right fix mentions bcrypt/argon2 + salt; missing salt is a real
-                   # concern but it's the *same* root issue (don't use raw md5 for passwords),
-                   # not a separate vuln, so no decoy for "missing salt"
-                   decoys=[[r"timing\s*attack"]]),  # the row[0]==md5 compare is a separate finding
+                                       r"password_hash"]}]),
                 sr_rub("sr-06-weakhash")]},
 
     {"id": "sr-07", "system": SR_SYS,
@@ -2128,10 +2131,13 @@ security_review = [
      "user": f"## File: archiver.py\n```python\n{_PY_TOCTOU.rstrip()}\n```",
      "tags": ["python", "race", "single-file", "hard"],
      "capability": "security_review_hard",
+     # TOCTOU race is the intended bug; symlink-based path-traversal is the
+     # SAME bug framed differently (a TOCTOU symlink swap IS a path-traversal
+     # primitive). No decoy for path-traversal — accepting that as a valid
+     # framing of the bug class.
      "grader": [sr(bugs=[{"cwe": _CWE_TOCTOU,
                           "location": [r"os\.path\.exists", r"shutil\.move", r"archive_if_present",
-                                       r"check.{0,20}use", r"between.{0,30}exists.{0,30}move"]}],
-                   decoys=[_CWE_PATHTRAV]),  # not the bug — paths are server-built; race is the bug
+                                       r"check.{0,20}use", r"between.{0,30}exists.{0,30}move"]}]),
                 sr_rub("sr-h-05-toctou")]},
 
     {"id": "sr-h-06", "system": SR_SYS,
@@ -2209,24 +2215,27 @@ security_review = [
                 sr_rub("sr-h-12-fmtstr-config")]},
 
     {"id": "sr-h-13", "system": SR_SYS,
-     "user": f"## File: squares.cpp\n```cpp\n{_CPP_ITERINV.rstrip()}\n```",
+     "user": f"## File: dup.cpp\n```cpp\n{_CPP_ITERINV.rstrip()}\n```",
      "tags": ["cpp", "memory", "single-file", "hard"],
      "capability": "security_review_hard",
+     # Function renamed to `duplicate_each` and now just copies *it (no
+     # multiplication) — removes the previous int-overflow side concern.
      "grader": [sr(bugs=[{"cwe": _CWE_ITERINV + _CWE_UAF,
-                          "location": [r"push_back", r"append_squares", r"iter.{0,15}invalidat",
-                                       r"reallocat", r"infinite\s*loop"]}],
-                   decoys=[_CWE_INTOF]),  # int*int overflow is real but not the security focus here
+                          "location": [r"push_back", r"duplicate_each", r"iter.{0,15}invalidat",
+                                       r"reallocat", r"infinite\s*loop"]}]),
                 sr_rub("sr-h-13-iterinv")]},
 
     {"id": "sr-h-14", "system": SR_SYS,
      "user": f"## File: buffer.cpp\n```cpp\n{_CPP_RULE3.rstrip()}\n```",
      "tags": ["cpp", "memory", "single-file", "hard"],
      "capability": "security_review_hard",
+     # `copy_and_log` no longer does memcpy/puts on dst.raw() — just reads
+     # dst.size() — so the previous "is memcpy(5) OOB if n<5" concern is gone.
+     # Only the double-free at scope-exit remains.
      "grader": [sr(bugs=[{"cwe": _CWE_DOUBLEFREE + _CWE_RULE3,
                           "location": [r"copy\s*constructor", r"rule\s*of\s*(three|3)",
                                        r"\bBuffer\b.{0,30}copy", r"shallow", r"delete\[\].{0,30}twice",
-                                       r"copy_and_log", r"by\s*value"]}],
-                   decoys=[_CWE_BUFOF + [r"memcpy.{0,20}5"]]),  # the memcpy of 5 bytes is fine
+                                       r"copy_and_log", r"by\s*value"]}]),
                 sr_rub("sr-h-14-rule3")]},
 
     # ===== Phase 2: HARD TIER (multi-file) =====

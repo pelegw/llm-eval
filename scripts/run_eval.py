@@ -53,10 +53,10 @@ MODEL_ID = "gemma-4-31b"              # server-side id (label only; llama.cpp ig
 N_CTX = 8192                          # served context per slot; auto-detected at startup (fallback)
 # Sampling: set per the loaded model's vendor recommendation (recorded in each run's .meta.json).
 # Gemma rec (current): below.  Qwen3 rec: dict(temperature=0.7, top_p=0.8, top_k=20, presence_penalty=1.5, min_p=0.0)
-SAMPLING = dict(temperature=0.3, top_k=20, top_p=1.0, min_p=0.0, seed=42)   # middle-ground noise check for security_review (between greedy and Gemma rec)
+SAMPLING = dict(temperature=0.7, top_p=0.8, top_k=20, presence_penalty=1.5, min_p=0.0)   # Qwen3 recommendation
 # Prior settings (toggle as needed):
 #   Gemma rec: dict(temperature=1.0, top_p=0.95, top_k=64)
-#   Qwen3 rec: dict(temperature=0.7, top_p=0.8, top_k=20, presence_penalty=1.5, min_p=0.0)
+#   T0.3 K20:  dict(temperature=0.3, top_k=20, top_p=1.0, min_p=0.0, seed=42)
 #   Greedy:    dict(temperature=0, top_k=1, top_p=1.0, min_p=0.0, seed=42)
 SAFETY_TOKENS = 96                    # leave a little headroom under n_ctx
 # default per-prompt generation cap (clamped to fit n_ctx); thinking needs lots of room
