@@ -96,9 +96,8 @@ before a real run).
 | **writing** | craft tasks — haiku, sonnet (ABAB CDCD EFEF GG), cover letter, mystery opening, limerick, bedtime story, "rewrite this sentence", flash fiction with a bookend constraint, song lyric with an identical chorus, acrostic, 100-word single-sentence story, second-person/present-tense scene, archaic-register continuation… | rubric (Claude scores 1–5 per named criterion — see §6) |
 | **coherence** | internal consistency under self-imposed structure — invent terms and reason from them, interleaved causal chains, a dungeon with a provably-shortest path, invent a base-6 numeral system and verify the arithmetic, a 4-generation family tree + distant-relation queries, necessary-vs-sufficient classification. *(Currently excluded from the comparison runs by choice — it's a "is it broken" floor that strong models ceiling.)* | rubric |
 | **tool_calling** | does the model emit the *right* OpenAI-style function call given a tool spec? — single-tool happy path, multi-tool selection from 5+ tools, argument extraction from prose, type-strict args (catches `"150"` vs `150`), enum constraints, refusal when no tool fits, parallel calls, multi-turn integration of a pre-injected tool result, ambiguous tool descriptions, seductive but wrong tools (e.g. `delete_database` for "clean up my desktop"), `tool_choice:"required"` discipline | programmatic (`tool_call`, `no_tool_call`, `tool_calls_set` — match by function name + per-arg constraints; see §6 and §8) |
-| **security_review** | given a code snippet (Python, JS, C, or C++), find the security vulnerabilities — name the CWE class, pinpoint the file/line, propose a fix. Covers injection (SQLi, command, XSS, SSTI), memory safety (buffer overflow, UAF, double-free, format string), integer bugs (overflow → heap overflow, signed↔unsigned), crypto misuse (weak hash, ECB, timing attacks), auth bugs (missing checks, IDOR, TOCTOU). Hard tier adds *recognize-absence* prompts (missing auth decorator), "looks fixed but isn't" (e.g. `if ".." in path` bypassable), multi-file prompts (vulnerability only visible across two files), and multi-bug-with-decoy prompts scored by precision × recall | hybrid: programmatic `sec_review` (CWE-class regex + line/function pinpoint + decoy false-positive guard, per-bug 0/0.5/1.0 then mean − 0.25/decoy) composed with `rubric` (fix_soundness, explanation_correctness, no_false_positives, actionability) — same shape as `coding_quality`; see §9 |
 
-The exact prompts, ids, and graders for every one of these are in **[`TESTS.md`](TESTS.md)**.
+The exact prompts, ids, and graders for every one of these are in **[`TESTS.md`](TESTS.md)**. Two further capabilities live outside this main eval and are kept in their own subfolders so they don't contaminate the main aggregates: `security_review` (graded, methodology still being calibrated — see [`security_review/README.md`](security_review/README.md)) and `political_bias` (qualitative, ungraded — see §13).
 
 ---
 
@@ -228,63 +227,22 @@ prompt loudly (`"no tool call emitted"`), which is itself the right signal.
 
 ---
 
-## 9. The `security_review` tiers (find the vulnerability)
+## 9. The `security_review` tiers (find the vulnerability) — moved out
 
-This tier asks the model to act as a security code reviewer: given a code snippet, identify each
-vulnerability (CWE class + line/function), explain why it is exploitable, and propose a fix. It is
-distinct from `coding_quality` (which asks "is this *clean* code") in that it asks "is this *safe*
-code". The two share a hybrid grader shape.
+This capability — given a code snippet (Python, JS, C, or C++), find the security vulnerabilities,
+name the CWE class, pinpoint the file/line, propose a fix — was originally drafted as a scored
+capability parallel to `coding_quality`, with a hybrid `sec_review` + `rubric` grader.
 
-**Languages, in v1.** Python, JavaScript/Node, C, C++. Different vulnerability shapes per language:
-Python/JS lean on injection (SQLi, command, XSS), auth bugs, deserialization, crypto misuse; C/C++
-lean on memory safety (buffer overflow, UAF, double-free, format string) and integer arithmetic
-(signed→unsigned cast, size_t wrap, malloc overflow). The base tier covers the obvious patterns; the
-hard tier targets the subtle versions that pattern-matchers miss.
+It now lives in its own subfolder ([`security_review/`](security_review/README.md)) so its data
+doesn't contaminate the main eval's aggregates while its methodology is still being calibrated
+(decoy false-positive handling, single-sample variance, etc.). It is opt-in only:
+`--caps security_review,security_review_hard`, results land in `security_review/results/`. See the
+subfolder's own README for design notes, the grader shape, the multi-file convention, the prompt
+inventory, and the run history.
 
-**System prompt (shared, `SR_SYS`).** A short instruction: identify each issue, name the CWE class
-and number, cite file + line, explain why it's exploitable, propose a fix; ignore style/perf issues.
-Set once in `gen_prompts.py` so the per-prompt entries only carry the code.
-
-**Multi-file prompts.** The hard tier includes prompts where the vulnerability is only visible
-across two or three files (missing `@require_auth` on one route while the middleware exists in
-another file; header defining `MAX_PACKET` while the parser in a sibling `.c` file doesn't bound a
-`memcpy` against it; UAF where one translation unit frees and another retains). These are rendered
-into a single user message using a `## File: path/foo.c\n` + fenced-block convention — same shape
-that PR review tools and GitHub feed models. No schema change; the user field just contains the
-multi-file body.
-
-**The `sec_review` grader (programmatic floor).** Per prompt:
-- `bugs: [{cwe: [regex,...], location: [regex,...]}, ...]` — the model must name *any* CWE
-  pattern from the list AND match *any* location pattern. Per-bug score: 1.0 if both, 0.5 if only
-  CWE matched ("named but not pinpointed"), 0.0 if CWE missed. If `location` is omitted, only the
-  CWE match is required. Raw = mean of per-bug scores; raw=1.0 if `bugs` is empty (clean-code
-  prompt).
-- `decoys: [[regex,...], ...]` — CWE classes the model must NOT flag (false-positive guards). Each
-  decoy that the response matches subtracts 0.25 from raw. Final score floored at 0.0. Pass ≥ 0.6.
-- Multi-bug prompts (3 real + 1 decoy etc.) score as precision×recall in effect: missing a real
-  bug drops the per-bug mean, flagging the decoy subtracts the 0.25 penalty.
-
-The grader operates on the response text alone (no `rec` needed; it follows the standard
-`fn(g, text)` shape, same as the 16 pre-tool-calling graders).
-
-**Rubric layer.** Each prompt also carries a `rubric` grader with 4 standard criteria —
-`fix_soundness`, `explanation_correctness`, `no_false_positives`, `actionability` — composed via
-the list-grader (the prompt's full grader spec is `[sec_review, rubric]`, the call's score is the
-mean of the two). The rubric catches "named the right CWE but proposed a cosmetic fix" (e.g.,
-"add a regex to strip quotes" instead of parameterized queries). The programmatic floor catches the
-opposite ("eloquently described the wrong vulnerability class"). The hybrid is the same shape as
-`coding_quality` — programmatic + rubric → mean of sub-scores in the list-grader.
-
-**What is deliberately out of scope (v1).** Memory-safety in Rust (`unsafe` blocks), concurrency
-primitives beyond simple races, supply-chain (typosquatted dependencies, postinstall scripts),
-secrets-in-git-history, infrastructure-as-code (terraform, k8s manifests), and "exploit this code
-to get RCE" (we score *recognition*, not exploit development). Race conditions are covered only at
-the TOCTOU level.
-
-**Phase notes.** Phase 1 of this capability shipped with 6 representative prompts (2 base + 4
-hard) spanning Python+C × single-file+multi-file × obvious+subtle. Phase 2 expands to ~22 base +
-~18 hard to hit the full coverage matrix. Backfilling the 5 already-evaluated models is a separate
-session (each gets ~40 prompts × 2 modes ≈ 80 calls + a `grade_rubrics.py` pass).
+The general "isolated capability" pattern this uses — `SUBFOLDER_CAPS` in `run_eval.py` routing
+both prompts and results to a sibling folder, `QUALITATIVE_CAPS` in `report.py` filtering the
+records out of main aggregates — is documented in §13.
 
 ---
 
@@ -336,22 +294,36 @@ means and a failures table) — it groups by `model_tag`, so a multi-file invoca
 
 ---
 
-## 13. Qualitative probes outside the scoring eval (the `political_bias/` pattern)
+## 13. Isolated capabilities outside the scoring eval (subfolder pattern)
 
-Some capabilities don't have a single right answer — they're worth *capturing* but not *grading*. The
-`political_bias/` subfolder is the first of these: 28 prompts about politically sensitive topics across different
-governments, run with no grader and read manually. To keep this data out of the scoring aggregates while still
-reusing the harness, it follows three conventions:
+Some capabilities are kept out of the main eval's data pool — either because there is no single
+right answer (`political_bias` — capture, not grade), or because the capability IS graded but its
+methodology is still being calibrated and we don't want partial results contaminating the headline
+ranking (`security_review`). Both follow the same three conventions:
 
-1. **The prompt has `grader: null`.** The harness records every call as it does for any prompt, but `grading.score`
-   is `null` and `report.py`'s pass-rate aggregates skip it.
-2. **The prompts and results live in their own subfolder** (`political_bias/prompts.jsonl`,
-   `political_bias/results/*.jsonl`), not in `prompts/` and `results/`. `run_eval.py` has a `SUBFOLDER_CAPS` dict
-   that maps the capability name to its prompts path and results dir; `load_prompts(cap)` and the results-dir
-   selection in `main()` consult it. Adding a new qualitative cap is one entry in that dict + a `gen_prompts.py`
+1. **The prompts and results live in a sibling subfolder**, not in `prompts/` and `results/`.
+   `political_bias/prompts.jsonl` + `political_bias/results/`; `security_review/prompts/*.jsonl` +
+   `security_review/results/`. `run_eval.py` has a `SUBFOLDER_CAPS` dict that maps each capability
+   name to its prompts path and results dir; `load_prompts(cap)` and the results-dir selection in
+   `main()` consult it. Adding a new isolated cap is one entry in that dict + a `gen_prompts.py`
    `write(..., out_path=...)` call.
-3. **`report.py` reads `results/*.jsonl` via shell glob** (non-recursive). Subfolder data is invisible to it by
-   construction — no special-case filter needed.
+2. **The cap is NOT in `CAP_ORDER` / `HARD_CAPS`** — so `--caps all`/`hard`/`everything` don't
+   pick it up. Invocation is explicit: `--caps political_bias` or `--caps security_review,
+   security_review_hard`.
+3. **`report.py` reads `results/*.jsonl` via shell glob** (non-recursive). Subfolder data is
+   invisible to it by construction. Belt-and-suspenders: the cap names also appear in
+   `QUALITATIVE_CAPS` at the top of `report.py`, which drops any matching records at load time —
+   so even if someone explicitly points `report.py` at a subfolder file, the records won't pollute
+   the aggregates.
+
+The difference between the two current examples:
+- `political_bias` prompts have `grader: null` — no programmatic scoring at all, raw responses
+  captured for manual reading.
+- `security_review` prompts have a hybrid `sec_review` + `rubric` grader — fully scored, with a
+  programmatic floor + a Claude-graded rubric layer (same shape as `coding_quality`). It still
+  sits in a subfolder because the methodology — decoy false-positive handling, single-sample
+  variance at vendor-rec temperatures, multi-bug precision/recall — is being calibrated and we
+  want to keep that experimentation separate from the headline ranking.
 
 Two harness flags exist primarily for these probes but are general:
 

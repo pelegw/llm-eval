@@ -29,13 +29,23 @@ import graders as G
 PROMPTS_DIR = ROOT / "prompts"
 RESULTS_DIR = ROOT / "results"
 
-# Caps that live in a sibling folder rather than under prompts/ + results/.
-# Used for qualitative probes that should not mix with the main eval data.
-# Each entry maps cap_name -> {"prompts": Path, "results": Path}.
+# Caps whose prompts and results live in a sibling folder rather than under
+# prompts/ + results/. Used for capabilities kept isolated from the main eval's
+# data pool — either qualitative probes (political_bias) or graded benchmarks
+# that we want to keep separate while their methodology is still in flux
+# (security_review). Each entry maps cap_name -> {"prompts": Path, "results": Path}.
 SUBFOLDER_CAPS = {
     "political_bias": {
         "prompts": ROOT / "political_bias" / "prompts.jsonl",
         "results": ROOT / "political_bias" / "results",
+    },
+    "security_review": {
+        "prompts": ROOT / "security_review" / "prompts" / "security_review.jsonl",
+        "results": ROOT / "security_review" / "results",
+    },
+    "security_review_hard": {
+        "prompts": ROOT / "security_review" / "prompts" / "security_review_hard.jsonl",
+        "results": ROOT / "security_review" / "results",
     },
 }
 ENDPOINT = "http://localhost:8080/v1/chat/completions"
@@ -43,17 +53,22 @@ MODEL_ID = "gemma-4-31b"              # server-side id (label only; llama.cpp ig
 N_CTX = 8192                          # served context per slot; auto-detected at startup (fallback)
 # Sampling: set per the loaded model's vendor recommendation (recorded in each run's .meta.json).
 # Gemma rec (current): below.  Qwen3 rec: dict(temperature=0.7, top_p=0.8, top_k=20, presence_penalty=1.5, min_p=0.0)
-SAMPLING = dict(temperature=1.0, top_p=0.95, top_k=64)   # Gemma recommendation
+SAMPLING = dict(temperature=0, top_k=1, top_p=1.0, min_p=0.0, seed=42)   # greedy decoding (for security_review noise check). llama.cpp PR #9897: temp=0 alone isn't greedy — set top_k=1 + min_p=0 belt-and-suspenders.
+# Prior settings (toggle as needed):
+#   Gemma rec: dict(temperature=1.0, top_p=0.95, top_k=64)
+#   Qwen3 rec: dict(temperature=0.7, top_p=0.8, top_k=20, presence_penalty=1.5, min_p=0.0)
 SAFETY_TOKENS = 96                    # leave a little headroom under n_ctx
 # default per-prompt generation cap (clamped to fit n_ctx); thinking needs lots of room
 MAXTOK_THINKING = 8192
 MAXTOK_PLAIN = 2048
 
 CAP_ORDER = ["coherence", "reasoning", "coding", "coding_quality", "instruction_following",
-             "long_context", "writing", "tool_calling", "security_review"]
+             "long_context", "writing", "tool_calling"]
 _HARD_BASE = ["coherence", "reasoning", "coding", "instruction_following", "long_context",
-              "writing", "tool_calling", "security_review"]
+              "writing", "tool_calling"]
 HARD_CAPS = [c + "_hard" for c in _HARD_BASE] + ["coding_quality_hard"]   # discriminating "hard tier" (separate prompt files)
+# security_review lives in its own subfolder and is opt-in via --caps security_review[,_hard].
+# Same shape as political_bias — explicit invocation only, excluded from --caps all/hard/everything.
 FULL_ORDER = CAP_ORDER + HARD_CAPS
 
 

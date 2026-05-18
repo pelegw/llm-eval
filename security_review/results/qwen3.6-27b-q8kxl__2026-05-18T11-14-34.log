@@ -1,0 +1,83 @@
+# run 2026-05-18T11-14-34  tag=qwen3.6-27b-q8kxl  caps=['security_review', 'security_review_hard']  modes=['on', 'off']  concurrency=1  -> qwen3.6-27b-q8kxl__2026-05-18T11-14-34.jsonl
+# 80 calls planned  (endpoint=http://localhost:8080/v1/chat/completions model=gemma-4-31b n_ctx=262144)
+[1/80] security_review/sr-01 mode=on PEND-RUBRIC score=None 146801.9ms ntok=1948 :: bug0(CWE-?89):both | awaiting rubric grading
+[2/80] security_review/sr-01 mode=off PEND-RUBRIC score=None 16988.3ms ntok=225 :: bug0(CWE-?89):both | awaiting rubric grading
+[3/80] security_review/sr-02 mode=on PEND-RUBRIC score=None 147634.3ms ntok=1970 :: bug0(CWE-?(120|121|122|787)):both | awaiting rubric grading
+[4/80] security_review/sr-02 mode=off PEND-RUBRIC score=None 38212.4ms ntok=513 :: bug0(CWE-?(120|121|122|787)):both | awaiting rubric grading
+[5/80] security_review/sr-03 mode=on PEND-RUBRIC score=None 194595.5ms ntok=2586 :: bug0(CWE-?78):both | awaiting rubric grading
+[6/80] security_review/sr-03 mode=off PEND-RUBRIC score=None 32682.5ms ntok=438 :: bug0(CWE-?78):both | awaiting rubric grading
+[7/80] security_review/sr-04 mode=on PEND-RUBRIC score=None 175936.9ms ntok=2347 :: bug0(CWE-?(22|23|36)):both | awaiting rubric grading
+[8/80] security_review/sr-04 mode=off PEND-RUBRIC score=None 21533.8ms ntok=287 :: bug0(CWE-?(22|23|36)):both | awaiting rubric grading
+[9/80] security_review/sr-05 mode=on PEND-RUBRIC score=None 175323.0ms ntok=2335 :: bug0(CWE-?918):both | awaiting rubric grading
+[10/80] security_review/sr-05 mode=off PEND-RUBRIC score=None 31493.7ms ntok=422 :: bug0(CWE-?918):both | awaiting rubric grading
+[11/80] security_review/sr-06 mode=on PEND-RUBRIC score=None 309581.3ms ntok=4076 :: bug0(CWE-?(327|328|916)):both | awaiting rubric grading
+[12/80] security_review/sr-06 mode=off PEND-RUBRIC score=None 37019.7ms ntok=496 :: bug0(CWE-?(327|328|916)):both | awaiting rubric grading
+[13/80] security_review/sr-07 mode=on PEND-RUBRIC score=None 162106.1ms ntok=2164 :: bug0(CWE-?502):both | awaiting rubric grading
+[14/80] security_review/sr-07 mode=off PEND-RUBRIC score=None 24608.3ms ntok=329 :: bug0(CWE-?502):both | awaiting rubric grading
+[15/80] security_review/sr-08 mode=on PEND-RUBRIC score=None 146227.5ms ntok=1950 :: bug0(CWE-?798):both | awaiting rubric grading
+[16/80] security_review/sr-08 mode=off PEND-RUBRIC score=None 28609.6ms ntok=383 :: bug0(CWE-?798):both | awaiting rubric grading
+[17/80] security_review/sr-09 mode=on PEND-RUBRIC score=None 143101.8ms ntok=1913 :: bug0(CWE-?601):both | awaiting rubric grading
+[18/80] security_review/sr-09 mode=off PEND-RUBRIC score=None 22938.7ms ntok=306 :: bug0(CWE-?601):both | awaiting rubric grading
+[19/80] security_review/sr-10 mode=on PEND-RUBRIC score=None 188854.7ms ntok=2515 :: bug0(CWE-?(330|338)):both | awaiting rubric grading
+[20/80] security_review/sr-10 mode=off PEND-RUBRIC score=None 32877.8ms ntok=441 :: bug0(CWE-?(330|338)):both | awaiting rubric grading
+[21/80] security_review/sr-11 mode=on PEND-RUBRIC score=None 138200.4ms ntok=1848 :: bug0(CWE-?79):both | awaiting rubric grading
+[22/80] security_review/sr-11 mode=off PEND-RUBRIC score=None 24780.9ms ntok=331 :: bug0(CWE-?79):both | awaiting rubric grading
+[23/80] security_review/sr-12 mode=on PEND-RUBRIC score=None 132712.2ms ntok=1776 :: bug0(CWE-?78):both | awaiting rubric grading
+[24/80] security_review/sr-12 mode=off PEND-RUBRIC score=None 28727.1ms ntok=385 :: bug0(CWE-?78):both | awaiting rubric grading
+[25/80] security_review/sr-13 mode=on PEND-RUBRIC score=None 179357.1ms ntok=2389 :: bug0(CWE-?(22|23|36)):both | awaiting rubric grading
+[26/80] security_review/sr-13 mode=off PEND-RUBRIC score=None 47355.1ms ntok=636 :: bug0(CWE-?(22|23|36)):both | awaiting rubric grading
+[27/80] security_review/sr-14 mode=on PEND-RUBRIC score=None 267174.0ms ntok=3530 :: bug0(CWE-?918):both | awaiting rubric grading
+[28/80] security_review/sr-14 mode=off PEND-RUBRIC score=None 49088.2ms ntok=660 :: bug0(CWE-?918):both | awaiting rubric grading
+[29/80] security_review/sr-15 mode=on PEND-RUBRIC score=None 159739.7ms ntok=2130 :: bug0(CWE-?(120|121|122|787)):both | awaiting rubric grading
+[30/80] security_review/sr-15 mode=off PEND-RUBRIC score=None 39752.6ms ntok=534 :: bug0(CWE-?(120|121|122|787)):both | awaiting rubric grading
+[31/80] security_review/sr-16 mode=on PEND-RUBRIC score=None 192384.9ms ntok=2558 :: bug0(CWE-?134):both | awaiting rubric grading
+[32/80] security_review/sr-16 mode=off PEND-RUBRIC score=None 23993.4ms ntok=320 :: bug0(CWE-?134):both | awaiting rubric grading
+[33/80] security_review/sr-17 mode=on PEND-RUBRIC score=None 147114.5ms ntok=1966 :: bug0(CWE-?(120|121|122|787)):both | awaiting rubric grading
+[34/80] security_review/sr-17 mode=off PEND-RUBRIC score=None 30332.5ms ntok=406 :: bug0(CWE-?(120|121|122|787)):both | awaiting rubric grading
+[35/80] security_review/sr-18 mode=on PEND-RUBRIC score=None 140418.5ms ntok=1877 :: bug0(CWE-?125):both | awaiting rubric grading
+[36/80] security_review/sr-18 mode=off PEND-RUBRIC score=None 29745.3ms ntok=398 :: bug0(CWE-?125):both | awaiting rubric grading
+[37/80] security_review/sr-19 mode=on PEND-RUBRIC score=None 155849.0ms ntok=2080 :: bug0(CWE-?(562|416)):both | awaiting rubric grading
+[38/80] security_review/sr-19 mode=off PEND-RUBRIC score=None 43868.9ms ntok=590 :: bug0(CWE-?(562|416)):both | awaiting rubric grading
+[39/80] security_review/sr-20 mode=on PEND-RUBRIC score=None 504517.2ms ntok=6507 :: must_say:ok | awaiting rubric grading
+[40/80] security_review/sr-20 mode=off PEND-RUBRIC score=None 153484.5ms ntok=2048 finish=length :: must_say:ok | awaiting rubric grading
+[41/80] security_review/sr-21 mode=on PEND-RUBRIC score=None 301659.4ms ntok=3966 :: must_say:ok | awaiting rubric grading
+[42/80] security_review/sr-21 mode=off PEND-RUBRIC score=None 21647.7ms ntok=287 :: must_say:ok | awaiting rubric grading
+[43/80] security_review_hard/sr-h-01 mode=on PEND-RUBRIC score=None 220636.2ms ntok=2930 :: bug0(CWE-?208):both | awaiting rubric grading
+[44/80] security_review_hard/sr-h-01 mode=off PEND-RUBRIC score=None 24821.8ms ntok=331 :: bug0(CWE-?208):both | awaiting rubric grading
+[45/80] security_review_hard/sr-h-02 mode=on PEND-RUBRIC score=None 371355.8ms ntok=4860 :: bug0(CWE-?(190|191)):both | awaiting rubric grading
+[46/80] security_review_hard/sr-h-02 mode=off PEND-RUBRIC score=None 98443.9ms ntok=1322 :: bug0(CWE-?(190|191)):both | awaiting rubric grading
+[47/80] security_review_hard/sr-h-03 mode=on PEND-RUBRIC score=None 277085.5ms ntok=3652 :: bug0(CWE-?(862|285|306)):both | awaiting rubric grading
+[48/80] security_review_hard/sr-h-03 mode=off PEND-RUBRIC score=None 64155.4ms ntok=861 :: bug0(CWE-?(862|285|306)):both | awaiting rubric grading
+[49/80] security_review_hard/sr-h-04 mode=on PEND-RUBRIC score=None 188011.3ms ntok=2494 :: bug0(CWE-?(120|121|122|787)):both; decoy1(CWE-?78):FP | awaiting rubric grading
+[50/80] security_review_hard/sr-h-04 mode=off PEND-RUBRIC score=None 40970.0ms ntok=549 :: bug0(CWE-?(120|121|122|787)):both | awaiting rubric grading
+[51/80] security_review_hard/sr-h-05 mode=on PEND-RUBRIC score=None 297996.9ms ntok=3929 :: bug0(CWE-?(367|362)):both; decoy0(CWE-?(22|23|36)):FP | awaiting rubric grading
+[52/80] security_review_hard/sr-h-05 mode=off PEND-RUBRIC score=None 68075.0ms ntok=915 :: bug0(CWE-?(367|362)):both; decoy0(CWE-?(22|23|36)):FP | awaiting rubric grading
+[53/80] security_review_hard/sr-h-06 mode=on PEND-RUBRIC score=None 141196.2ms ntok=1889 :: bug0(CWE-?502):both | awaiting rubric grading
+[54/80] security_review_hard/sr-h-06 mode=off PEND-RUBRIC score=None 17399.9ms ntok=231 :: bug0(CWE-?502):both | awaiting rubric grading
+[55/80] security_review_hard/sr-h-07 mode=on PEND-RUBRIC score=None 298528.3ms ntok=3937 :: bug0(CWE-?(22|23|36)):both | awaiting rubric grading
+[56/80] security_review_hard/sr-h-07 mode=off PEND-RUBRIC score=None 38937.4ms ntok=523 :: bug0(CWE-?(22|23|36)):both | awaiting rubric grading
+[57/80] security_review_hard/sr-h-08 mode=on PEND-RUBRIC score=None 328130.1ms ntok=4315 :: bug0(CWE-?1321):both | awaiting rubric grading
+[58/80] security_review_hard/sr-h-08 mode=off PEND-RUBRIC score=None 35186.9ms ntok=471 :: bug0(CWE-?1321):both | awaiting rubric grading
+[59/80] security_review_hard/sr-h-09 mode=on PEND-RUBRIC score=None 171407.3ms ntok=2285 :: bug0(CWE-?(1333|400)):both | awaiting rubric grading
+[60/80] security_review_hard/sr-h-09 mode=off PEND-RUBRIC score=None 35721.2ms ntok=479 :: bug0(CWE-?(1333|400)):both | awaiting rubric grading
+[61/80] security_review_hard/sr-h-10 mode=on PEND-RUBRIC score=None 343089.2ms ntok=4501 :: bug0(CWE-?416):both | awaiting rubric grading
+[62/80] security_review_hard/sr-h-10 mode=off PEND-RUBRIC score=None 84040.4ms ntok=1131 :: bug0(CWE-?416):both | awaiting rubric grading
+[63/80] security_review_hard/sr-h-11 mode=on PEND-RUBRIC score=None 404539.3ms ntok=5276 :: bug0(\bECB\s*mode\b):both | awaiting rubric grading
+[64/80] security_review_hard/sr-h-11 mode=off PEND-RUBRIC score=None 44906.3ms ntok=603 :: bug0(\bECB\s*mode\b):both | awaiting rubric grading
+[65/80] security_review_hard/sr-h-12 mode=on PEND-RUBRIC score=None 193919.5ms ntok=2581 :: bug0(CWE-?134):both | awaiting rubric grading
+[66/80] security_review_hard/sr-h-12 mode=off PEND-RUBRIC score=None 71687.1ms ntok=966 :: bug0(CWE-?134):both | awaiting rubric grading
+[67/80] security_review_hard/sr-h-13 mode=on PEND-RUBRIC score=None 330567.9ms ntok=4347 :: bug0(iterator\s*invalidation):both; decoy0(CWE-?(190|191)):FP | awaiting rubric grading
+[68/80] security_review_hard/sr-h-13 mode=off PEND-RUBRIC score=None 40148.1ms ntok=539 :: bug0(iterator\s*invalidation):both | awaiting rubric grading
+[69/80] security_review_hard/sr-h-14 mode=on PEND-RUBRIC score=None 375215.0ms ntok=4910 :: bug0(CWE-?415):both; decoy0(CWE-?(120|121|122|787)):FP | awaiting rubric grading
+[70/80] security_review_hard/sr-h-14 mode=off PEND-RUBRIC score=None 84919.9ms ntok=1143 :: bug0(CWE-?415):both; decoy0(CWE-?(120|121|122|787)):FP | awaiting rubric grading
+[71/80] security_review_hard/sr-h-15 mode=on PEND-RUBRIC score=None 302147.9ms ntok=3961 :: bug0(CWE-?352):both | awaiting rubric grading
+[72/80] security_review_hard/sr-h-15 mode=off PEND-RUBRIC score=None 104678.1ms ntok=1401 :: bug0(CWE-?352):both | awaiting rubric grading
+[73/80] security_review_hard/sr-h-16 mode=on PEND-RUBRIC score=None 429350.2ms ntok=5570 :: bug0(CWE-?(120|121|122|787)):both | awaiting rubric grading
+[74/80] security_review_hard/sr-h-16 mode=off PEND-RUBRIC score=None 75139.3ms ntok=1008 :: bug0(CWE-?(120|121|122|787)):both | awaiting rubric grading
+[75/80] security_review_hard/sr-h-17 mode=on PEND-RUBRIC score=None 373792.2ms ntok=4869 :: bug0(CWE-?601):both | awaiting rubric grading
+[76/80] security_review_hard/sr-h-17 mode=off PEND-RUBRIC score=None 67730.1ms ntok=909 :: bug0(CWE-?601):both | awaiting rubric grading
+[77/80] security_review_hard/sr-h-18 mode=on PEND-RUBRIC score=None 356867.3ms ntok=4653 :: bug0(CWE-?89):both; bug1(CWE-?(862|285|306)):both; bug2(CWE-?502):both; bug3(CWE-?(327|328|916)):both | awaiting rubric 
+[78/80] security_review_hard/sr-h-18 mode=off PEND-RUBRIC score=None 65480.7ms ntok=876 :: bug0(CWE-?89):both; bug1(CWE-?(862|285|306)):both; bug2(CWE-?502):both; bug3(CWE-?(327|328|916)):both | awaiting rubric 
+[79/80] security_review_hard/sr-h-19 mode=on PEND-RUBRIC score=None 418731.4ms ntok=5436 :: bug0(CWE-?134):both; bug1(CWE-?(120|121|122|787)):both; bug2(CWE-?(190|191)):both | awaiting rubric grading
+[80/80] security_review_hard/sr-h-19 mode=off PEND-RUBRIC score=None 89942.6ms ntok=1207 :: bug0(CWE-?134):both; bug1(CWE-?(120|121|122|787)):both; bug2(CWE-?(190|191)):both | awaiting rubric grading
+# done in 197.7 min (0.01 calls/s, concurrency=1) :: pass=0 fail=0 pending_rubric=80 error=0 -> /home/peleg/llm-eval/results/qwen3.6-27b-q8kxl__2026-05-18T11-14-34.jsonl

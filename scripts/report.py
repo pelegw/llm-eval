@@ -9,12 +9,15 @@ import argparse, json, statistics, sys
 from collections import defaultdict
 from pathlib import Path
 
-# Capabilities that produce qualitative-only records (no grader, no pass/fail).
-# Filtered out at load time so they never move score-rate numbers.
-# Their data lives in a parallel subfolder (e.g. political_bias/results/) with its
-# own README.md + ANALYSIS.md; this set is the belt-and-suspenders filter in case
-# someone passes a subfolder path explicitly. See METHODOLOGY.md §12.
-QUALITATIVE_CAPS = {"political_bias"}
+# Capabilities whose records are kept out of the main eval's aggregates.
+# Includes both qualitative-only caps (political_bias — no grader, no pass/fail)
+# AND graded-but-isolated caps (security_review — programmatic + rubric, but
+# its methodology is still being calibrated and we don't want it contaminating
+# the main 5-way ranking yet). Their data lives in parallel subfolders
+# (political_bias/results/, security_review/results/) with their own README +
+# ANALYSIS; this set is the belt-and-suspenders filter in case someone passes
+# a subfolder path explicitly. See METHODOLOGY.md §12.
+QUALITATIVE_CAPS = {"political_bias", "security_review", "security_review_hard"}
 
 
 def load(paths):
