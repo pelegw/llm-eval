@@ -1,0 +1,38 @@
+{
+  "model_tag": "claude-opus-4-7",
+  "served_model_id": "claude-opus-4-7",
+  "model_file": "cloud (Anthropic API via Claude Code's Agent sub-agent mechanism)",
+  "quantization": "n/a (cloud frontier model)",
+  "architecture": "Claude Opus 4.7",
+  "n_params": "undisclosed",
+  "n_ctx": "200000+ (cloud)",
+  "endpoint": "internal Claude Code Agent tool, subagent_type=general-purpose, model=opus",
+  "sampling": "Anthropic API defaults (temperature/top_p not exposed via Agent)",
+  "thinking_mode": "n/a — Opus has extended thinking but the reasoning_content was not surfaced back from the Agent tool, so each prompt has one record (vs locals' on+off pair)",
+  "n_calls": 40,
+  "caps_covered": [
+    "security_review",
+    "security_review_hard"
+  ],
+  "caps_missing": [
+    "Opus was run only on security_review as a reference-ceiling probe.",
+    "It has no coherence/reasoning/coding/instruction_following/long_context/writing/tool_calling data,",
+    "so it must NOT appear in the overall pass-rate ranking — only in security_review breakdowns."
+  ],
+  "notes": [
+    "Each prompt's system+user message was sent to a fresh Claude Opus 4.7 agent context with",
+    "explicit instructions not to use any tools (tool_uses=0 confirmed for every call).",
+    "Responses saved at /tmp/opus_eval_responses/{prompt_id}.txt are abbreviated to the",
+    "load-bearing sections (CWE class + location + fix); full agent outputs were typically",
+    "600-1500 words each. Programmatic grader output is identical against full vs abbreviated text.",
+    "Latencies and exact token counts were per-call but were not captured into a single sweep.",
+    "Reference comparison only — do not treat as a direct head-to-head with the local-model runs",
+    "since sampling, request shape, and the thinking-mode axis all differ."
+  ],
+  "result_summary": {
+    "total": 40,
+    "perfect_1.0": 38,
+    "partial_0.75": 2,
+    "miss_0.0": 0
+  }
+}
